@@ -31,3 +31,4 @@ func ComputeStringSHA256(content string) string {
 	hasher.Write([]byte(content))
 	return hex.EncodeToString(hasher.Sum(nil))
 }
+

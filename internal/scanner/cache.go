@@ -149,3 +149,4 @@ func ComputeDiff(cached *CacheManifest, current map[string]FileMeta) *DiffResult
 
 	return diff
 }
+

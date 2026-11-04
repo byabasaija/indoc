@@ -54,3 +54,4 @@ func IsSupportedSourceFile(filePath string) bool {
 	_, ok := DetectLanguage(filePath)
 	return ok
 }
+
