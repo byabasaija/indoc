@@ -5,6 +5,7 @@ import (
 	"strings"
 
 	"github.com/byabasaija/indoc/internal/config"
+	"github.com/byabasaija/indoc/internal/scanner"
 	"github.com/spf13/cobra"
 )
 
@@ -77,7 +78,34 @@ func runGenerate(cmd *cobra.Command, args []string) error {
 	fmt.Printf("   Output:    %s\n", cfg.OutputDir)
 	fmt.Printf("   Provider:  %s (%s)\n", cfg.Provider, cfg.Model)
 
-	// Note: Later phases hook the scanner, LLM synthesis, and bundler here!
+	// 4. Scan codebase and compute incremental diff
+	sc := scanner.NewScanner(cfg.SourceDirs, cfg.Exclude, cfg.IncludeTests, scanner.DefaultCacheFile)
+	scanResult, err := sc.Scan()
+	if err != nil {
+		return fmt.Errorf("scanning failed: %w", err)
+	}
+
+	fmt.Printf("\n📦 Codebase Inspection:\n")
+	fmt.Printf("   Total files: %d\n", scanResult.TotalFiles)
+	fmt.Printf("   ➕ Added:    %d\n", len(scanResult.Diff.Added))
+	fmt.Printf("   🔄 Modified: %d\n", len(scanResult.Diff.Modified))
+	fmt.Printf("   ⏭️  Unchanged: %d\n", len(scanResult.Diff.Unchanged))
+	if len(scanResult.Diff.Deleted) > 0 {
+		fmt.Printf("   🗑️  Deleted:  %d\n", len(scanResult.Diff.Deleted))
+	}
+
+	if verbose {
+		for _, f := range scanResult.Diff.Added {
+			fmt.Printf("     [+] %s (%s)\n", f.Path, f.Language)
+		}
+		for _, f := range scanResult.Diff.Modified {
+			fmt.Printf("     [*] %s (%s)\n", f.Path, f.Language)
+		}
+		for _, p := range scanResult.Diff.Deleted {
+			fmt.Printf("     [-] %s\n", p)
+		}
+	}
+
 	return nil
 }
 

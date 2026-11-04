@@ -17,8 +17,9 @@ type Config struct {
 	ProjectName string   `yaml:"project_name" json:"project_name"`
 	SourceDirs  []string `yaml:"source_dirs" json:"source_dirs"`
 	OutputDir   string   `yaml:"output_dir" json:"output_dir"`
-	AssetsDir   string   `yaml:"assets_dir,omitempty" json:"assets_dir,omitempty"`
-	Provider    string   `yaml:"provider" json:"provider"` // e.g. "openai", "anthropic", "ollama"
+	AssetsDir    string   `yaml:"assets_dir,omitempty" json:"assets_dir,omitempty"`
+	IncludeTests bool     `yaml:"include_tests,omitempty" json:"include_tests,omitempty"`
+	Provider     string   `yaml:"provider" json:"provider"` // e.g. "openai", "anthropic", "ollama"
 	Model       string   `yaml:"model" json:"model"`       // e.g. "gpt-4o-mini", "claude-3-5-sonnet-20241022"
 	Exclude     []string `yaml:"exclude,omitempty" json:"exclude,omitempty"`
 }
