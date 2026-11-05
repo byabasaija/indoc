@@ -72,3 +72,4 @@ type ChatResponse struct {
 	ToolCalls []ToolCall `json:"tool_calls,omitempty"`
 	Usage     Usage      `json:"usage"`
 }
+

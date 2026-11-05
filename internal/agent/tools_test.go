@@ -91,3 +91,4 @@ func TestToolRegistryListFiles(t *testing.T) {
 		t.Errorf("expected list to contain files, got: %s", out)
 	}
 }
+

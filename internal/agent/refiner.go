@@ -71,3 +71,4 @@ GUIDELINES:
 
 	return ParseModuleDoc(resp.Content, currentDoc.FilePath, currentDoc.Language)
 }
+

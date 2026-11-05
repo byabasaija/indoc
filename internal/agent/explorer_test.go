@@ -86,3 +86,4 @@ func TestExplorerAgentReActLoop(t *testing.T) {
 		t.Errorf("expected 2 turns in ReAct loop, got %d", mockProv.turn)
 	}
 }
+

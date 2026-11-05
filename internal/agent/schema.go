@@ -64,3 +64,4 @@ func ParseModuleDoc(raw string, defaultFilePath, defaultLang string) (*ModuleDoc
 
 	return &doc, nil
 }
+

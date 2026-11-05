@@ -183,3 +183,4 @@ func (r *ToolRegistry) listSourceFiles() string {
 	}
 	return strings.Join(r.files, "\n")
 }
+

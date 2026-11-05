@@ -50,3 +50,4 @@ func ToolResultMessage(toolCallID, content string) Message {
 		Content:    content,
 	}
 }
+
