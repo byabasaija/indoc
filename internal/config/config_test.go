@@ -28,7 +28,6 @@ func TestSaveAndLoadRoundtrip(t *testing.T) {
 		ProjectName: "Hospital Core API",
 		SourceDirs:  []string{"./backend/controllers", "./backend/models"},
 		OutputDir:   "./custom/docs",
-		AssetsDir:   "./docs/images",
 		Exclude:     []string{"node_modules"},
 	}
 
@@ -49,9 +48,6 @@ func TestSaveAndLoadRoundtrip(t *testing.T) {
 	}
 	if loaded.OutputDir != original.OutputDir {
 		t.Errorf("expected OutputDir '%s', got '%s'", original.OutputDir, loaded.OutputDir)
-	}
-	if loaded.AssetsDir != original.AssetsDir {
-		t.Errorf("expected AssetsDir '%s', got '%s'", original.AssetsDir, loaded.AssetsDir)
 	}
 	if len(loaded.SourceDirs) != 2 || loaded.SourceDirs[0] != original.SourceDirs[0] {
 		t.Errorf("expected source dirs %#v, got %#v", original.SourceDirs, loaded.SourceDirs)

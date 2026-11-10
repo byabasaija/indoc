@@ -17,8 +17,6 @@ indoc serve
 
 `scan` prints added, modified, and deleted files, a fresh reference (routes and env vars), and the previous overview and guides so the agent can edit them. `bundle` writes `index.html`, `style.css`, `app.js`, and `docs.js`. `serve` previews that directory at `http://127.0.0.1:4173`.
 
-An example document lives at [`examples/site.json`](examples/site.json).
-
 ## What gets written
 
 The document has three parts:

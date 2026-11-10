@@ -11,11 +11,6 @@
 # indoc Local Cache & Manifests
 .indoc/
 
-# Environment Variables & Secrets (Prevent leaking BYO API keys)
-.env
-.env.*
-!.env.example
-
 # Test outputs & temporary builds
 dist/
 tmp/

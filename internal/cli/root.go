@@ -10,7 +10,6 @@ import (
 var (
 	cfgFile   string
 	cacheFile string
-	verbose   bool
 
 	rootCmd = &cobra.Command{
 		Use:   "indoc",
@@ -30,7 +29,6 @@ func Execute() error {
 func init() {
 	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file path (default is .indoc.yaml)")
 	rootCmd.PersistentFlags().StringVar(&cacheFile, "cache", "", "cache manifest path (default is .indoc/cache.json)")
-	rootCmd.PersistentFlags().BoolVarP(&verbose, "verbose", "v", false, "enable verbose output")
 }
 
 func resolvedCachePath() string {

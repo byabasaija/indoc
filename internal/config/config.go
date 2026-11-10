@@ -17,7 +17,6 @@ type Config struct {
 	ProjectName  string   `yaml:"project_name" json:"project_name"`
 	SourceDirs   []string `yaml:"source_dirs" json:"source_dirs"`
 	OutputDir    string   `yaml:"output_dir" json:"output_dir"`
-	AssetsDir    string   `yaml:"assets_dir,omitempty" json:"assets_dir,omitempty"`
 	IncludeTests bool     `yaml:"include_tests,omitempty" json:"include_tests,omitempty"`
 	Exclude      []string `yaml:"exclude,omitempty" json:"exclude,omitempty"`
 }
@@ -29,7 +28,6 @@ func Default() *Config {
 		ProjectName: "API Documentation",
 		SourceDirs:  []string{"."},
 		OutputDir:   "./static/docs",
-		AssetsDir:   "",
 		Exclude: []string{
 			"node_modules",
 			"vendor",
