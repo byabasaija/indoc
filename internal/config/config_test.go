@@ -14,8 +14,8 @@ func TestDefaultConfig(t *testing.T) {
 	if cfg.OutputDir != "./static/docs" {
 		t.Errorf("expected output_dir './static/docs', got '%s'", cfg.OutputDir)
 	}
-	if cfg.Provider != "openai" {
-		t.Errorf("expected provider 'openai', got '%s'", cfg.Provider)
+	if len(cfg.SourceDirs) != 1 || cfg.SourceDirs[0] != "." {
+		t.Errorf("expected default source '.', got %#v", cfg.SourceDirs)
 	}
 }
 
@@ -29,8 +29,6 @@ func TestSaveAndLoadRoundtrip(t *testing.T) {
 		SourceDirs:  []string{"./backend/controllers", "./backend/models"},
 		OutputDir:   "./custom/docs",
 		AssetsDir:   "./docs/images",
-		Provider:    "ollama",
-		Model:       "llama3",
 		Exclude:     []string{"node_modules"},
 	}
 
@@ -55,8 +53,8 @@ func TestSaveAndLoadRoundtrip(t *testing.T) {
 	if loaded.AssetsDir != original.AssetsDir {
 		t.Errorf("expected AssetsDir '%s', got '%s'", original.AssetsDir, loaded.AssetsDir)
 	}
-	if loaded.Provider != original.Provider {
-		t.Errorf("expected Provider '%s', got '%s'", original.Provider, loaded.Provider)
+	if len(loaded.SourceDirs) != 2 || loaded.SourceDirs[0] != original.SourceDirs[0] {
+		t.Errorf("expected source dirs %#v, got %#v", original.SourceDirs, loaded.SourceDirs)
 	}
 }
 
@@ -92,4 +90,3 @@ func TestLoadInvalidYAML(t *testing.T) {
 		t.Error("expected found to be true since file exists")
 	}
 }
-

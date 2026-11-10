@@ -1,104 +1,74 @@
-# indoc 🚀
+# indoc
 
-> **Automated, standalone, Docusaurus-styled documentation for any codebase — zero servers, zero Node.js.**
+`indoc` compiles a documentation site into the application you already ship. The editor agent writes the overview and the guides. The binary extracts routes and environment variables from the source, then writes a static site to `./static/docs`.
 
-`indoc` is a single-binary CLI tool written in Go. Just like FastAPI generates interactive Swagger docs at runtime, `indoc` automatically inspects your codebase, uses an LLM (Bring Your Own API Key), and compiles a standalone, Docusaurus-styled documentation bundle directly into your project's static folder.
+No API key. No second host. Mount the folder from FastAPI, Express, Django, or Go.
 
----
+## Commands
 
-## ✨ Features
-
-- **Zero-Server Static Output:** Generates a clean `./static/docs/index.html` (with bundled CSS/JS) that can be served as a static route in **Go, FastAPI, Django, Express, Rails, or Laravel**, or opened directly in a browser.
-- **Docusaurus / Stripe Docs Aesthetics:** Clean sidebar navigation, reading pane, right-side table of contents, and dark/light mode toggle.
-- **Offline Full-Text Search:** In-memory, instant client-side search with zero external network calls.
-- **Incremental Caching:** Computes SHA-256 hashes of your source files against `.indoc/cache.json`. Only changed files trigger LLM API calls, saving you tokens and money.
-- **BYO API Key:** Supports **OpenAI**, **Anthropic**, and **Ollama** (for local, air-gapped codebases).
-- **Zero Node.js Dependency:** Shipped as a single compiled Go binary with UI assets embedded via `go:embed`.
-
----
-
-## 🏗️ Architecture
-
-```
-┌─────────────────────────────────────────────────────────────┐
-│ 1. SCAN & AST PARSE                                         │
-│ Crawls source files (.go, .py, .js, .ts, .sql, etc.)        │
-│ Computes SHA-256 hashes against local `.indoc/cache.json`   │
-└──────────────────────────────┬──────────────────────────────┘
-                               │ (Only modified files)
-                               ▼
-┌─────────────────────────────────────────────────────────────┐
-│ 2. LLM SYNTHESIS (BYO API KEY)                              │
-│ Sends code signatures to provider (OpenAI / Claude /        │
-│ Ollama) with structured prompt                              │
-└──────────────────────────────┬──────────────────────────────┘
-                               │ (Returns Markdown / JSON)
-                               ▼
-┌─────────────────────────────────────────────────────────────┐
-│ 3. BUNDLE & INJECT (Zero Server)                            │
-│ Injects Markdown & Search Index into pre-built UI           │
-│ using Go's `embed` package into target directory            │
-└─────────────────────────────────────────────────────────────┘
-```
-
----
-
-## 🚀 Quickstart
-
-### 1. Set your API Key
 ```bash
-export OPENAI_API_KEY="sk-..."
-```
+go install github.com/byabasaija/indoc/cmd/indoc@latest
 
-### 2. Initialize Configuration
-```bash
 indoc init
-```
-This creates a `.indoc.yaml` configuration file in your project root.
-
-### 3. Generate Documentation
-```bash
-indoc generate --source="./backend" --out="./static/docs"
+indoc scan --json
+indoc bundle --input .indoc/site.json --out ./static/docs
+indoc serve
 ```
 
----
+`scan` prints added, modified, and deleted files, a fresh reference (routes and env vars), and the previous overview and guides so the agent can edit them. `bundle` writes `index.html`, `style.css`, `app.js`, and `docs.js`. `serve` previews that directory at `http://127.0.0.1:4173`.
 
-## ⚙️ Configuration (`.indoc.yaml`)
+An example document lives at [`examples/site.json`](examples/site.json).
+
+## What gets written
+
+The document has three parts:
+
+- **Overview.** What the system does and how a request moves through it.
+- **Guides.** Tasks a reader came to finish: run it, authenticate, the one flow that is hard to infer. A few pages, not one page per file.
+- **Reference.** Routes and environment variables copied from `indoc scan`. The agent does not invent these.
+
+## Mount it
+
+FastAPI:
+
+```python
+from fastapi.staticfiles import StaticFiles
+
+app.mount("/docs", StaticFiles(directory="static/docs", html=True), name="docs")
+```
+
+Express: `app.use("/docs", express.static("static/docs"))`
+
+Go: `http.Handle("/docs/", http.StripPrefix("/docs/", http.FileServer(http.Dir("static/docs"))))`
+
+## Configuration
+
+`indoc init` writes `.indoc.yaml`:
 
 ```yaml
 version: "1"
-project_name: "My Awesome Project"
+project_name: "Hospital API"
 source_dirs:
-  - "./backend/controllers"
-  - "./backend/models"
+  - "."
 output_dir: "./static/docs"
-provider: "openai" # Options: openai, anthropic, ollama
-model: "gpt-4o-mini"
+exclude:
+  - node_modules
+  - vendor
+  - .git
+  - .indoc
+  - dist
+  - build
 ```
 
----
+Hashes and the last bundled document are stored in `.indoc/cache.json`.
 
-## 🗺️ Project Layout
+## Layout
 
 ```
-indoc/
-├── cmd/
-│   └── indoc/
-│       └── main.go           # CLI Entrypoint (Cobra)
-├── internal/
-│   ├── config/               # Configuration parsing (.indoc.yaml, flags, env vars)
-│   ├── scanner/              # File crawler, hasher, and AST parser
-│   ├── llm/                  # BYO API Key LLM provider abstraction
-│   ├── generator/            # Markdown & JSON Manifest compiler
-│   └── bundler/              # Single-file / Static Asset embedder (go:embed)
-├── ui/                       # Docusaurus-style UI Template
-├── go.mod
-└── go.sum
+cmd/indoc/            CLI entrypoint
+internal/scanner/     SHA-256 incremental scan
+internal/reference/   route and env extraction
+internal/doc/         overview, guides, reference
+internal/bundler/     embedded viewer and site writer
+internal/cli/         init, scan, bundle, serve
 ```
-
----
-
-## 📄 License
-
-This project is licensed under the [MIT License](LICENSE).
-

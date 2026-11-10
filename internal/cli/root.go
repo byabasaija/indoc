@@ -1,35 +1,41 @@
 package cli
 
 import (
+	"strings"
+
+	"github.com/byabasaija/indoc/internal/scanner"
 	"github.com/spf13/cobra"
 )
 
 var (
-	// Global flag variables
-	cfgFile string
-	verbose bool
+	cfgFile   string
+	cacheFile string
+	verbose   bool
 
-	// rootCmd represents the base command when called without any subcommands.
 	rootCmd = &cobra.Command{
 		Use:   "indoc",
-		Short: "indoc is an automated, zero-server documentation compiler for any codebase",
-		Long: `indoc is a single-binary CLI tool that automatically inspects your codebase,
-uses an LLM (Bring Your Own API Key), and compiles a standalone, Docusaurus-styled
-documentation bundle directly into your project's static folder with zero external servers.
+		Short: "Compile a static documentation site from agent-written pages and extracted code facts",
+		Long: `indoc scans a project, extracts routes and environment variables, and compiles
+overview pages, guides, and that reference into a static site the application can mount.
 
-Like FastAPI generates Swagger UI at startup, indoc gives your entire codebase
-beautiful, searchable, offline-ready documentation.`,
+The host agent writes the prose. indoc does not call a model and does not need an API key.`,
 	}
 )
 
-// Execute adds all child commands to the root command and sets flags appropriately.
-// This is called by main.main().
+// Execute runs the root command.
 func Execute() error {
 	return rootCmd.Execute()
 }
 
 func init() {
-	// Persistent flags are available to this command and all subcommands below it.
 	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file path (default is .indoc.yaml)")
-	rootCmd.PersistentFlags().BoolVarP(&verbose, "verbose", "v", false, "enable verbose output and debug logs")
+	rootCmd.PersistentFlags().StringVar(&cacheFile, "cache", "", "cache manifest path (default is .indoc/cache.json)")
+	rootCmd.PersistentFlags().BoolVarP(&verbose, "verbose", "v", false, "enable verbose output")
+}
+
+func resolvedCachePath() string {
+	if strings.TrimSpace(cacheFile) == "" {
+		return scanner.DefaultCacheFile
+	}
+	return cacheFile
 }

@@ -48,13 +48,13 @@ We are decoupling the **Intelligence Layer** from the **Compiler & Bundler Layer
 ┌─────────────────────────────────────────────────────────────────┐
 │                  indoc ENGINE (Go Binary)                       │
 │                                                                 │
-│  1. `indoc_scan`:                                               │
-│     Fast SHA-256 crawler. Tells the agent which files are added,│
-│     modified, or unchanged since last run.                      │
+│  1. `indoc scan`:                                               │
+│     SHA-256 diff, extracted routes and env vars, and the last   │
+│     overview and guides so the agent can patch them.            │
 │                                                                 │
-│  2. `indoc_bundle`:                                             │
-│     Takes the agent's synthesized documentation, validates it,  │
-│     and injects it into the embedded Docusaurus UI.             │
+│  2. `indoc bundle` / `indoc serve`:                             │
+│     Validates overview, guides, and reference, then writes the  │
+│     static viewer. `serve` previews it on localhost.            │
 └────────────────────────────────┬────────────────────────────────┘
                                  │
                                  ▼ (Writes static assets)
@@ -87,43 +87,37 @@ We are decoupling the **Intelligence Layer** from the **Compiler & Bundler Layer
 | :--- | :--- | :--- |
 | **Code Reading & Intelligence** | Host Agent (Claude/Antigravity) | Host agents already have native codebase access and superior reasoning capabilities. |
 | **User Prompts & Iteration** | Host Agent Chat UI | Eliminates the need to build and maintain terminal REPLs or custom chat UIs. |
-| **Incremental SHA-256 Hashing** | `indoc` (`internal/scanner`) | Go streams file hashes with $O(1)$ memory, preventing redundant work. |
-| **UI Design & Asset Bundling** | `indoc` (`internal/bundler`) | Go's `//go:embed` packages the entire Docusaurus SPA into a single compiled binary. |
-| **Offline Search & Rendering** | Client Browser (`app.js`) | Search runs in the user's browser memory (MiniSearch)—zero network latency, zero servers. |
+| **Routes, env vars, and hashing** | `indoc` (`internal/scanner`, `internal/reference`) | Facts come from the source. The agent copies them and does not invent rows. |
+| **UI Design & Asset Bundling** | `indoc` (`internal/bundler`) | Go's `//go:embed` packages the viewer into the binary and writes `./static/docs`. |
+| **Offline Search & Rendering** | Client Browser (`app.js`) | Markdown is rendered at bundle time. Search and theme run in the browser. |
 | **Serving the Docs** | User's Web Application | No secondary servers; documentation lives on the existing web host. |
 
 ---
 
-## 4. MCP Tool Specifications
+## 4. CLI Contract
 
-When `indoc` runs as an MCP server (`indoc mcp`), it exposes two primary tools to the host agent:
+The host agent invokes the binary directly. An MCP adapter can wrap these same commands later. The binary does not call a model.
 
-### Tool 1: `indoc_scan`
-* **Purpose:** Inspects source directories, checks `.indoc/cache.json`, and returns diffs.
-* **Output:** List of added, modified, unchanged, and deleted source files.
-* **Benefit:** The agent immediately knows which files need documentation without reading the entire repository.
+The document is the system, not a page per file:
 
-### Tool 2: `indoc_bundle`
-* **Purpose:** Accepts the agent's documentation payload and writes the complete static viewer.
-* **Inputs:**
-  * `project_name`: Name of the application.
-  * `output_dir`: Target path (e.g., `./static/docs`).
-  * `modules`: Array of `{ title, file_path, summary, content_markdown, routes }`.
-  * `overview`: High-level system overview Markdown with Mermaid architecture diagrams.
-* **Output:** Writes `index.html`, `style.css`, `app.js`, and `docs.js` into `output_dir`.
+* **Overview** and **guides** are prose the agent writes.
+* **Reference** is facts the scanner extracts: HTTP routes and environment variables. The agent copies that array through unchanged.
+
+### `indoc scan`
+* **Purpose:** Hash source files against `.indoc/cache.json`, extract the current reference, and return the last bundled document.
+* **Output:** Added, modified, unchanged, and deleted files; `reference`; `stale_reference` for citations whose source file changed; `previous` overview and guides.
+
+### `indoc bundle`
+* **Purpose:** Validate a document JSON file and write the static viewer.
+* **Inputs:** `project_name`, `overview`, `guides[]`, `reference[]` (`kind` is `routes` or `config`).
+* **Output:** `index.html`, `style.css`, `app.js`, and `docs.js` in the output directory. The normalized document is stored in the cache for the next scan.
+* **Preview:** `indoc serve` hosts that directory on `127.0.0.1`.
 
 ---
 
 ## 5. Next Implementation Priorities
 
-With this decision recorded, our engineering roadmap focuses purely on:
-1. **The Docusaurus-Style UI Shell (`ui/`):**
-   * Responsive layout (Left sidebar, Center reader, Right Table of Contents).
-   * Client-side Markdown rendering and syntax highlighting.
-   * Offline full-text search with MiniSearch.
-   * Dark/Light mode theme persistence.
-2. **The Bundler (`internal/bundler/`):**
-   * Embedding `ui/` files into Go via `//go:embed`.
-   * Exporting assets and writing `docs.js` into the target directory.
-3. **The MCP Server Adapter:**
-   * Implementing JSON-RPC stdio handler exposing `indoc_scan` and `indoc_bundle`.
+1. **MCP adapter** over `scan` and `bundle`, so the host can call them without a shell.
+2. **Broader deterministic extraction** (Django/Flask paths, command declarations) with the same rule: the model does not invent reference rows.
+3. **Syntax highlighting** in the embedded viewer. Search, theme, sidebar, and table of contents already run from the static files.
+

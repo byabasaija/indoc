@@ -1,0 +1,46 @@
+{
+  "project_name": "Hospital API",
+  "overview": {
+    "title": "Overview",
+    "markdown": "Hospital API admits patients and records visits. A request hits a route, the handler checks configuration, and the visit is stored.\n\n## Where to look\n\nRead **Run it** to start the service. The reference pages list routes and environment variables taken from the source, not from this prose.\n\n```mermaid\nflowchart LR\n  Client --> API --> Record\n```\n"
+  },
+  "guides": [
+    {
+      "id": "run-it",
+      "title": "Run it",
+      "markdown": "Install dependencies, export `DATABASE_URL`, and start the process that serves this app.\n\n```bash\nexport DATABASE_URL=postgres://localhost/hospital\npython -m app\n```\n\nThe site you are reading is static. Mount `static/docs` from the same process.\n"
+    }
+  ],
+  "reference": [
+    {
+      "id": "routes",
+      "title": "Routes",
+      "kind": "routes",
+      "entries": [
+        {
+          "name": "/health",
+          "detail": "GET",
+          "description": "Liveness check.",
+          "source": "app/main.py:8"
+        },
+        {
+          "name": "/visits",
+          "detail": "POST",
+          "description": "Create a visit for a patient.",
+          "source": "app/visits.py:14"
+        }
+      ]
+    },
+    {
+      "id": "config",
+      "title": "Configuration",
+      "kind": "config",
+      "entries": [
+        {
+          "name": "DATABASE_URL",
+          "source": "app/settings.py:4"
+        }
+      ]
+    }
+  ]
+}

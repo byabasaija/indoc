@@ -13,15 +13,13 @@ const DefaultConfigFileName = ".indoc.yaml"
 
 // Config represents the top-level configuration options for indoc.
 type Config struct {
-	Version     string   `yaml:"version" json:"version"`
-	ProjectName string   `yaml:"project_name" json:"project_name"`
-	SourceDirs  []string `yaml:"source_dirs" json:"source_dirs"`
-	OutputDir   string   `yaml:"output_dir" json:"output_dir"`
+	Version      string   `yaml:"version" json:"version"`
+	ProjectName  string   `yaml:"project_name" json:"project_name"`
+	SourceDirs   []string `yaml:"source_dirs" json:"source_dirs"`
+	OutputDir    string   `yaml:"output_dir" json:"output_dir"`
 	AssetsDir    string   `yaml:"assets_dir,omitempty" json:"assets_dir,omitempty"`
 	IncludeTests bool     `yaml:"include_tests,omitempty" json:"include_tests,omitempty"`
-	Provider     string   `yaml:"provider" json:"provider"` // e.g. "openai", "anthropic", "ollama"
-	Model       string   `yaml:"model" json:"model"`       // e.g. "gpt-4o-mini", "claude-3-5-sonnet-20241022"
-	Exclude     []string `yaml:"exclude,omitempty" json:"exclude,omitempty"`
+	Exclude      []string `yaml:"exclude,omitempty" json:"exclude,omitempty"`
 }
 
 // Default returns a Config struct populated with sensible default settings.
@@ -32,8 +30,6 @@ func Default() *Config {
 		SourceDirs:  []string{"."},
 		OutputDir:   "./static/docs",
 		AssetsDir:   "",
-		Provider:    "openai",
-		Model:       "gpt-4o-mini",
 		Exclude: []string{
 			"node_modules",
 			"vendor",
@@ -89,4 +85,3 @@ func (c *Config) Save(filePath string) error {
 
 	return nil
 }
-

@@ -6,6 +6,8 @@ import (
 	"os"
 	"path/filepath"
 	"time"
+
+	"github.com/byabasaija/indoc/internal/doc"
 )
 
 const (
@@ -28,10 +30,12 @@ type FileMeta struct {
 }
 
 // CacheManifest represents the saved cache manifest in .indoc/cache.json.
+// Document is the last bundled narrative so the next scan can hand it back for editing.
 type CacheManifest struct {
 	Version   string              `json:"version"`
 	LastScan  string              `json:"last_scan"`
 	FileCache map[string]FileMeta `json:"file_cache"`
+	Document  *doc.Document       `json:"document,omitempty"`
 }
 
 // DiffResult categorizes files based on comparison between current disk state and cache.
@@ -149,4 +153,3 @@ func ComputeDiff(cached *CacheManifest, current map[string]FileMeta) *DiffResult
 
 	return diff
 }
-

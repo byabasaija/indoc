@@ -25,12 +25,12 @@ var extensionMap = map[string]string{
 	".scala": "Scala",
 
 	// Web & Frontend
-	".js":   "JavaScript",
-	".jsx":  "JavaScript",
-	".mjs":  "JavaScript",
-	".ts":   "TypeScript",
-	".tsx":  "TypeScript",
-	".vue":  "Vue",
+	".js":     "JavaScript",
+	".jsx":    "JavaScript",
+	".mjs":    "JavaScript",
+	".ts":     "TypeScript",
+	".tsx":    "TypeScript",
+	".vue":    "Vue",
 	".svelte": "Svelte",
 
 	// Query, Schema & Config
@@ -54,4 +54,3 @@ func IsSupportedSourceFile(filePath string) bool {
 	_, ok := DetectLanguage(filePath)
 	return ok
 }
-
