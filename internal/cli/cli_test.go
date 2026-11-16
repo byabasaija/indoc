@@ -5,7 +5,10 @@ import (
 	"encoding/json"
 	"os"
 	"path/filepath"
+	"strings"
 	"testing"
+
+	"github.com/byabasaija/indoc/internal/doc"
 )
 
 func TestCommandsRegistered(t *testing.T) {
@@ -34,6 +37,70 @@ func TestVersionCommandOutput(t *testing.T) {
 
 	if err := rootCmd.Execute(); err != nil {
 		t.Fatalf("version command failed: %v", err)
+	}
+}
+
+func TestInitCreatesAgentScaffoldingWithoutOverwritingSite(t *testing.T) {
+	dir := t.TempDir()
+	oldDir, err := os.Getwd()
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err := os.Chdir(dir); err != nil {
+		t.Fatal(err)
+	}
+	defer func() {
+		if err := os.Chdir(oldDir); err != nil {
+			t.Errorf("restore working directory: %v", err)
+		}
+	}()
+
+	if err := runInit(nil, nil); err != nil {
+		t.Fatalf("init: %v", err)
+	}
+
+	var site doc.Document
+	siteData, err := os.ReadFile(siteFile)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err := json.Unmarshal(siteData, &site); err != nil {
+		t.Fatalf("site template JSON: %v", err)
+	}
+	if site.ProjectName == "" || site.Overview.Markdown != "" {
+		t.Fatalf("site template = %+v", site)
+	}
+
+	guide, err := os.ReadFile(agentGuideFile)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if !strings.Contains(string(guide), "entire `reference` array") {
+		t.Fatalf("agent guide does not explain reference handling:\n%s", guide)
+	}
+	schema, err := os.ReadFile(schemaFile)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if !json.Valid(schema) {
+		t.Fatal("document schema is not valid JSON")
+	}
+
+	customSite := []byte("{\"custom\":true}\n")
+	if err := os.WriteFile(siteFile, customSite, 0644); err != nil {
+		t.Fatal(err)
+	}
+	forceInit = true
+	defer func() { forceInit = false }()
+	if err := runInit(nil, nil); err != nil {
+		t.Fatalf("forced init: %v", err)
+	}
+	got, err := os.ReadFile(siteFile)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if !bytes.Equal(got, customSite) {
+		t.Fatalf("init overwrote existing site: %s", got)
 	}
 }
 

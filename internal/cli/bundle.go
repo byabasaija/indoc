@@ -87,6 +87,6 @@ func executeBundle(opts bundleOptions) error {
 	if opts.out == nil {
 		opts.out = io.Discard
 	}
-	fmt.Fprintf(opts.out, "Wrote %s\nPreview with: indoc serve --dir %s\n", outputDir, outputDir)
+	fmt.Fprintf(opts.out, "Wrote %s\nOptional local preview: indoc serve --dir %s\n", outputDir, outputDir)
 	return nil
 }

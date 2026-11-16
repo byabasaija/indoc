@@ -2,7 +2,7 @@
 
 **Status:** Approved  
 **Date:** November 2026  
-**Subject:** Pivot from Standalone BYO-API CLI to Agent Plugin & MCP-First Static Documentation Compiler  
+**Subject:** Agent-Assisted Static Documentation Compiler
 
 ---
 
@@ -17,16 +17,18 @@
 ### The Realities of Modern Developer Workflows
 1. **Existing AI Subscriptions:** Modern developers already work inside AI coding assistants (**Claude Code, Google Antigravity, Cursor, Codex**). Asking developers to purchase and manage a separate API key creates unnecessary friction.
 2. **Conversational Refinement Belongs in the Agent:** Real-world documentation requires iterative refinement ("add curl examples", "simplify this architecture diagram", "document the Stripe webhook"). Developers naturally do this inside their existing AI chat interface—not in a clunky terminal prompt.
-3. **Zero-Server Principle:** `indoc` docs must have **zero external servers**. The generated bundle must be pure static assets (`./static/docs`) directly mounted and served by the developer's existing application (FastAPI, Django, Express, Go, Laravel).
+3. **Portable output:** Documentation should not require a separate docs backend or a web application. The generated bundle is a static artifact that works for web applications, CLI tools, libraries, and other projects. If a host application exists, it can serve the bundle; otherwise, the bundle can be published or shipped independently.
 
 ---
 
-## 2. The Decision: Agent Plugin & MCP-First Architecture
+## 2. The Decision: Agent-Assisted Static Compiler
 
 We are decoupling the **Intelligence Layer** from the **Compiler & Bundler Layer**:
 
 * **The Host Agent (Claude / Antigravity / Cursor):** Acts as the brain. It reads source code, reasons through dependencies, writes Markdown, generates Mermaid diagrams, and handles conversational refinement using the developer's existing subscription.
-* **`indoc` (The Go Engine):** Acts as the static compiler, incremental cache, and asset bundler. It exposes tools via the **Model Context Protocol (MCP)** and compiles a standalone, Docusaurus-styled static SPA directly into the user's project.
+* **`indoc` (The Go Engine):** Acts as the deterministic scanner, static compiler, and asset bundler. It validates agent-written content, extracts source facts, and compiles a standalone static site into the project.
+
+The bundle is the product; a particular hosting model is not. Web projects may mount the generated directory in their existing server. CLI-only projects can publish the same static files or ship them with releases. Neither path requires a docs-specific production server. `indoc serve` is an optional local preview convenience, not part of the production architecture.
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
@@ -52,14 +54,16 @@ We are decoupling the **Intelligence Layer** from the **Compiler & Bundler Layer
 │     SHA-256 diff, extracted routes and env vars, and the last   │
 │     overview and guides so the agent can patch them.            │
 │                                                                 │
-│  2. `indoc bundle` / `indoc serve`:                             │
+│  2. `indoc bundle`:                                             │
 │     Validates overview, guides, and reference, then writes the  │
-│     static viewer. `serve` previews it on localhost.            │
+│     portable static viewer.                                     │
+│  3. Optional `indoc serve`:                                     │
+│     Previews the bundle locally; not required for publishing.   │
 └────────────────────────────────┬────────────────────────────────┘
                                  │
                                  ▼ (Writes static assets)
 ┌─────────────────────────────────────────────────────────────────┐
-│             TARGET OUTPUT DIRECTORY (`./static/docs`)           │
+│            PORTABLE OUTPUT DIRECTORY (`./static/docs`)          │
 │                                                                 │
 │  ./static/docs/                                                 │
 │  ├── index.html   (Single-Page App shell)                       │
@@ -68,15 +72,13 @@ We are decoupling the **Intelligence Layer** from the **Compiler & Bundler Layer
 │  └── docs.js      (Self-contained documentation payload)        │
 └────────────────────────────────┬────────────────────────────────┘
                                  │
-                                 ▼ (Mounted directly by user's app)
-┌─────────────────────────────────────────────────────────────────┐
-│             USER'S EXISTING BACKEND SERVER                      │
-│                                                                 │
-│  • FastAPI:   app.mount("/docs", StaticFiles(directory="static/docs"))
-│  • Go:        http.Handle("/docs/", http.FileServer(http.Dir("static/docs")))
-│  • Django:    django.views.static.serve                         │
-│  • Express:   app.use("/docs", express.static("static/docs"))   │
-└─────────────────────────────────────────────────────────────────┘
+                 ┌───────────────┴────────────────┐
+                 ▼                                ▼
+┌──────────────────────────────┐  ┌──────────────────────────────┐
+│ Web application (optional)   │  │ CLI / library / no web app   │
+│ Serve from existing app      │  │ Publish or ship static files │
+│ server; no new service       │  │ as a release artifact        │
+└──────────────────────────────┘  └──────────────────────────────┘
 ```
 
 ---
@@ -90,7 +92,8 @@ We are decoupling the **Intelligence Layer** from the **Compiler & Bundler Layer
 | **Routes, env vars, and hashing** | `indoc` (`internal/scanner`, `internal/reference`) | Facts come from the source. The agent copies them and does not invent rows. |
 | **UI Design & Asset Bundling** | `indoc` (`internal/bundler`) | Go's `//go:embed` packages the viewer into the binary and writes `./static/docs`. |
 | **Offline Search & Rendering** | Client Browser (`app.js`) | Markdown is rendered at bundle time. Search and theme run in the browser. |
-| **Serving the Docs** | User's Web Application | No secondary servers; documentation lives on the existing web host. |
+| **Using / distributing docs** | Project owner | Mount in an existing web app, publish as a static site, or ship the bundle; no docs-specific production server is required. |
+| **Local preview** | Optional `indoc serve` command | Convenience for checking the bundle; not a deployment mechanism or product dependency. |
 
 ---
 
@@ -108,16 +111,25 @@ The document is the system, not a page per file:
 * **Output:** Added, modified, unchanged, and deleted files; `reference`; `stale_reference` for citations whose source file changed; `previous` overview and guides.
 
 ### `indoc bundle`
-* **Purpose:** Validate a document JSON file and write the static viewer.
+* **Purpose:** Validate a document JSON file and write the portable static viewer.
 * **Inputs:** `project_name`, `overview`, `guides[]`, `reference[]` (`kind` is `routes` or `config`).
 * **Output:** `index.html`, `style.css`, `app.js`, and `docs.js` in the output directory. The normalized document is stored in the cache for the next scan.
-* **Preview:** `indoc serve` hosts that directory on `127.0.0.1`.
+* **Preview:** Optional `indoc serve` previews that directory on `127.0.0.1`. It is not required for deployment, including CLI-only projects.
 
 ---
 
-## 5. Next Implementation Priorities
+## 5. Delivery Sequence
 
-1. **MCP adapter** over `scan` and `bundle`, so the host can call them without a shell.
-2. **Broader deterministic extraction** (Django/Flask paths, command declarations) with the same rule: the model does not invent reference rows.
-3. **Syntax highlighting** in the embedded viewer. Search, theme, sidebar, and table of contents already run from the static files.
+### Minimum viable tool
+
+First, make the end-to-end core useful and dependable:
+
+1. A developer can initialize a project and scan it for changes and deterministic reference facts.
+2. A host agent can use the scan output to create or update a concise overview and task-oriented guides without inventing reference entries.
+3. `indoc bundle` validates that content and emits a polished, self-contained static docs site that can be used without a docs backend.
+4. The artifact has a clear path for both web projects (optional mount in the existing app) and projects without a web app (publish or ship the files).
+
+### Later improvements
+
+Defer enhancements until that minimum workflow is complete and usable. Candidate follow-up work includes an MCP adapter, broader deterministic extraction (such as Django/Flask routes and command declarations), and additional viewer features such as syntax highlighting. These are not prerequisites for the initial tool.
 

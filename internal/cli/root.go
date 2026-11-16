@@ -15,7 +15,7 @@ var (
 		Use:   "indoc",
 		Short: "Compile a static documentation site from agent-written pages and extracted code facts",
 		Long: `indoc scans a project, extracts routes and environment variables, and compiles
-overview pages, guides, and that reference into a static site the application can mount.
+overview pages, guides, and that reference into a portable static site.
 
 The host agent writes the prose. indoc does not call a model and does not need an API key.`,
 	}
