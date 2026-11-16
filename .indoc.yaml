@@ -1,0 +1,12 @@
+version: "1"
+project_name: indoc
+source_dirs:
+    - .
+output_dir: ./.indoc/output
+exclude:
+    - node_modules
+    - vendor
+    - .git
+    - .indoc
+    - dist
+    - build

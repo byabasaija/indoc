@@ -8,8 +8,10 @@
 *.test
 *.out
 
-# indoc Local Cache & Manifests
-.indoc/
+# indoc local cache and generated preview
+.indoc/cache.json
+.indoc/scan.json
+.indoc/output/
 
 # Test outputs & temporary builds
 dist/
