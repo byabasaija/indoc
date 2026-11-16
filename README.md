@@ -63,6 +63,22 @@ exclude:
 
 Hashes and the last bundled document are stored in `.indoc/cache.json`.
 
+The generated site uses a clean, light documentation layout by default. To brand it, add an `appearance` object to `.indoc/site.json`:
+
+```json
+{
+  "appearance": {
+    "logo": "../assets/logo.svg",
+    "colors": {
+      "primary": "#0969da",
+      "accent": "#1f883d"
+    }
+  }
+}
+```
+
+Logo paths are relative to `.indoc/site.json` and copied into the bundle; an `http` or `https` URL can also be used. Both colors are optional 6-digit hex values.
+
 ## Layout
 
 ```

@@ -1,6 +1,7 @@
 package doc
 
 import (
+	"encoding/hex"
 	"fmt"
 	"strings"
 	"unicode"
@@ -17,9 +18,22 @@ const (
 // Overview and guides are prose. Reference is facts extracted from source.
 type Document struct {
 	ProjectName string       `json:"project_name" yaml:"project_name"`
+	Appearance  *Appearance  `json:"appearance,omitempty" yaml:"appearance,omitempty"`
 	Overview    Page         `json:"overview" yaml:"overview"`
 	Guides      []Page       `json:"guides" yaml:"guides"`
 	Reference   []RefSection `json:"reference" yaml:"reference"`
+}
+
+// Appearance contains optional branding for the generated site.
+type Appearance struct {
+	Logo   string  `json:"logo" yaml:"logo"`
+	Colors *Colors `json:"colors,omitempty" yaml:"colors,omitempty"`
+}
+
+// Colors defines the site's primary and secondary accent colors.
+type Colors struct {
+	Primary string `json:"primary,omitempty" yaml:"primary,omitempty"`
+	Accent  string `json:"accent,omitempty" yaml:"accent,omitempty"`
 }
 
 // Page is one narrative page.
@@ -119,6 +133,19 @@ func Validate(d *Document) error {
 	if strings.TrimSpace(d.ProjectName) == "" {
 		return fmt.Errorf("project_name is required")
 	}
+	if d.Appearance != nil && d.Appearance.Colors != nil {
+		for _, color := range []struct {
+			name  string
+			value string
+		}{
+			{name: "primary", value: d.Appearance.Colors.Primary},
+			{name: "accent", value: d.Appearance.Colors.Accent},
+		} {
+			if color.value != "" && !isHexColor(color.value) {
+				return fmt.Errorf("appearance.colors.%s must be a 6-digit hex color", color.name)
+			}
+		}
+	}
 	if strings.TrimSpace(d.Overview.Markdown) == "" {
 		return fmt.Errorf("overview markdown is required")
 	}
@@ -163,6 +190,14 @@ func Validate(d *Document) error {
 		}
 	}
 	return nil
+}
+
+func isHexColor(color string) bool {
+	if len(color) != 7 || color[0] != '#' {
+		return false
+	}
+	_, err := hex.DecodeString(color[1:])
+	return err == nil
 }
 
 // StaleReference lists reference entries from a previous document whose source file changed.

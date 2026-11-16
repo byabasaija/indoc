@@ -6,8 +6,10 @@ import (
 	"encoding/json"
 	"fmt"
 	"html"
+	"net/url"
 	"os"
 	"path/filepath"
+	"strings"
 
 	"github.com/byabasaija/indoc/internal/doc"
 	"github.com/byabasaija/indoc/internal/render"
@@ -17,8 +19,9 @@ import (
 var ui embed.FS
 
 type payload struct {
-	ProjectName string     `json:"project_name"`
-	Pages       []pageView `json:"pages"`
+	ProjectName string          `json:"project_name"`
+	Appearance  *doc.Appearance `json:"appearance,omitempty"`
+	Pages       []pageView      `json:"pages"`
 }
 
 type pageView struct {
@@ -33,7 +36,7 @@ type pageView struct {
 }
 
 // Write compiles a document into a static site at outputDir.
-func Write(document *doc.Document, outputDir string) error {
+func Write(document *doc.Document, outputDir, sourceDir string) error {
 	if err := doc.Normalize(document); err != nil {
 		return err
 	}
@@ -44,10 +47,57 @@ func Write(document *doc.Document, outputDir string) error {
 	if err := os.MkdirAll(outputDir, 0755); err != nil {
 		return fmt.Errorf("failed to create %s: %w", outputDir, err)
 	}
+	if document.Appearance != nil {
+		appearance := *document.Appearance
+		if appearance.Logo != "" {
+			logo, err := writeLogo(outputDir, sourceDir, appearance.Logo)
+			if err != nil {
+				return err
+			}
+			appearance.Logo = logo
+		}
+		site.Appearance = &appearance
+	}
 	if err := writeAssets(outputDir, document.ProjectName); err != nil {
 		return err
 	}
 	return writePayload(filepath.Join(outputDir, "docs.js"), site)
+}
+
+func writeLogo(outputDir, sourceDir, logo string) (string, error) {
+	parsed, err := url.Parse(logo)
+	if err != nil {
+		return "", fmt.Errorf("invalid appearance.logo: %w", err)
+	}
+	if parsed.IsAbs() {
+		if !strings.EqualFold(parsed.Scheme, "http") && !strings.EqualFold(parsed.Scheme, "https") {
+			return "", fmt.Errorf("appearance.logo URL must use http or https")
+		}
+		if parsed.Hostname() == "" {
+			return "", fmt.Errorf("appearance.logo URL must include a host")
+		}
+		return logo, nil
+	}
+
+	extension := strings.ToLower(filepath.Ext(logo))
+	switch extension {
+	case ".avif", ".gif", ".jpeg", ".jpg", ".png", ".svg", ".webp":
+	default:
+		return "", fmt.Errorf("appearance.logo must be an http(s) URL or a local image file")
+	}
+	source := filepath.Join(sourceDir, filepath.Clean(filepath.FromSlash(logo)))
+	data, err := os.ReadFile(source)
+	if err != nil {
+		return "", fmt.Errorf("failed to read appearance.logo %s: %w", logo, err)
+	}
+	const relativePath = "assets/logo"
+	if err := os.MkdirAll(filepath.Join(outputDir, "assets"), 0755); err != nil {
+		return "", fmt.Errorf("failed to create logo directory: %w", err)
+	}
+	if err := os.WriteFile(filepath.Join(outputDir, relativePath+extension), data, 0644); err != nil {
+		return "", fmt.Errorf("failed to write logo: %w", err)
+	}
+	return relativePath + extension, nil
 }
 
 func buildPayload(document *doc.Document) (*payload, error) {

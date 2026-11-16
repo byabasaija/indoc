@@ -70,6 +70,10 @@ func TestInitCreatesAgentScaffoldingWithoutOverwritingSite(t *testing.T) {
 	if site.ProjectName == "" || site.Overview.Markdown != "" {
 		t.Fatalf("site template = %+v", site)
 	}
+	if site.Appearance == nil || site.Appearance.Logo != "" ||
+		site.Appearance.Colors == nil || site.Appearance.Colors.Primary == "" {
+		t.Fatalf("site template is missing appearance options: %+v", site.Appearance)
+	}
 
 	guide, err := os.ReadFile(agentGuideFile)
 	if err != nil {
@@ -149,8 +153,18 @@ func TestScanThenBundleRemembersDocument(t *testing.T) {
 	}
 
 	input := filepath.Join(dir, "site.json")
+	if err := os.WriteFile(filepath.Join(dir, "logo.svg"), []byte("<svg></svg>"), 0644); err != nil {
+		t.Fatal(err)
+	}
 	document := map[string]any{
 		"project_name": "Hospital API",
+		"appearance": map[string]any{
+			"logo": "logo.svg",
+			"colors": map[string]string{
+				"primary": "#0969da",
+				"accent":  "#1f883d",
+			},
+		},
 		"overview": map[string]string{
 			"markdown": "Admits patients.\n\n## Flow\n\nRequest, then record.",
 		},
@@ -184,6 +198,16 @@ func TestScanThenBundleRemembersDocument(t *testing.T) {
 	}
 	if !bytes.Contains(index, []byte("Hospital API")) {
 		t.Fatalf("index = %s", index)
+	}
+	if _, err := os.Stat(filepath.Join(outDir, "assets", "logo.svg")); err != nil {
+		t.Fatalf("bundled logo: %v", err)
+	}
+	payload, err := os.ReadFile(filepath.Join(outDir, "docs.js"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if !bytes.Contains(payload, []byte(`"primary":"#0969da"`)) {
+		t.Fatalf("custom colors missing from payload: %s", payload)
 	}
 
 	if err := os.WriteFile(sourceFile, []byte(body+"\n# changed\n"), 0644); err != nil {

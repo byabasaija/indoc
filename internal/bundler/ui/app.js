@@ -10,23 +10,31 @@
 
   var shell = [
     '<header class="top">',
-    '  <button type="button" class="nav-toggle">Menu</button>',
-    '  <div class="brand"></div>',
+    '  <div class="top-start">',
+    '    <button type="button" class="nav-toggle" aria-label="Open navigation" aria-expanded="false" aria-controls="docs-nav"><span></span><span></span><span></span></button>',
+    '    <a class="brand" href="#/overview"><span class="brand-mark" aria-hidden="true">i</span><span class="brand-name"></span></a>',
+    '    <span class="top-divider" aria-hidden="true"></span>',
+    '    <span class="top-context">Documentation</span>',
+    '  </div>',
     '  <form class="search" role="search">',
-    '    <input type="search" placeholder="Search docs" aria-label="Search docs">',
+    '    <svg class="search-icon" aria-hidden="true" viewBox="0 0 20 20"><circle cx="8.5" cy="8.5" r="5.5"></circle><path d="m13 13 4 4"></path></svg>',
+    '    <input type="search" placeholder="Search documentation" aria-label="Search documentation" autocomplete="off">',
+    '    <kbd class="search-shortcut" aria-hidden="true">/</kbd>',
     '    <div class="results" hidden></div>',
     '  </form>',
-    '  <button type="button" class="theme">Theme</button>',
+    '  <button type="button" class="theme" aria-label="Toggle color theme" title="Toggle color theme">',
+    '    <svg aria-hidden="true" viewBox="0 0 20 20"><circle cx="10" cy="10" r="3.5"></circle><path d="M10 1.75v2M10 16.25v2M18.25 10h-2M3.75 10h-2m14.08-5.83-1.42 1.42M5.59 14.41l-1.42 1.42m11.66 0-1.42-1.42M5.59 5.59 4.17 4.17"></path></svg>',
+    '    <span class="theme-label">Theme</span>',
+    '  </button>',
     '</header>',
     '<div class="body">',
-    '  <nav class="sidebar"></nav>',
+    '  <nav id="docs-nav" class="sidebar" aria-label="Documentation navigation"></nav>',
     '  <main class="content"></main>',
-    '  <aside class="toc"></aside>',
+    '  <aside class="toc" aria-label="On this page"></aside>',
     '</div>'
   ].join("");
   app.innerHTML = shell;
 
-  var brand = app.querySelector(".brand");
   var nav = app.querySelector(".sidebar");
   var content = app.querySelector(".content");
   var toc = app.querySelector(".toc");
@@ -34,10 +42,106 @@
   var results = app.querySelector(".results");
   var form = app.querySelector(".search");
 
-  brand.textContent = data.project_name;
+  app.querySelector(".brand-name").textContent = data.project_name;
+  var brandMark = app.querySelector(".brand-mark");
+  if (data.appearance && data.appearance.logo) {
+    var logo = document.createElement("img");
+    logo.src = data.appearance.logo;
+    logo.alt = "";
+    brandMark.classList.add("has-logo");
+    brandMark.textContent = "";
+    brandMark.appendChild(logo);
+  } else {
+    var initial = data.project_name.trim().charAt(0);
+    brandMark.textContent = initial ? initial.toUpperCase() : "D";
+  }
+  if (data.appearance && data.appearance.colors) {
+    var colorPattern = /^#[0-9a-f]{6}$/i;
+    var colors = data.appearance.colors;
+    if (colorPattern.test(colors.primary || "")) {
+      document.documentElement.style.setProperty("--accent", colors.primary);
+      document.documentElement.style.setProperty("--accent-strong", colors.primary);
+    }
+    if (colorPattern.test(colors.accent || "")) {
+      document.documentElement.style.setProperty("--accent-2", colors.accent);
+    }
+  }
 
   function pagesIn(section) {
     return data.pages.filter(function (page) { return page.section === section; });
+  }
+
+  function addGuideCards(article) {
+    var guides = pagesIn("guides").slice(0, 4);
+    if (!guides.length) return;
+
+    var launchpad = document.createElement("section");
+    launchpad.className = "guide-launchpad";
+    launchpad.setAttribute("aria-label", "Start with a guide");
+
+    var heading = document.createElement("div");
+    heading.className = "guide-launchpad-heading";
+    var label = document.createElement("div");
+    label.className = "guide-launchpad-label";
+    label.textContent = "START HERE";
+    var title = document.createElement("h2");
+    title.className = "guide-launchpad-title";
+    title.textContent = "Choose your next step";
+    heading.appendChild(label);
+    heading.appendChild(title);
+    launchpad.appendChild(heading);
+
+    var grid = document.createElement("div");
+    grid.className = "guide-grid";
+    guides.forEach(function (page, index) {
+      var link = document.createElement("a");
+      link.className = "guide-card";
+      link.href = hrefFor(page);
+
+      var top = document.createElement("div");
+      top.className = "guide-card-top";
+      var number = document.createElement("span");
+      number.className = "guide-card-number";
+      number.textContent = index < 9 ? "0" + (index + 1) : String(index + 1);
+      var arrow = document.createElement("span");
+      arrow.className = "guide-card-arrow";
+      arrow.setAttribute("aria-hidden", "true");
+      arrow.textContent = "↗";
+      top.appendChild(number);
+      top.appendChild(arrow);
+
+      var heading = document.createElement("strong");
+      heading.className = "guide-card-title";
+      heading.textContent = page.title;
+      link.appendChild(top);
+      link.appendChild(heading);
+
+      var preview = document.createElement("div");
+      preview.innerHTML = page.html || "";
+      var paragraph = preview.querySelector("p");
+      if (paragraph && paragraph.textContent.trim()) {
+        var summary = document.createElement("span");
+        summary.className = "guide-card-summary";
+        var text = paragraph.textContent.trim();
+        summary.textContent = text.length > 112 ? text.slice(0, 109).trim() + "..." : text;
+        link.appendChild(summary);
+      }
+
+      var action = document.createElement("span");
+      action.className = "guide-card-action";
+      action.textContent = "Open guide";
+      link.appendChild(action);
+      grid.appendChild(link);
+    });
+    launchpad.appendChild(grid);
+
+    var intro = article.querySelector("p");
+    if (intro) {
+      intro.classList.add("lede");
+      article.insertBefore(launchpad, intro.nextSibling);
+    } else {
+      article.insertBefore(launchpad, article.firstChild);
+    }
   }
 
   function hrefFor(page) {
@@ -170,10 +274,15 @@
     content.innerHTML = "";
     var title = document.createElement("h1");
     title.textContent = page.title;
+    var kicker = document.createElement("div");
+    kicker.className = "page-kicker";
+    kicker.textContent = page.section === "reference" ? "REFERENCE" : page.section === "guides" ? "GUIDE" : "OVERVIEW";
+    content.appendChild(kicker);
     content.appendChild(title);
     if (page.html) {
       var article = document.createElement("article");
       article.innerHTML = page.html;
+      if (page.section === "overview") addGuideCards(article);
       content.appendChild(article);
     }
     if (page.entries && page.entries.length) {
@@ -237,8 +346,9 @@
     try { localStorage.setItem("indoc-theme", next); } catch (e) {}
   });
 
-  app.querySelector(".nav-toggle").addEventListener("click", function () {
-    document.body.classList.toggle("nav-open");
+  app.querySelector(".nav-toggle").addEventListener("click", function (event) {
+    var open = document.body.classList.toggle("nav-open");
+    event.currentTarget.setAttribute("aria-expanded", String(open));
   });
 
   document.addEventListener("keydown", function (event) {
@@ -248,6 +358,8 @@
     }
     if (event.key === "Escape") {
       results.hidden = true;
+      document.body.classList.remove("nav-open");
+      app.querySelector(".nav-toggle").setAttribute("aria-expanded", "false");
     }
   });
 

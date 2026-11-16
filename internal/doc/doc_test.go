@@ -44,6 +44,24 @@ func TestValidateRejectsEmptyOverview(t *testing.T) {
 	}
 }
 
+func TestValidateAppearanceColors(t *testing.T) {
+	d := &Document{
+		ProjectName: "Demo",
+		Appearance: &Appearance{Colors: &Colors{
+			Primary: "#0969da",
+			Accent:  "#1f883d",
+		}},
+		Overview: Page{ID: "overview", Title: "Overview", Markdown: "Hi"},
+	}
+	if err := Validate(d); err != nil {
+		t.Fatalf("valid palette rejected: %v", err)
+	}
+	d.Appearance.Colors.Primary = "red"
+	if err := Validate(d); err == nil {
+		t.Fatal("expected invalid palette color to fail")
+	}
+}
+
 func TestValidateRejectsUnknownReferenceKind(t *testing.T) {
 	d := &Document{
 		ProjectName: "Demo",

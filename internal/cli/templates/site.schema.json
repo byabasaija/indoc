@@ -8,6 +8,9 @@
       "type": "string",
       "minLength": 1
     },
+    "appearance": {
+      "$ref": "#/$defs/appearance"
+    },
     "overview": {
       "$ref": "#/$defs/overview"
     },
@@ -25,6 +28,28 @@
     }
   },
   "$defs": {
+    "appearance": {
+      "type": "object",
+      "properties": {
+        "logo": {
+          "type": "string",
+          "description": "A local image path relative to this JSON file, or an http(s) URL."
+        },
+        "colors": {
+          "type": "object",
+          "properties": {
+            "primary": {
+              "type": "string",
+              "pattern": "^#[0-9a-fA-F]{6}$"
+            },
+            "accent": {
+              "type": "string",
+              "pattern": "^#[0-9a-fA-F]{6}$"
+            }
+          }
+        }
+      }
+    },
     "overview": {
       "type": "object",
       "required": ["markdown"],

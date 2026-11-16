@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"path/filepath"
 	"strings"
 
 	"github.com/byabasaija/indoc/internal/bundler"
@@ -71,7 +72,7 @@ func executeBundle(opts bundleOptions) error {
 	if outputDir == "" {
 		return fmt.Errorf("output directory is required")
 	}
-	if err := bundler.Write(&document, outputDir); err != nil {
+	if err := bundler.Write(&document, outputDir, filepath.Dir(opts.input)); err != nil {
 		return err
 	}
 

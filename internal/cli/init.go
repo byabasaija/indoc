@@ -40,9 +40,15 @@ func runInit(cmd *cobra.Command, args []string) error {
 
 	template := doc.Document{
 		ProjectName: cfg.ProjectName,
-		Overview:    doc.Page{Title: "Overview"},
-		Guides:      []doc.Page{},
-		Reference:   []doc.RefSection{},
+		Appearance: &doc.Appearance{
+			Colors: &doc.Colors{
+				Primary: "#0969da",
+				Accent:  "#1f2328",
+			},
+		},
+		Overview:  doc.Page{Title: "Overview"},
+		Guides:    []doc.Page{},
+		Reference: []doc.RefSection{},
 	}
 	site, err := json.MarshalIndent(template, "", "  ")
 	if err != nil {

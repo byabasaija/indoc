@@ -13,10 +13,13 @@ Use this guide when creating or updating `.indoc/site.json`.
 ## Writing useful pages
 
 - Set `project_name` to the project name in `.indoc.yaml`.
+- Before authoring or updating the site, ask whether the user wants a custom logo or color palette. If yes, collect a logo path or URL and optional primary/accent hex colors; if not, keep the starter appearance defaults.
 - Write an overview explaining what the project does and how its important flow works.
 - Add a small number of task-oriented guides for work a reader is likely to do. For a CLI, prioritize installation, running commands, and common workflows. For a service or library, cover its important setup and usage paths.
 - Use Markdown in each page's `markdown` field. Keep the docs focused; do not make a page for every source file.
 - When updating docs, use `previous` in the scan report as context, but verify claims against the current source.
+- Optionally set `appearance.logo` to a local image path relative to `.indoc/site.json` or an http(s) URL. Local logo files are copied into the generated site.
+- Optionally set `appearance.colors.primary` and `appearance.colors.accent` to 6-digit hex colors (for example `#0969da`) to customize the site's primary and secondary accents.
 
 ## Reference facts
 
