@@ -35,24 +35,30 @@ Two ways to adopt, and the first needs no migration:
 
 The pitch to an existing Docusaurus team is "add one CI job", not "migrate your docs".
 
-## 3. Two layers
+## 3. Three layers
 
 ```
 ┌──────────────────────────────────────────────────────────────┐
-│ CORE: any language, any repo                                 │
-│  • Markdown pages with `sources:` frontmatter                │
-│  • indoc check: stale pages fail CI                          │
-│  • citation validation (path::Symbol must resolve)           │
-│  • project map for the agent                                 │
-│  • static bundle                                             │
-├──────────────────────────────────────────────────────────────┤
-│ EXTRACTORS: per framework, optional enrichment               │
+│ FRAMEWORK EXTRACTORS: optional enrichment                    │
 │  • routes, settings/env vars, CLI commands                   │
-│  • Django + DRF, FastAPI first; more added over time         │
+│  • Django + DRF, FastAPI, Cobra first; more over time        │
+├──────────────────────── built on ────────────────────────────┤
+│ LANGUAGE PARSERS: any project in that language               │
+│  • symbols with surface/body hashes                          │
+│  • path::Symbol citations, precise staleness tiers           │
+│  • Python, Go first; JS/TS later                             │
+├──────────────────────── built on ────────────────────────────┤
+│ CORE: any repo, any file                                     │
+│  • Markdown pages, lock, indoc check, bundle, project map    │
+│  • file-hash staleness (drift only) where no parser exists   │
 └──────────────────────────────────────────────────────────────┘
 ```
 
-A repo on an unsupported framework still gets everything in the core. It just has no generated reference pages. **An unsupported framework is a smaller feature set, not a broken tool**, and the README says so.
+Dependencies point down only. A language parser serves every project in that language regardless of framework (a Flask app or a plain library gets precise staleness from the Python parser). A framework extractor is a thin layer that reads calls like `path("x/", View)` using its language's tokenizer. Adding Flask is extractor work only; adding Express needs the JS/TS parser first.
+
+The README keeps two support tables: **languages** (staleness, citations) and **frameworks** (reference pages). A framework can be marked supported only if its language is.
+
+A repo outside every row still gets the core. **An unsupported framework or language is a smaller feature set, not a broken tool.**
 
 ## 4. Data model
 
@@ -189,7 +195,7 @@ What staleness and extraction need from a parser is structural, not semantic: wh
 | :--- | :--- | :--- |
 | Go | Standard library `go/parser` + `go/ast` | Exact, maintained by the Go team, zero dependencies. |
 | Python | Hand-written in Go: full tokenizer + structural parser | See below. |
-| JS/TS (later) | Decide at that point; leading option is tree-sitter grammars compiled to WebAssembly and run with a pure-Go runtime (wazero) | JSX, generics, and ASI make hand-writing a trap. Requires a spike before committing. |
+| JS/TS, Rust, Java, C#, Ruby, PHP, … (later) | One shared path: tree-sitter grammars compiled to WebAssembly, run with a pure-Go runtime (wazero), using each grammar's `tags.scm` symbol queries | Hand-writing parsers does not scale past a few languages. With a shared runtime, a new language is a grammar plus a query file. Each language must pass a differential test against its own reference parser (e.g. `syn` for Rust) before it is marked supported. Requires a spike first: binary size (~0.5-3 MB per grammar) and speed. |
 
 **Python, in detail.** The tokenizer is exact and complete: strings (triple-quoted, raw, bytes, f-strings with nested quotes), comments, bracket nesting, line continuations, `INDENT`/`DEDENT`. The parser above it is deliberately partial: it recognises `def`, `async def`, `class`, decorators, and call expressions with literal arguments, and treats every other statement as opaque tokens. Because hashing runs over tokens, comment and whitespace changes are ignored without any extra work.
 
@@ -338,6 +344,10 @@ Each phase ends with a concrete check against a real repo, shop unless noted.
 
 ### Phase 4: FastAPI + Cobra
 * **Exit:** lexai (or another FastAPI project) and indoc itself produce complete reference pages.
+
+### Phase 4b: Multi-language spike
+* wazero + tree-sitter WebAssembly prototype with TS and Rust grammars and `tags.scm` queries.
+* **Exit:** differential agreement on a real TS and Rust corpus, binary size and scan speed measured, go/no-go recorded here.
 
 ### Phase 5: MCP + plugins
 * `indoc mcp` subcommand (same binary).
