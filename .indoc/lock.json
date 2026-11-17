@@ -359,7 +359,7 @@
       }
     },
     "documentation/getting-started.md": {
-      "page": "970ace943e250e6c",
+      "page": "ca131604b2e82947",
       "citations": {
         "internal/cli/bundle.go::runBundle": {
           "surface": "afbcb60d55daccfa",
@@ -464,7 +464,7 @@
             "TestSaveLoadRoundTrip": "59775ecd4338fc38",
             "TestSourceURL": "292d1d4604b5f38c"
           },
-          "raw": "6a7504c701928bbe",
+          "raw": "f8c8ff3e35d777c0",
           "hasher": "go/2"
         }
       }

@@ -93,11 +93,13 @@ jobs:
 
 ### By hand
 
-Download a binary from [Releases](https://github.com/byabasaija/indoc/releases), or:
+macOS and Linux:
 
 ```sh
-go install github.com/byabasaija/indoc/cmd/indoc@latest
+curl -fsSL https://github.com/byabasaija/indoc/releases/latest/download/install.sh | sh
 ```
+
+The script verifies the download against the release checksums. Or use Go (`go install github.com/byabasaija/indoc/cmd/indoc@latest`), or download a binary (including Windows) from [Releases](https://github.com/byabasaija/indoc/releases).
 
 ```sh
 indoc init       # create .indoc/config.yaml

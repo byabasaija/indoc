@@ -13,11 +13,13 @@ sources:
 
 The easiest way is the plugin for your coding agent, which needs nothing else installed; see [Using indoc from a coding agent](agents.md). The agent then runs the steps below for you.
 
-For the command itself, download a binary from the GitHub releases page, or:
+For the command itself, on macOS or Linux:
 
 ```sh
-go install github.com/byabasaija/indoc/cmd/indoc@latest
+curl -fsSL https://github.com/byabasaija/indoc/releases/latest/download/install.sh | sh
 ```
+
+It installs to `/usr/local/bin` when writable, otherwise `~/.local/bin`, after verifying the download against the release's checksums. Pin a version with `| sh -s -- v0.3.0`, or choose the folder with `INDOC_INSTALL_DIR`. Alternatively, `go install github.com/byabasaija/indoc/cmd/indoc@latest`, or download a binary (including Windows) from the GitHub releases page.
 
 ## Initialize
 

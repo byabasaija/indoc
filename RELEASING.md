@@ -20,7 +20,7 @@ So `main` must never pin a version whose release doesn't exist yet, or every plu
    git tag -a vX.Y.Z -m "indoc X.Y.Z: <one line>"
    git push origin vX.Y.Z
    ```
-4. Wait for the **Release** workflow to finish and confirm the release has six archives plus `checksums.txt`.
+4. Wait for the **Release** workflow to finish and confirm the release has six archives, `install.sh`, and `checksums.txt`.
 5. Push `main`. Plugin installs now pin a release that exists.
    ```sh
    git push origin main

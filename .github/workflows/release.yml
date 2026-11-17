@@ -48,6 +48,7 @@ jobs:
               tar -czf "dist/indoc_${os}_${arch}.tar.gz" -C "$work" "$exe"
             fi
           done
+          cp install.sh dist/install.sh
           (cd dist && sha256sum * > checksums.txt)
 
       - name: Publish

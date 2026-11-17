@@ -19,6 +19,11 @@ jobs:
       - run: go test ./...
       - name: indoc's own docs match its code
         run: go run ./cmd/indoc check --strict
+      - name: install.sh installs the latest release
+        run: |
+          sh -n install.sh
+          INDOC_INSTALL_DIR="$RUNNER_TEMP/bin" sh install.sh
+          "$RUNNER_TEMP/bin/indoc" version
 
   grammars:
     # The committed tree-sitter modules must be exactly what the pinned sources build.
