@@ -228,3 +228,25 @@ func TestVersionCommand(t *testing.T) {
 		t.Fatal(err)
 	}
 }
+
+func TestBundleLinksCitationsAndSources(t *testing.T) {
+	r := newRepo(t)
+	r.write("app/main.py", appPy)
+	if err := runInit(r.cfg, &bytes.Buffer{}, nil, "", false); err != nil {
+		t.Fatal(err)
+	}
+	r.write(".indoc/config.yaml", r.read(".indoc/config.yaml")+"source_url: https://example.test/{path}#L{line}\n")
+	r.write("docs/index.md", admitPage)
+	if err := runBundle(r.cfg, "", &bytes.Buffer{}); err != nil {
+		t.Fatal(err)
+	}
+	payload := r.read(".indoc/site/docs.js")
+	for _, want := range []string{
+		`href=\"https://example.test/app/main.py#L7\"`, // citation -> def admit
+		`"url":"https://example.test/app/main.py#L3"`,  // route source -> @app.get
+	} {
+		if !strings.Contains(payload, want) {
+			t.Errorf("payload missing %s", want)
+		}
+	}
+}

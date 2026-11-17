@@ -5,6 +5,7 @@ import (
 	"io"
 	"path"
 	"path/filepath"
+	"strconv"
 	"strings"
 
 	"github.com/byabasaija/indoc/internal/bundler"
@@ -79,8 +80,44 @@ func buildSite(p *project, outDir string) error {
 	if err != nil {
 		return err
 	}
+	linkSources(p, ref.Sections)
 	document := assemble(p, ref.Sections)
 	return bundler.Write(document, outDir, p.paths.Root)
+}
+
+// linkSources sets each reference entry's URL from source_url.
+func linkSources(p *project, sections []doc.RefSection) {
+	for i := range sections {
+		for j := range sections[i].Entries {
+			e := &sections[i].Entries[j]
+			file, line := splitSource(e.Source)
+			e.URL = p.cfg.SourceLink(file, line)
+		}
+	}
+}
+
+func splitSource(source string) (string, int) {
+	file := doc.SourcePath(source)
+	line, _ := strconv.Atoi(strings.TrimPrefix(source[len(file):], ":"))
+	return file, line
+}
+
+// citationLink resolves a citation to its symbol's current line.
+func citationLink(p *project) func(pages.Citation) string {
+	return func(c pages.Citation) string {
+		if p.cfg.SourceURL == "" {
+			return ""
+		}
+		f, ok := p.repo.Analyze(c.Path)
+		if !ok {
+			return ""
+		}
+		line := 0
+		if sym, found := f.Lookup(c.Symbol); found {
+			line = sym.DecoratorLine
+		}
+		return p.cfg.SourceLink(c.Path, line)
+	}
 }
 
 // assemble maps pages onto the viewer's document: the top-most index.md or
@@ -100,7 +137,7 @@ func assemble(p *project, sections []doc.RefSection) *doc.Document {
 		page := doc.Page{
 			ID:       doc.Slug(strings.TrimSuffix(pg.Path, path.Ext(pg.Path))),
 			Title:    pg.Title,
-			Markdown: pg.Body,
+			Markdown: pages.Linkify(pg.Body, citationLink(p)),
 		}
 		if i == overview {
 			d.Overview = page

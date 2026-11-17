@@ -9,6 +9,7 @@ import (
 	"github.com/byabasaija/indoc/internal/code"
 	"github.com/byabasaija/indoc/internal/doc"
 	"github.com/byabasaija/indoc/internal/drift"
+	"github.com/byabasaija/indoc/internal/projectmap"
 	"github.com/byabasaija/indoc/internal/reference"
 	"github.com/spf13/cobra"
 )
@@ -50,6 +51,8 @@ type scanReport struct {
 	Reference   []doc.RefSection `json:"reference"`
 	// Coverage says what each extractor detected and could not resolve.
 	Coverage []reference.Coverage `json:"coverage"`
+	// Map summarizes the repository for choosing what to document.
+	Map *projectmap.Map `json:"map"`
 	// Files is the number of repository files; Parsed of those have a
 	// language parser and support path::Symbol citations.
 	Files  int `json:"files"`
@@ -72,6 +75,7 @@ func runScan(configPath string, out io.Writer, asJSON bool) error {
 		Findings:    nonNil(drift.Check(p.repo, p.pages, p.lock)),
 		Reference:   sections,
 		Coverage:    ref.Coverage,
+		Map:         projectmap.Build(p.paths.Root, p.repo.Files, pagePaths(p)),
 		Files:       len(p.repo.Files),
 	}
 	for _, f := range p.repo.Files {
@@ -96,7 +100,9 @@ func runScan(configPath string, out io.Writer, asJSON bool) error {
 		enc.SetEscapeHTML(false)
 		return enc.Encode(report)
 	}
-	fmt.Fprintf(out, "%s: %d pages, %d files (%d parsed)\n\n", report.ProjectName, len(report.Pages), report.Files, report.Parsed)
+	fmt.Fprintf(out, "%s: %d pages, %d files (%d parsed)\n", report.ProjectName, len(report.Pages), report.Files, report.Parsed)
+	printMap(out, report.Map)
+	fmt.Fprintln(out)
 	for _, sp := range report.Pages {
 		fmt.Fprintf(out, "  %-40s %d sources, %d citations\n", sp.Path, len(sp.Sources), len(sp.Citations))
 	}
@@ -125,4 +131,52 @@ func summarizeReference(sections []doc.RefSection) string {
 		parts[i] = fmt.Sprintf("%d %s", len(s.Entries), s.Kind)
 	}
 	return strings.Join(parts, ", ")
+}
+
+func pagePaths(p *project) []string {
+	out := make([]string, len(p.pages))
+	for i, pg := range p.pages {
+		out[i] = pg.Path
+	}
+	return out
+}
+
+func printMap(out io.Writer, m *projectmap.Map) {
+	var langs []string
+	for _, l := range m.Languages {
+		mark := ""
+		if l.Parsed {
+			mark = "*"
+		}
+		langs = append(langs, fmt.Sprintf("%s%s %d", l.Name, mark, l.Files))
+	}
+	if len(langs) > 0 {
+		fmt.Fprintf(out, "languages: %s  (* = parsed)\n", strings.Join(langs, ", "))
+	}
+	if len(m.Frameworks) > 0 {
+		fmt.Fprintf(out, "frameworks: %s\n", strings.Join(m.Frameworks, ", "))
+	}
+	if len(m.EntryPoints) > 0 {
+		fmt.Fprintf(out, "entry points: %s\n", strings.Join(m.EntryPoints, ", "))
+	}
+	if len(m.Tasks) > 0 {
+		var ts []string
+		for _, t := range m.Tasks {
+			ts = append(ts, t.Command)
+		}
+		fmt.Fprintf(out, "tasks: %s\n", strings.Join(ts, ", "))
+	}
+	if len(m.Docs) > 0 {
+		fmt.Fprintf(out, "unpublished docs: %d Markdown files\n", len(m.Docs))
+	}
+	var hot []string
+	for _, h := range m.HotFiles {
+		if len(hot) == 5 {
+			break
+		}
+		hot = append(hot, fmt.Sprintf("%s (%d)", h.Path, h.Count))
+	}
+	if len(hot) > 0 {
+		fmt.Fprintf(out, "most changed (90 days): %s\n", strings.Join(hot, ", "))
+	}
 }

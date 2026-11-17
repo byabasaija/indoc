@@ -16,7 +16,15 @@ indoc keeps Markdown pages tied to code. Pages list the code they cover (`source
 
 ## 2. Understand the project
 
-Run `indoc scan --json`. It returns the pages, every check finding with its reason, reference facts (routes, environment variables, commands) extracted from source, and `coverage`: what each extractor detected and could not resolve. Then read the code: entry points, the main request or command flow, configuration, and any existing docs.
+Run `indoc scan --json`. It returns the pages, every check finding with its reason, reference facts (routes, environment variables, commands) extracted from source, `coverage` (what each extractor detected and could not resolve), and `map`:
+
+- `frameworks`, `entry_points`, `languages` (`parsed` languages support `path::Symbol` citations)
+- `tasks`: the project's real commands (just, make, npm scripts, Python entry points). Use these in guides instead of inventing commands.
+- `docs`: Markdown not yet published. Read it; it often says who the readers are.
+- `hot_files`: what changed most recently, usually where readers need help.
+- `central`: modules most of the code imports, usually the core concepts.
+
+Then read the code, starting from the entry points and the central modules.
 
 Tell the user about `coverage` warnings worth acting on, such as unreachable routes or variables missing from `.env.example`. Do not paper over unresolved items by writing route or variable tables by hand.
 

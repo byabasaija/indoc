@@ -8,6 +8,7 @@ import (
 	"os"
 	"path/filepath"
 	"regexp"
+	"strconv"
 	"strings"
 
 	"github.com/byabasaija/indoc/internal/doc"
@@ -35,6 +36,80 @@ type Config struct {
 	OutputDir   string          `yaml:"output_dir"`
 	Exclude     []string        `yaml:"exclude,omitempty"`
 	Appearance  *doc.Appearance `yaml:"appearance,omitempty"`
+	// SourceURL links citations and reference entries to the code, e.g.
+	// https://github.com/org/repo/blob/HEAD/{path}#L{line}
+	SourceURL string `yaml:"source_url,omitempty"`
+}
+
+// SourceLink fills the source_url template, or returns "" when unset.
+func (c *Config) SourceLink(path string, line int) string {
+	if c.SourceURL == "" || path == "" {
+		return ""
+	}
+	u := strings.ReplaceAll(c.SourceURL, "{path}", path)
+	if line > 0 {
+		return strings.ReplaceAll(u, "{line}", strconv.Itoa(line))
+	}
+	// No line: drop a trailing line anchor such as #L{line} or #lines-{line}.
+	if i := strings.LastIndex(u, "#"); i >= 0 && strings.Contains(u[i:], "{line}") {
+		return u[:i]
+	}
+	return strings.ReplaceAll(u, "{line}", "1")
+}
+
+var remoteURL = regexp.MustCompile(`^\s*url\s*=\s*(\S+)`)
+
+// InferSourceURL builds a source_url template from the origin remote in
+// .git/config, for GitHub, GitLab, and Bitbucket. It returns "" otherwise.
+func InferSourceURL(root string) string {
+	f, err := os.Open(filepath.Join(root, ".git", "config"))
+	if err != nil {
+		return ""
+	}
+	defer f.Close()
+	inOrigin := false
+	sc := bufio.NewScanner(f)
+	for sc.Scan() {
+		line := strings.TrimSpace(sc.Text())
+		if strings.HasPrefix(line, "[") {
+			inOrigin = line == `[remote "origin"]`
+			continue
+		}
+		if m := remoteURL.FindStringSubmatch(line); inOrigin && m != nil {
+			return sourceTemplate(m[1])
+		}
+	}
+	return ""
+}
+
+func sourceTemplate(remote string) string {
+	r := strings.TrimSuffix(strings.TrimSuffix(remote, "/"), ".git")
+	var host, repoPath string
+	switch {
+	case strings.HasPrefix(r, "git@"):
+		host, repoPath, _ = strings.Cut(strings.TrimPrefix(r, "git@"), ":")
+	case strings.HasPrefix(r, "https://"), strings.HasPrefix(r, "http://"), strings.HasPrefix(r, "ssh://"):
+		rest := r[strings.Index(r, "://")+3:]
+		if at := strings.LastIndex(rest, "@"); at >= 0 {
+			rest = rest[at+1:]
+		}
+		host, repoPath, _ = strings.Cut(rest, "/")
+		host, _, _ = strings.Cut(host, ":")
+	default:
+		return ""
+	}
+	if host == "" || strings.Count(repoPath, "/") < 1 {
+		return ""
+	}
+	switch host {
+	case "github.com":
+		return "https://github.com/" + repoPath + "/blob/HEAD/{path}#L{line}"
+	case "gitlab.com":
+		return "https://gitlab.com/" + repoPath + "/-/blob/HEAD/{path}#L{line}"
+	case "bitbucket.org":
+		return "https://bitbucket.org/" + repoPath + "/src/HEAD/{path}#lines-{line}"
+	}
+	return ""
 }
 
 // Default returns a configuration with defaults filled in.

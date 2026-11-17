@@ -63,7 +63,7 @@ indoc check     # in CI: fail when docs no longer match the code
 | Command | Does |
 |---|---|
 | `indoc init` | Create `.indoc/config.yaml`. Publishing is opt-in: existing Markdown is listed, not published. |
-| `indoc scan --json` | Pages, findings, and extracted reference facts, for your agent |
+| `indoc scan --json` | For your agent: pages, findings, extracted reference facts, and a map of the project (frameworks, entry points, task runner commands, unpublished docs, most-changed files) |
 | `indoc check` | Fail when pages no longer match the code. `--warn` to report only, `--strict` to fail on drift too. |
 | `indoc ack [page...]` | Record new or edited pages. Name a page to confirm it is still correct after a code change. |
 | `indoc bundle` | Build the static site |
@@ -89,6 +89,12 @@ docs/             your pages (location set by `pages:` in config.yaml)
 ```
 
 To serve the site from an existing app, set `output_dir` to a folder the app serves. The site uses relative links, so it works under any path.
+
+`indoc init` reads your git remote and sets `source_url` (GitHub, GitLab, Bitbucket), so every citation and reference entry in the site links to the exact line in your repository. For another host, set the template yourself:
+
+```yaml
+source_url: https://git.example.com/team/app/src/branch/main/{path}#L{line}
+```
 
 ## Language support
 

@@ -31,7 +31,9 @@ indoc init
 | No Markdown under `docs/` | `docs/**/*.md` |
 | `docs/` already has Markdown | empty: nothing is published until you choose |
 
-The last case is deliberate. A `docs/` folder often holds internal notes, review findings, or plans next to user documentation, and none of it should be published by accident. `init` lists the files it found; pick the ones to publish:
+`init` also sets `source_url` from your git remote, so citations in the built site link to the code.
+
+The last case in the table is deliberate. A `docs/` folder often holds internal notes, review findings, or plans next to user documentation, and none of it should be published by accident. `init` lists the files it found; pick the ones to publish:
 
 ```sh
 indoc init --force --pages 'docs/partner-integration.md,docs/guides/**/*.md'

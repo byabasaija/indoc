@@ -95,7 +95,7 @@
       }
     },
     "docs/getting-started.md": {
-      "page": "8979aa14957f5546",
+      "page": "4fca30d0ca9dc1aa",
       "citations": {
         "internal/cli/bundle.go::runBundle": {
           "surface": "afbcb60d55daccfa",
@@ -103,7 +103,7 @@
         },
         "internal/cli/init.go::runInit": {
           "surface": "08c0804721543100",
-          "body": "38b890cfed4496a9"
+          "body": "7458fa34dd1c59ff"
         },
         "internal/config/config.go::InferProjectName": {
           "surface": "665df7f08f982cfb",
@@ -112,17 +112,20 @@
       },
       "sources": {
         "internal/cli/bundle.go": {
-          "body": "f34d5e2156dc4c5c",
+          "body": "7a46aa3281339ed3",
           "symbols": {
             "assemble": "ae682a0fc0ffc73a",
             "buildSite": "a025c648708f8f48",
+            "citationLink": "840bb03b38bba364",
             "init": "c78f10468427bc77",
+            "linkSources": "3b41123d1bc8c90c",
             "overviewIndex": "d5fe107b30abd0b5",
-            "runBundle": "afbcb60d55daccfa"
+            "runBundle": "afbcb60d55daccfa",
+            "splitSource": "ebcb91591de95bdb"
           }
         },
         "internal/cli/init.go": {
-          "body": "61da5507baf06a8f",
+          "body": "81d42e71a5beec20",
           "symbols": {
             "hasAny": "b6d1a7c0ec76e5ea",
             "init": "c78f10468427bc77",
@@ -130,28 +133,32 @@
           }
         },
         "internal/config/config.go": {
-          "body": "40612fff2f4803a1",
+          "body": "8709f2b3864914e6",
           "symbols": {
-            "Config": "248da09b860f7f20",
+            "Config": "dc4701ef7b92cab0",
             "Config.Save": "ab4c717e8f3c6e18",
+            "Config.SourceLink": "d0269e979316b6e1",
             "Default": "fcba8035c4318c9d",
             "InferProjectName": "665df7f08f982cfb",
+            "InferSourceURL": "357e1bd6b502cadd",
             "Load": "7988a8d596a72425",
             "Paths": "76140627bde13cc5",
             "Resolve": "dbdc0ac20bbad50d",
             "goModuleName": "dafb094673af3a2d",
             "packageJSONName": "32172c9075e6be3a",
-            "pyprojectName": "44d439eb4064fd49"
+            "pyprojectName": "44d439eb4064fd49",
+            "sourceTemplate": "16f7771317498873"
           }
         },
         "internal/config/config_test.go": {
-          "body": "28ebc8d3b92b4768",
+          "body": "296db378a3830332",
           "symbols": {
             "TestInferProjectName": "4a4371ac59b9b6c3",
             "TestLoadDefaultsOutputDir": "21eb196bb3e3702d",
             "TestLoadMissing": "cf080fa1593dad73",
             "TestResolve": "1e0c2aa40c46b1ab",
-            "TestSaveLoadRoundTrip": "59775ecd4338fc38"
+            "TestSaveLoadRoundTrip": "59775ecd4338fc38",
+            "TestSourceURL": "292d1d4604b5f38c"
           }
         }
       }

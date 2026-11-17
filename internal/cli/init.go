@@ -51,6 +51,7 @@ func runInit(configPath string, out io.Writer, pagesFlag []string, output string
 
 	cfg := config.Default()
 	cfg.ProjectName = config.InferProjectName(paths.Root)
+	cfg.SourceURL = config.InferSourceURL(paths.Root)
 	if output != "" {
 		cfg.OutputDir = output
 	}
@@ -101,6 +102,9 @@ func runInit(configPath string, out io.Writer, pagesFlag []string, output string
 	}
 	if len(cfg.Pages) > 0 {
 		fmt.Fprintf(out, "pages: %s\n", strings.Join(cfg.Pages, ", "))
+	}
+	if cfg.SourceURL != "" {
+		fmt.Fprintf(out, "source_url: %s (citations link to the code)\n", cfg.SourceURL)
 	}
 	if len(cfg.Pages) == 0 && len(markdown) > 0 {
 		fmt.Fprintln(out, "\nExisting Markdown files (not published):")

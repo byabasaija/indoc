@@ -3,3 +3,4 @@ project_name: indoc
 pages:
     - docs/**/*.md
 output_dir: .indoc/site
+source_url: https://github.com/byabasaija/indoc/blob/HEAD/{path}#L{line}

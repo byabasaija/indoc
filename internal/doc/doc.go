@@ -61,6 +61,7 @@ type RefEntry struct {
 	Handler     string `json:"handler,omitempty" yaml:"handler,omitempty"`
 	Description string `json:"description,omitempty" yaml:"description,omitempty"`
 	Source      string `json:"source,omitempty" yaml:"source,omitempty"`
+	URL         string `json:"url,omitempty" yaml:"url,omitempty"` // link to Source, when source_url is set
 }
 
 // Heading is a markdown heading used by the table of contents.

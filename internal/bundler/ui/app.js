@@ -237,7 +237,14 @@
         nameCell.appendChild(desc);
       });
       if (page.kind !== "routes") cell(row, entry.detail || "", "detail");
-      cell(row, entry.source, "source");
+      var sourceCell = cell(row, entry.url ? "" : entry.source, "source");
+      if (entry.url) {
+        var a = document.createElement("a");
+        a.href = entry.url;
+        a.textContent = entry.source;
+        a.rel = "noopener";
+        sourceCell.appendChild(a);
+      }
       table.appendChild(row);
     });
     wrap.appendChild(table);

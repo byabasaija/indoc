@@ -254,3 +254,54 @@ func firstNonEmpty(values ...string) string {
 	}
 	return ""
 }
+
+// Linkify turns citations outside fenced code blocks into Markdown links.
+// link returns the URL for a citation, or "" to leave it as written. A
+// citation wrapped in backticks keeps them inside the link text.
+func Linkify(body string, link func(Citation) string) string {
+	lines := strings.Split(body, "\n")
+	inFence, fence := false, ""
+	for i, line := range lines {
+		trimmed := strings.TrimSpace(line)
+		if marker := fenceMarker(trimmed); marker != "" {
+			switch {
+			case !inFence:
+				inFence, fence = true, marker
+			case strings.HasPrefix(trimmed, fence):
+				inFence = false
+			}
+			continue
+		}
+		if inFence {
+			continue
+		}
+		lines[i] = linkifyLine(line, link)
+	}
+	return strings.Join(lines, "\n")
+}
+
+func linkifyLine(line string, link func(Citation) string) string {
+	var b strings.Builder
+	last := 0
+	for _, m := range citationRe.FindAllStringSubmatchIndex(line, -1) {
+		start, end := m[0], m[1]
+		c := Citation{Path: strings.TrimPrefix(line[m[2]:m[3]], "./"), Symbol: line[m[4]:m[5]]}
+		ticked := start > 0 && end < len(line) && line[start-1] == '`' && line[end] == '`'
+		if ticked {
+			start, end = start-1, end+1
+		}
+		// Leave citations that are already link text or a link target alone.
+		if start > 0 && (line[start-1] == '[' || line[start-1] == '(') {
+			continue
+		}
+		url := link(c)
+		if url == "" || start < last {
+			continue
+		}
+		b.WriteString(line[last:start])
+		b.WriteString("[" + line[start:end] + "](" + url + ")")
+		last = end
+	}
+	b.WriteString(line[last:])
+	return b.String()
+}

@@ -84,3 +84,21 @@ func TestMatch(t *testing.T) {
 		t.Errorf("Match = %v", got)
 	}
 }
+
+func TestLinkify(t *testing.T) {
+	body := "See `app/x.py::A.run` and app/y.go::Serve.\n" +
+		"```\napp/x.py::A.run\n```\n" +
+		"Already [`app/x.py::A.run`](http://x) linked; unknown `app/z.py::Nope`.\n"
+	got := Linkify(body, func(c Citation) string {
+		if c.Path == "app/z.py" {
+			return ""
+		}
+		return "https://src/" + c.Path + "#" + c.Symbol
+	})
+	want := "See [`app/x.py::A.run`](https://src/app/x.py#A.run) and [app/y.go::Serve](https://src/app/y.go#Serve).\n" +
+		"```\napp/x.py::A.run\n```\n" +
+		"Already [`app/x.py::A.run`](http://x) linked; unknown `app/z.py::Nope`.\n"
+	if got != want {
+		t.Errorf("Linkify:\n%s\nwant:\n%s", got, want)
+	}
+}

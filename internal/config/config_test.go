@@ -68,3 +68,37 @@ func TestInferProjectName(t *testing.T) {
 		t.Errorf("fallback: got %q", got)
 	}
 }
+
+func TestSourceURL(t *testing.T) {
+	cases := map[string]string{
+		"git@github.com:acme/shop.git":   "https://github.com/acme/shop/blob/HEAD/{path}#L{line}",
+		"https://github.com/byabasaija/indoc.git":         "https://github.com/byabasaija/indoc/blob/HEAD/{path}#L{line}",
+		"https://user:token@gitlab.com/group/sub/app.git": "https://gitlab.com/group/sub/app/-/blob/HEAD/{path}#L{line}",
+		"ssh://git@bitbucket.org:22/team/repo":            "https://bitbucket.org/team/repo/src/HEAD/{path}#lines-{line}",
+		"git@git.internal.example:team/repo.git":          "",
+		"/local/path/repo":                                "",
+	}
+	for remote, want := range cases {
+		if got := sourceTemplate(remote); got != want {
+			t.Errorf("sourceTemplate(%q) = %q, want %q", remote, got, want)
+		}
+	}
+
+	dir := t.TempDir()
+	os.MkdirAll(filepath.Join(dir, ".git"), 0o755)
+	os.WriteFile(filepath.Join(dir, ".git", "config"), []byte("[core]\n\tbare = false\n[remote \"upstream\"]\n\turl = git@github.com:other/x.git\n[remote \"origin\"]\n\turl = git@github.com:me/app.git\n"), 0o644)
+	if got := InferSourceURL(dir); got != "https://github.com/me/app/blob/HEAD/{path}#L{line}" {
+		t.Errorf("InferSourceURL = %q", got)
+	}
+
+	c := &Config{SourceURL: "https://github.com/me/app/blob/HEAD/{path}#L{line}"}
+	if got := c.SourceLink("app/views.py", 42); got != "https://github.com/me/app/blob/HEAD/app/views.py#L42" {
+		t.Errorf("SourceLink = %q", got)
+	}
+	if got := c.SourceLink("app/views.py", 0); got != "https://github.com/me/app/blob/HEAD/app/views.py" {
+		t.Errorf("SourceLink without line = %q", got)
+	}
+	if (&Config{}).SourceLink("a.py", 1) != "" {
+		t.Error("SourceLink without template must be empty")
+	}
+}
