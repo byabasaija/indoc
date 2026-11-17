@@ -1,8 +1,6 @@
 package doc
 
 import (
-	"encoding/hex"
-	"fmt"
 	"strings"
 	"unicode"
 )
@@ -16,16 +14,6 @@ const (
 	KindCommands = "commands"
 )
 
-// Document is the site the agent writes and the bundler compiles.
-// Overview and guides are prose. Reference is facts extracted from source.
-type Document struct {
-	ProjectName string       `json:"project_name" yaml:"project_name"`
-	Appearance  *Appearance  `json:"appearance,omitempty" yaml:"appearance,omitempty"`
-	Overview    Page         `json:"overview" yaml:"overview"`
-	Guides      []Page       `json:"guides" yaml:"guides"`
-	Reference   []RefSection `json:"reference" yaml:"reference"`
-}
-
 // Appearance contains optional branding for the generated site.
 type Appearance struct {
 	Logo   string  `json:"logo" yaml:"logo"`
@@ -36,13 +24,6 @@ type Appearance struct {
 type Colors struct {
 	Primary string `json:"primary,omitempty" yaml:"primary,omitempty"`
 	Accent  string `json:"accent,omitempty" yaml:"accent,omitempty"`
-}
-
-// Page is one narrative page.
-type Page struct {
-	ID       string `json:"id" yaml:"id"`
-	Title    string `json:"title" yaml:"title"`
-	Markdown string `json:"markdown" yaml:"markdown"`
 }
 
 // RefSection is one block of extracted facts.
@@ -69,130 +50,6 @@ type Heading struct {
 	ID    string `json:"id"`
 	Text  string `json:"text"`
 	Level int    `json:"level"`
-}
-
-// Normalize fills ids and titles, then checks the document is bundleable.
-func Normalize(d *Document) error {
-	if d == nil {
-		return fmt.Errorf("document is nil")
-	}
-	d.ProjectName = strings.TrimSpace(d.ProjectName)
-	if d.Guides == nil {
-		d.Guides = []Page{}
-	}
-	if d.Reference == nil {
-		d.Reference = []RefSection{}
-	}
-
-	if strings.TrimSpace(d.Overview.Title) == "" {
-		d.Overview.Title = "Overview"
-	}
-	d.Overview.ID = "overview"
-
-	usedGuides := map[string]bool{"overview": true}
-	for i := range d.Guides {
-		title := strings.TrimSpace(d.Guides[i].Title)
-		d.Guides[i].Title = title
-		base := d.Guides[i].ID
-		if strings.TrimSpace(base) == "" {
-			base = Slug(title)
-		}
-		d.Guides[i].ID = uniqueSlug(Slug(base), usedGuides)
-	}
-
-	usedRefs := map[string]bool{}
-	for i := range d.Reference {
-		kind := strings.TrimSpace(d.Reference[i].Kind)
-		d.Reference[i].Kind = kind
-		if strings.TrimSpace(d.Reference[i].Title) == "" {
-			d.Reference[i].Title = defaultRefTitle(kind)
-		}
-		base := d.Reference[i].ID
-		if strings.TrimSpace(base) == "" {
-			base = kind
-		}
-		d.Reference[i].ID = uniqueSlug(Slug(base), usedRefs)
-		if d.Reference[i].Entries == nil {
-			d.Reference[i].Entries = []RefEntry{}
-		}
-	}
-
-	return Validate(d)
-}
-
-// Validate checks a normalized document.
-func Validate(d *Document) error {
-	if d == nil {
-		return fmt.Errorf("document is nil")
-	}
-	if strings.TrimSpace(d.ProjectName) == "" {
-		return fmt.Errorf("project_name is required")
-	}
-	if d.Appearance != nil && d.Appearance.Colors != nil {
-		for _, color := range []struct {
-			name  string
-			value string
-		}{
-			{name: "primary", value: d.Appearance.Colors.Primary},
-			{name: "accent", value: d.Appearance.Colors.Accent},
-		} {
-			if color.value != "" && !isHexColor(color.value) {
-				return fmt.Errorf("appearance.colors.%s must be a 6-digit hex color", color.name)
-			}
-		}
-	}
-	if strings.TrimSpace(d.Overview.Markdown) == "" {
-		return fmt.Errorf("overview markdown is required")
-	}
-	seenGuides := map[string]bool{}
-	for i, page := range d.Guides {
-		if page.ID == "" || page.ID == "overview" {
-			return fmt.Errorf("guides[%d] needs an id other than overview", i)
-		}
-		if seenGuides[page.ID] {
-			return fmt.Errorf("duplicate guide id %q", page.ID)
-		}
-		seenGuides[page.ID] = true
-		if strings.TrimSpace(page.Title) == "" {
-			return fmt.Errorf("guides[%d] title is required", i)
-		}
-		if strings.TrimSpace(page.Markdown) == "" {
-			return fmt.Errorf("guides[%d] markdown is required", i)
-		}
-	}
-	seenRefs := map[string]bool{}
-	for i, section := range d.Reference {
-		if section.Kind != KindRoutes && section.Kind != KindConfig && section.Kind != KindCommands {
-			return fmt.Errorf("reference[%d] kind must be %q, %q, or %q", i, KindRoutes, KindConfig, KindCommands)
-		}
-		if section.ID == "" {
-			return fmt.Errorf("reference[%d] id is required", i)
-		}
-		if seenRefs[section.ID] {
-			return fmt.Errorf("duplicate reference id %q", section.ID)
-		}
-		seenRefs[section.ID] = true
-		if len(section.Entries) == 0 {
-			return fmt.Errorf("reference[%d] has no entries", i)
-		}
-		for j, entry := range section.Entries {
-			if strings.TrimSpace(entry.Name) == "" {
-				return fmt.Errorf("reference[%d].entries[%d] name is required", i, j)
-			}
-			if section.Kind == KindRoutes && strings.TrimSpace(entry.Detail) == "" {
-				return fmt.Errorf("reference[%d].entries[%d] method is required", i, j)
-			}
-		}
-	}
-	return nil
-}
-
-func isHexColor(color string) bool {
-	if len(color) != 7 || color[0] != '#' {
-		return false
-	}
-	_, err := hex.DecodeString(color[1:])
-	return err == nil
 }
 
 // SourcePath returns the file path from a "path:line" source citation.
@@ -235,34 +92,4 @@ func Slug(s string) string {
 		return "page"
 	}
 	return out
-}
-
-func uniqueSlug(base string, used map[string]bool) string {
-	if base == "" {
-		base = "page"
-	}
-	if !used[base] {
-		used[base] = true
-		return base
-	}
-	for i := 2; ; i++ {
-		id := fmt.Sprintf("%s-%d", base, i)
-		if !used[id] {
-			used[id] = true
-			return id
-		}
-	}
-}
-
-func defaultRefTitle(kind string) string {
-	switch kind {
-	case KindRoutes:
-		return "Routes"
-	case KindConfig:
-		return "Configuration"
-	case KindCommands:
-		return "Commands"
-	default:
-		return kind
-	}
 }

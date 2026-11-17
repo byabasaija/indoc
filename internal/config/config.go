@@ -39,6 +39,24 @@ type Config struct {
 	// SourceURL links citations and reference entries to the code, e.g.
 	// https://github.com/org/repo/blob/HEAD/{path}#L{line}
 	SourceURL string `yaml:"source_url,omitempty"`
+	// Links appear in the site header, e.g. the repository or a website.
+	Links []Link `yaml:"links,omitempty"`
+	// Footer is a line of Markdown shown at the bottom of every page.
+	Footer string `yaml:"footer,omitempty"`
+	// SiteURL is where the site is published; enables sitemap.xml and
+	// canonical links.
+	SiteURL string `yaml:"site_url,omitempty"`
+	// ShowAuthors adds the last author's name from git to "Last updated".
+	// Off by default: it publishes contributors' names.
+	ShowAuthors bool `yaml:"show_authors,omitempty"`
+	// AllowHTML passes raw HTML in pages through. Off by default.
+	AllowHTML bool `yaml:"allow_html,omitempty"`
+}
+
+// Link is a header link.
+type Link struct {
+	Text string `yaml:"text"`
+	URL  string `yaml:"url"`
 }
 
 // SourceLink fills the source_url template, or returns "" when unset.

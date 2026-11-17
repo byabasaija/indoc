@@ -3,16 +3,17 @@ package cli
 import (
 	"fmt"
 	"io"
-	"path"
+	"os"
+	"os/exec"
 	"path/filepath"
 	"strconv"
 	"strings"
 
-	"github.com/byabasaija/indoc/internal/bundler"
 	"github.com/byabasaija/indoc/internal/doc"
 	"github.com/byabasaija/indoc/internal/drift"
 	"github.com/byabasaija/indoc/internal/pages"
 	"github.com/byabasaija/indoc/internal/reference"
+	"github.com/byabasaija/indoc/internal/site"
 	"github.com/spf13/cobra"
 )
 
@@ -81,8 +82,7 @@ func buildSite(p *project, outDir string) error {
 		return err
 	}
 	linkSources(p, ref.Sections)
-	document := assemble(p, ref.Sections)
-	return bundler.Write(document, outDir, p.paths.Root)
+	return site.Build(siteFor(p, ref.Sections), outDir)
 }
 
 // linkSources sets each reference entry's URL from source_url.
@@ -120,45 +120,87 @@ func citationLink(p *project) func(pages.Citation) string {
 	}
 }
 
-// assemble maps pages onto the viewer's document: the top-most index.md or
-// README.md is the overview, every other page is a guide in page order.
-func assemble(p *project, sections []doc.RefSection) *doc.Document {
-	overview := overviewIndex(p.pages)
-	d := &doc.Document{
-		ProjectName: p.cfg.ProjectName,
-		Appearance:  p.cfg.Appearance,
+// siteFor collects what the site is built from.
+func siteFor(p *project, sections []doc.RefSection) *site.Site {
+	s := &site.Site{
+		Name:        p.cfg.ProjectName,
+		Footer:      p.cfg.Footer,
+		SiteURL:     p.cfg.SiteURL,
+		AllowHTML:   p.cfg.AllowHTML,
+		ShowAuthors: p.cfg.ShowAuthors,
+		RepoRoot:    p.paths.Root,
 		Reference:   sections,
-		Guides:      []doc.Page{},
+		Repo:        githubRepo(p.cfg.SourceURL),
 	}
-	if d.ProjectName == "" {
-		d.ProjectName = "Documentation"
+	if s.Name == "" {
+		s.Name = "Documentation"
 	}
-	for i, pg := range p.pages {
-		page := doc.Page{
-			ID:       doc.Slug(strings.TrimSuffix(pg.Path, path.Ext(pg.Path))),
-			Title:    pg.Title,
+	if a := p.cfg.Appearance; a != nil {
+		s.Logo, s.Colors = a.Logo, a.Colors
+	}
+	for _, l := range p.cfg.Links {
+		s.Links = append(s.Links, site.Link{Text: l.Text, URL: l.URL})
+	}
+	dir := filepath.Dir(p.paths.Config)
+	if css, err := os.ReadFile(filepath.Join(dir, "custom.css")); err == nil {
+		s.CustomCSS = css
+	}
+	if head, err := os.ReadFile(filepath.Join(dir, "head.html")); err == nil {
+		s.HeadHTML = string(head)
+	}
+	editURL, editLabel := "", ""
+	for _, pg := range p.pages {
+		if p.cfg.SourceURL != "" {
+			editURL, editLabel = editLink(p.cfg.SourceLink(pg.Path, 0))
+		}
+		updated, author := gitLastChange(p.paths.Root, pg.Path)
+		if !p.cfg.ShowAuthors {
+			author = ""
+		}
+		s.Pages = append(s.Pages, site.Page{
+			Source: pg.Path, Title: pg.Title, Description: pg.Description,
+			Order: pg.Order, HasOrder: pg.HasOrder, Layout: pg.Layout,
 			Markdown: pages.Linkify(pg.Body, citationLink(p)),
-		}
-		if i == overview {
-			d.Overview = page
-			continue
-		}
-		d.Guides = append(d.Guides, page)
+			Hero:     pg.Hero, Features: pg.Features, Featured: pg.Featured,
+			EditURL: editURL, EditLabel: editLabel, Updated: updated, Author: author,
+		})
 	}
-	return d
+	return s
 }
 
-func overviewIndex(ps []pages.Page) int {
-	best, bestDepth := 0, -1
-	for i, p := range ps {
-		base := strings.ToLower(path.Base(p.Path))
-		if base != "index.md" && base != "readme.md" {
-			continue
-		}
-		depth := strings.Count(p.Path, "/")
-		if bestDepth < 0 || depth < bestDepth {
-			best, bestDepth = i, depth
-		}
+// editLink turns a source link into an edit link where the host has one.
+func editLink(view string) (string, string) {
+	switch {
+	case strings.Contains(view, "github.com/") && strings.Contains(view, "/blob/"):
+		return strings.Replace(view, "/blob/", "/edit/", 1), "Edit this page"
+	case strings.Contains(view, "/-/blob/"):
+		return strings.Replace(view, "/-/blob/", "/-/edit/", 1), "Edit this page"
+	case view != "":
+		return view, "View source"
 	}
-	return best
+	return "", ""
+}
+
+// githubRepo extracts owner/repo from a GitHub source_url.
+func githubRepo(sourceURL string) string {
+	rest, ok := strings.CutPrefix(sourceURL, "https://github.com/")
+	if !ok {
+		return ""
+	}
+	parts := strings.SplitN(rest, "/", 3)
+	if len(parts) < 2 || parts[0] == "" || parts[1] == "" {
+		return ""
+	}
+	return parts[0] + "/" + parts[1]
+}
+
+// gitLastChange returns the date (YYYY-MM-DD) and author of the last commit
+// that touched file, or empty strings outside git.
+func gitLastChange(root, file string) (string, string) {
+	out, err := exec.Command("git", "-C", root, "log", "-1", "--format=%cs%x1f%an", "--", file).Output()
+	if err != nil {
+		return "", ""
+	}
+	date, author, _ := strings.Cut(strings.TrimSpace(string(out)), "\x1f")
+	return date, author
 }

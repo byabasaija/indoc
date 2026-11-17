@@ -89,6 +89,8 @@ func fingerprint(p *project) string {
 		}
 	}
 	stat(p.paths.Config)
+	stat(filepath.Join(filepath.Dir(p.paths.Config), "custom.css"))
+	stat(filepath.Join(filepath.Dir(p.paths.Config), "head.html"))
 	for _, pg := range p.pages {
 		stat(filepath.Join(p.paths.Root, filepath.FromSlash(pg.Path)))
 	}

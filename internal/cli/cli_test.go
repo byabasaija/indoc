@@ -53,6 +53,23 @@ func (r *repo) write(path, content string) {
 	}
 }
 
+// site returns every HTML page of the built site, concatenated.
+func (r *repo) site() string {
+	r.t.Helper()
+	var b strings.Builder
+	filepath.WalkDir(filepath.Join(r.root, ".indoc/site"), func(p string, d os.DirEntry, err error) error {
+		if err == nil && strings.HasSuffix(p, ".html") {
+			data, _ := os.ReadFile(p)
+			b.Write(data)
+		}
+		return nil
+	})
+	if b.Len() == 0 {
+		r.t.Fatal("no HTML pages were built")
+	}
+	return b.String()
+}
+
 func (r *repo) read(path string) string {
 	r.t.Helper()
 	data, err := os.ReadFile(filepath.Join(r.root, path))
@@ -110,10 +127,10 @@ func TestWorkflow(t *testing.T) {
 	if err := runBundle(r.cfg, "", &out); err != nil {
 		t.Fatalf("bundle: %v\n%s", err, out.String())
 	}
-	payload := r.read(".indoc/site/docs.js")
+	payload := r.site()
 	for _, want := range []string{"Admitting patients", "/health", "DATABASE_URL"} {
 		if !strings.Contains(payload, want) {
-			t.Errorf("site payload missing %q", want)
+			t.Errorf("site missing %q", want)
 		}
 	}
 	if !strings.Contains(r.read(".indoc/lock.json"), "app/main.py::admit") {
@@ -220,7 +237,7 @@ func TestInitWithExistingDocsPublishesNothing(t *testing.T) {
 	if err := runBundle(r.cfg, "", &bytes.Buffer{}); err != nil {
 		t.Fatal(err)
 	}
-	if strings.Contains(r.read(".indoc/site/docs.js"), "Security gaps") {
+	if strings.Contains(r.site(), "Security gaps") {
 		t.Fatal("unselected page was published")
 	}
 }
@@ -245,10 +262,10 @@ func TestBundleLinksCitationsAndSources(t *testing.T) {
 	if err := runBundle(r.cfg, "", &bytes.Buffer{}); err != nil {
 		t.Fatal(err)
 	}
-	payload := r.read(".indoc/site/docs.js")
+	payload := r.site()
 	for _, want := range []string{
-		`href=\"https://example.test/app/main.py#L7\"`, // citation -> def admit
-		`"url":"https://example.test/app/main.py#L3"`,  // route source -> @app.get
+		`href="https://example.test/app/main.py#L7"`, // citation -> def admit
+		`href="https://example.test/app/main.py#L3"`, // route source -> @app.get
 	} {
 		if !strings.Contains(payload, want) {
 			t.Errorf("payload missing %s", want)

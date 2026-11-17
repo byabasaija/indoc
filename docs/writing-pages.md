@@ -32,6 +32,8 @@ Every request lands in
 | `audience` | Optional reader group, such as `partner` or `dev`. |
 | `sources` | Globs of code this page describes. `**` matches any depth. |
 | `strict` | `true` makes body changes to cited symbols fail the check. |
+| `description` | One line for search results and link previews. |
+| `layout` | `landing` on the home page adds a hero and feature cards; see [Customizing the site](site.md). |
 
 Docusaurus keys `sidebar_label` and `sidebar_position` are read too, so an existing Docusaurus docs folder works unchanged.
 

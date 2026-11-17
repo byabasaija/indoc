@@ -127,6 +127,8 @@ To serve the site from an existing app, set `output_dir` to a folder the app ser
 source_url: https://git.example.com/team/app/src/branch/main/{path}#L{line}
 ```
 
+The site is one pre-rendered HTML page per Markdown file, with search, dark mode, syntax highlighting, copy buttons, and Mermaid diagrams. The sidebar follows your folders. A landing page, logo, colors, header links, footer, `custom.css`, and `head.html` are set in config and frontmatter; see [docs/site.md](docs/site.md).
+
 ## Language support
 
 Precise staleness and `path::Symbol` citations need a parser for the language. Every other part of indoc works on any repository.

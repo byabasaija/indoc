@@ -31,6 +31,35 @@ type Page struct {
 	Body      string // Markdown without frontmatter
 	Raw       []byte // whole file, for hashing
 	Citations []Citation
+	// Description is a one-line summary for search results and meta tags.
+	Description string
+	// Hero, Features, and Featured fill the landing layout (layout: landing).
+	Hero     *Hero
+	Features []Feature
+	Featured []Action
+}
+
+// Hero is the top of a landing page.
+type Hero struct {
+	Title   string   `yaml:"title"`
+	Tagline string   `yaml:"tagline"`
+	Image   string   `yaml:"image"`
+	Actions []Action `yaml:"actions"`
+}
+
+// Action is a button or link: primary actions are filled, others outlined.
+type Action struct {
+	Text  string `yaml:"text"`
+	Link  string `yaml:"link"`
+	Theme string `yaml:"theme"` // primary or secondary
+}
+
+// Feature is a landing page card.
+type Feature struct {
+	Title    string `yaml:"title"`
+	Details  string `yaml:"details"`
+	Link     string `yaml:"link"`
+	LinkText string `yaml:"link_text"`
 }
 
 // Citation is a `path::Symbol` reference in a page.
@@ -47,14 +76,18 @@ func (c Citation) Ref() string { return c.Path + "::" + c.Symbol }
 func (p Page) Anchored() bool { return len(p.Sources) > 0 || len(p.Citations) > 0 }
 
 type frontmatter struct {
-	Title           string   `yaml:"title"`
-	Order           *int     `yaml:"order"`
-	Audience        string   `yaml:"audience"`
-	Layout          string   `yaml:"layout"`
-	Sources         []string `yaml:"sources"`
-	Strict          bool     `yaml:"strict"`
-	SidebarLabel    string   `yaml:"sidebar_label"`    // Docusaurus
-	SidebarPosition *int     `yaml:"sidebar_position"` // Docusaurus
+	Title           string    `yaml:"title"`
+	Order           *int      `yaml:"order"`
+	Audience        string    `yaml:"audience"`
+	Layout          string    `yaml:"layout"`
+	Sources         []string  `yaml:"sources"`
+	Strict          bool      `yaml:"strict"`
+	SidebarLabel    string    `yaml:"sidebar_label"`    // Docusaurus
+	SidebarPosition *int      `yaml:"sidebar_position"` // Docusaurus
+	Description     string    `yaml:"description"`
+	Hero            *Hero     `yaml:"hero"`
+	Features        []Feature `yaml:"features"`
+	Featured        []Action  `yaml:"featured"`
 }
 
 // Match returns the files (from a ListFiles result) selected by globs.
@@ -116,6 +149,8 @@ func Parse(pagePath string, raw []byte) (Page, error) {
 		p.Audience = fm.Audience
 		p.Layout = fm.Layout
 		p.Strict = fm.Strict
+		p.Description = strings.TrimSpace(fm.Description)
+		p.Hero, p.Features, p.Featured = fm.Hero, fm.Features, fm.Featured
 		for _, s := range fm.Sources {
 			s = strings.TrimSpace(s)
 			if s == "" {

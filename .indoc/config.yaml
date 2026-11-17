@@ -4,3 +4,6 @@ pages:
     - docs/**/*.md
 output_dir: .indoc/site
 source_url: https://github.com/byabasaija/indoc/blob/HEAD/{path}#L{line}
+appearance:
+    logo: design/logo.svg
+footer: MIT licensed. Source on [GitHub](https://github.com/byabasaija/indoc).

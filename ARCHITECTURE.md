@@ -21,7 +21,7 @@ internal/cli              commands: init, scan, check, ack, bundle, preview, ver
         │       │               └── internal/treesitter   WebAssembly grammars via wazero (Python, JS/TS)
         │       └── internal/glob     `**` glob matching
         │
-        └── internal/bundler    static site (embedded viewer), via internal/doc + internal/render
+        └── internal/site       static site: pre-rendered pages, via internal/render (goldmark)
                 └── internal/reference   extractors: Django/DRF, FastAPI, Cobra, Python env, generic regex
                         └── internal/lang/python (ParseModule)   static module view on tree-sitter
 ```
@@ -89,11 +89,12 @@ A page is compared only while its content matches the lock. `drift.Ack` with no 
 
 ## Site
 
-`indoc bundle` refuses broken citations, runs `internal/reference` over non-test source files, maps pages onto the viewer's document (the top-most `index.md`/`README.md` is the overview), and writes `index.html`, `style.css`, `app.js`, and `docs.js` to `output_dir` (default `.indoc/site/`, gitignored). It then records new and edited pages, as `ack` would.
+`indoc bundle` refuses broken citations, runs `internal/reference` over non-test source files, and hands pages, reference sections, and config to `internal/site`, which writes one HTML file per page to `output_dir` (default `.indoc/site/`, gitignored). It then records new and edited pages, as `ack` would.
+
+`internal/site` renders Markdown at build time with `html/template`; every page is complete without JavaScript. URLs follow the page's path under the pages' common folder (`docs/guides/setup.md` → `guides/setup/`), the first folder is the sidebar group, and all links are relative so the folder works from any path or from disk. Links to other pages' `.md` files are rewritten to page URLs; local images are copied under `assets/img/` with content-hashed names. Search is an index written as `assets/search-index.js` (a script, not JSON, so it loads from `file://`). The browser side is `indoc.js` plus vendored Prism; Mermaid is written only when a page uses it. A manifest (`.indoc-site`) lists the files indoc wrote, so later builds delete only those.
 
 `indoc preview` builds into a temporary directory, serves it on `127.0.0.1`, and rebuilds when pages or the config change. It never writes the lock or `output_dir`.
 
-The viewer is still the original hash-routed single page; ROADMAP Phase 6 replaces it with pre-rendered pages.
 
 ## Files
 

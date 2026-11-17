@@ -394,6 +394,7 @@ Each phase ends with a concrete check against a real repo, shop unless noted.
 * Landing layout, header links with star count, footer, edit-this-page, last-updated.
 * `custom.css`, `head.html`, `allow_html`.
 * **Exit:** indoc's own docs site uses the landing layout and looks credible next to a default Docusaurus site.
+* **Result (2026-11-17):** `internal/site` replaces `internal/bundler`. indoc's own docs build to 192 KB (7 pages, 2 reference pages, search index); checked in Chrome at desktop and phone widths, light and dark. Highlighting is Prism 1.30 in the browser (47 KB, vendored by `make vendor`), not chroma at build time: chroma added 5.4 MB to the binary for the same languages. Mermaid 11 is embedded gzipped (976 KB) and written only when a page has a diagram. Output from the old single-page viewer is removed on the first build, recognized by its payload.
 
 ## 10. Not doing
 
@@ -410,7 +411,7 @@ Saying no keeps indoc small enough to be excellent at one thing. Each item lists
 | Bundling `docs/` (or any folder) by default | It published a security-gaps file in our very first test repo. Publishing is opt-in. | Never. |
 | Network access during `bundle` | Builds must be deterministic and work offline. Live data (stars) loads in the browser. | Never for build output. |
 | Committing build output by default | Generated files cause merge noise. Default output is gitignored; committing is a choice. | Never as a default. |
-| cgo / tree-sitter | indoc must stay one static binary on every platform. | A third language makes hand-written parsing the bottleneck. |
+| cgo | indoc must stay one static binary on every platform. tree-sitter runs as WebAssembly instead (Phase 4b). | Never. |
 | Duplicating OpenAPI / Swagger | drf-spectacular and FastAPI already produce exact schemas. We link to them, and may read them later. | Never as a replacement. |
 | Hosting docs for users (an "indoc cloud") | The output is static files; any host works. | Out of scope for the open-source tool. |
 | Competing on rendering features | We lose that fight. We compete on keeping docs correct. | Never; this is the positioning. |

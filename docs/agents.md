@@ -1,6 +1,6 @@
 ---
 title: Using indoc from a coding agent
-order: 5
+order: 6
 sources:
   - internal/cli/mcp.go
   - internal/mcp/**

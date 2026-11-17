@@ -2,7 +2,7 @@
   "version": 1,
   "pages": {
     "docs/agents.md": {
-      "page": "55bbfe162f3fbf46",
+      "page": "8e8cb884353f96f1",
       "citations": {
         "internal/cli/mcp.go::mcpServer": {
           "surface": "9a5340343b623d99",
@@ -266,7 +266,7 @@
         "internal/cli/bundle.go::runBundle": {
           "surface": "afbcb60d55daccfa",
           "body": "4c33e356e3345660",
-          "raw": "c943a3a51b21a5b0",
+          "raw": "4d64316a6eccca24",
           "hasher": "go/2"
         },
         "internal/cli/init.go::runInit": {
@@ -278,34 +278,38 @@
         "internal/config/config.go::InferProjectName": {
           "surface": "665df7f08f982cfb",
           "body": "7b074de3acb70fe3",
-          "raw": "1aff1c3d19e30162",
+          "raw": "71faddcba90466a5",
           "hasher": "go/2"
         }
       },
       "sources": {
         "internal/cli/bundle.go": {
-          "body": "7a46aa3281339ed3",
+          "body": "0f083e485935e0f2",
           "symbols": {
-            "assemble": "ae682a0fc0ffc73a",
             "buildSite": "a025c648708f8f48",
             "citationLink": "840bb03b38bba364",
+            "editLink": "7c023cbaf4f922aa",
+            "gitLastChange": "4c7a4daf2cb930a4",
+            "githubRepo": "cf15e64fa201c261",
             "init": "c78f10468427bc77",
             "linkSources": "3b41123d1bc8c90c",
-            "overviewIndex": "d5fe107b30abd0b5",
             "runBundle": "afbcb60d55daccfa",
+            "siteFor": "3a09b09748126992",
             "splitSource": "ebcb91591de95bdb"
           },
           "private": [
-            "assemble",
             "buildSite",
             "citationLink",
+            "editLink",
+            "gitLastChange",
+            "githubRepo",
             "init",
             "linkSources",
-            "overviewIndex",
             "runBundle",
+            "siteFor",
             "splitSource"
           ],
-          "raw": "c943a3a51b21a5b0",
+          "raw": "4d64316a6eccca24",
           "hasher": "go/2"
         },
         "internal/cli/init.go": {
@@ -324,14 +328,15 @@
           "hasher": "go/2"
         },
         "internal/config/config.go": {
-          "body": "8709f2b3864914e6",
+          "body": "2c36514fc1647087",
           "symbols": {
-            "Config": "dc4701ef7b92cab0",
+            "Config": "3282cc6990a1cae4",
             "Config.Save": "ab4c717e8f3c6e18",
             "Config.SourceLink": "d0269e979316b6e1",
             "Default": "fcba8035c4318c9d",
             "InferProjectName": "665df7f08f982cfb",
             "InferSourceURL": "357e1bd6b502cadd",
+            "Link": "9941900250d55bc4",
             "Load": "7988a8d596a72425",
             "Paths": "76140627bde13cc5",
             "Resolve": "dbdc0ac20bbad50d",
@@ -346,7 +351,7 @@
             "pyprojectName",
             "sourceTemplate"
           ],
-          "raw": "1aff1c3d19e30162",
+          "raw": "71faddcba90466a5",
           "hasher": "go/2"
         },
         "internal/config/config_test.go": {
@@ -365,7 +370,7 @@
       }
     },
     "docs/index.md": {
-      "page": "217dff2e648cc185",
+      "page": "a410dc722c1b303a",
       "citations": {
         "internal/code/code.go::Analyze": {
           "surface": "498b2762e77d0628",
@@ -395,7 +400,7 @@
           "private": [
             "main"
           ],
-          "raw": "e69265b020553194",
+          "raw": "9b54f6e929a50d91",
           "hasher": "go/2"
         },
         "internal/drift/drift.go": {
@@ -1002,8 +1007,268 @@
         }
       }
     },
+    "docs/site.md": {
+      "page": "b7cf3b2606cd5dfc",
+      "citations": {
+        "internal/cli/bundle.go::editLink": {
+          "surface": "7c023cbaf4f922aa",
+          "body": "5ab551982e7c7030",
+          "raw": "4d64316a6eccca24",
+          "hasher": "go/2"
+        },
+        "internal/cli/bundle.go::gitLastChange": {
+          "surface": "4c7a4daf2cb930a4",
+          "body": "2dc4c2511680d66f",
+          "raw": "4d64316a6eccca24",
+          "hasher": "go/2"
+        },
+        "internal/cli/bundle.go::siteFor": {
+          "surface": "3a09b09748126992",
+          "body": "908d7e4d34a4b8e1",
+          "raw": "4d64316a6eccca24",
+          "hasher": "go/2"
+        },
+        "internal/pages/pages.go::Hero": {
+          "surface": "93665241ccacfd85",
+          "body": "",
+          "raw": "4276e81309cb19ab",
+          "hasher": "go/2"
+        },
+        "internal/site/site.go::Build": {
+          "surface": "b40cda3ec9f95359",
+          "body": "d8620248c3acc27f",
+          "raw": "75dfef16bb097090",
+          "hasher": "go/2"
+        }
+      },
+      "sources": {
+        "internal/cli/bundle.go": {
+          "body": "0f083e485935e0f2",
+          "symbols": {
+            "buildSite": "a025c648708f8f48",
+            "citationLink": "840bb03b38bba364",
+            "editLink": "7c023cbaf4f922aa",
+            "gitLastChange": "4c7a4daf2cb930a4",
+            "githubRepo": "cf15e64fa201c261",
+            "init": "c78f10468427bc77",
+            "linkSources": "3b41123d1bc8c90c",
+            "runBundle": "afbcb60d55daccfa",
+            "siteFor": "3a09b09748126992",
+            "splitSource": "ebcb91591de95bdb"
+          },
+          "private": [
+            "buildSite",
+            "citationLink",
+            "editLink",
+            "gitLastChange",
+            "githubRepo",
+            "init",
+            "linkSources",
+            "runBundle",
+            "siteFor",
+            "splitSource"
+          ],
+          "raw": "4d64316a6eccca24",
+          "hasher": "go/2"
+        },
+        "internal/pages/pages.go": {
+          "body": "63022fc79fd3c80f",
+          "symbols": {
+            "Action": "75dfe11cbbcd9aa6",
+            "Citation": "4ff1d172532f8877",
+            "Citation.Ref": "d428f6f2d2b262be",
+            "Feature": "a5cf0a84e0b6a327",
+            "Hero": "93665241ccacfd85",
+            "Linkify": "b31743bf804e9b22",
+            "Load": "92343c81f51a3dd1",
+            "Match": "b6ece7cdf64077ba",
+            "Page": "397f1260720056e8",
+            "Page.Anchored": "91797e9211489847",
+            "Parse": "21d7718c70908c49",
+            "fenceMarker": "da58d0423dfd6529",
+            "findCitations": "a7fd3bcc744cf263",
+            "firstHeading": "a09462356d2e5c85",
+            "firstNonEmpty": "a4fc998c56dbd5b9",
+            "frontmatter": "9285ec73cee51084",
+            "linkifyLine": "22fde92b484bff29",
+            "splitFrontmatter": "392c5658a5874645",
+            "titleFromPath": "0ccab65379cf0320"
+          },
+          "private": [
+            "fenceMarker",
+            "findCitations",
+            "firstHeading",
+            "firstNonEmpty",
+            "frontmatter",
+            "linkifyLine",
+            "splitFrontmatter",
+            "titleFromPath"
+          ],
+          "raw": "4276e81309cb19ab",
+          "hasher": "go/2"
+        },
+        "internal/site/assets/indoc.css": {
+          "body": "d1a11247a8084fd8",
+          "raw": "d1a11247a8084fd8",
+          "hasher": "bytes"
+        },
+        "internal/site/assets/indoc.js": {
+          "body": "e80a016b99f0b7e0",
+          "symbols": {
+            "copyText": "2156b8cd9c42e36d",
+            "dark": "675dce303af63061",
+            "escapeHTML": "fc635dba7d931de8",
+            "highlight": "b2c5ed5ffdf6b5c7",
+            "move": "38397f97c84d4b5e",
+            "renderDiagrams": "9467ce315d790704",
+            "score": "5f3f70deaa2dddff",
+            "search": "f092e115439a8aae",
+            "show": "e3b0c44298fc1c14",
+            "snippet": "3b74ff3ffb1fed21"
+          },
+          "private": [
+            "copyText",
+            "dark",
+            "escapeHTML",
+            "highlight",
+            "move",
+            "renderDiagrams",
+            "score",
+            "search",
+            "show",
+            "snippet"
+          ],
+          "raw": "4033d05c286c1aaf",
+          "hasher": "javascript/44c892e0be05/2"
+        },
+        "internal/site/site.go": {
+          "body": "dc9cfa95e398e3a0",
+          "symbols": {
+            "Build": "b40cda3ec9f95359",
+            "Link": "d7c60ea0d7835f63",
+            "Page": "18c902b22254064d",
+            "Site": "6127c0a159b68927",
+            "builder": "87e1504af65bd86b",
+            "builder.assets": "b4ec11e7fdd7703b",
+            "builder.categoryRank": "ae8d547a37e17bc1",
+            "builder.categoryTitle": "e9667abdc839591b",
+            "builder.copyFile": "461572243aa470eb",
+            "builder.isFolder": "358eaf71304af29f",
+            "builder.less": "72cd38f41843868f",
+            "builder.plan": "968c7118e062ba41",
+            "builder.render": "bdd8cf3c89def1e3",
+            "builder.resolveImage": "9bd21065e7021313",
+            "builder.resolveLink": "35658f81ca7efb9d",
+            "builder.searchIndex": "b866e3a29a08428f",
+            "built": "3a738f57981828db",
+            "commonDir": "acbb3d0fb641a90f",
+            "humanize": "a8e40962f5500bfa",
+            "pageLess": "b0681c15b476cd81",
+            "rank": "475c17380f316fbf",
+            "refText": "eb4d031f6f68518b",
+            "relURL": "28519d825dddf49d",
+            "rootPrefix": "748b4484d23b165a",
+            "searchEntry": "8703558b8e9c913f",
+            "slugPath": "cbd6507c802f6c4b",
+            "urlOf": "d501530eafb4f60d",
+            "writer": "b9796fdf4c482343",
+            "writer.finish": "5d267f2d478cfe6d",
+            "writer.write": "cb9a3612c7be96f6"
+          },
+          "private": [
+            "builder",
+            "builder.assets",
+            "builder.categoryRank",
+            "builder.categoryTitle",
+            "builder.copyFile",
+            "builder.isFolder",
+            "builder.less",
+            "builder.plan",
+            "builder.render",
+            "builder.resolveImage",
+            "builder.resolveLink",
+            "builder.searchIndex",
+            "built",
+            "commonDir",
+            "humanize",
+            "pageLess",
+            "rank",
+            "refText",
+            "relURL",
+            "rootPrefix",
+            "searchEntry",
+            "slugPath",
+            "urlOf",
+            "writer",
+            "writer.finish",
+            "writer.write"
+          ],
+          "raw": "75dfef16bb097090",
+          "hasher": "go/2"
+        },
+        "internal/site/site_test.go": {
+          "body": "663102bc4abc4918",
+          "symbols": {
+            "TestLanding": "3c18404c6fab744f",
+            "TestLayoutAndLinks": "20c522e3db29fb83",
+            "TestLegacyViewerRemoved": "7187d912e7d8be91",
+            "TestMermaidOnlyWhenUsed": "cd62c00a1da3567b",
+            "TestReferenceTables": "ae59f9f109f5a7e9",
+            "TestStaleFilesRemoved": "4823141262fe41dd",
+            "basicSite": "31a2e0164be82723",
+            "build": "227a27ce1384a0c5",
+            "exists": "adc92eea098ab63c",
+            "read": "92008ed0428d7e03"
+          },
+          "private": [
+            "basicSite",
+            "build",
+            "exists",
+            "read"
+          ],
+          "raw": "5f63d9346f9961f1",
+          "hasher": "go/2"
+        },
+        "internal/site/templates/page.html": {
+          "body": "4c423c290750a9be",
+          "raw": "4c423c290750a9be",
+          "hasher": "bytes"
+        },
+        "internal/site/write.go": {
+          "body": "ed530e57a0769f57",
+          "symbols": {
+            "action": "7dbbf684e45c7f1e",
+            "builder.execute": "e3d06716413fa76a",
+            "builder.landing": "be1f234b460e302b",
+            "builder.nav": "0f97abc234241bab",
+            "builder.sitemap": "644c59ed76ff6618",
+            "builder.view": "bb2b804166e107ef",
+            "builder.writePages": "ec5c723d601b074f",
+            "feature": "92b02d70eb008f96",
+            "navGroup": "0fb1bb38ceab36f6",
+            "navItem": "e11e00936f210838",
+            "view": "02e3ed0c82a40e4e"
+          },
+          "private": [
+            "action",
+            "builder.execute",
+            "builder.landing",
+            "builder.nav",
+            "builder.sitemap",
+            "builder.view",
+            "builder.writePages",
+            "feature",
+            "navGroup",
+            "navItem",
+            "view"
+          ],
+          "raw": "81536ffa8de5ca56",
+          "hasher": "go/2"
+        }
+      }
+    },
     "docs/writing-pages.md": {
-      "page": "88db63624d571c27",
+      "page": "cdb47823e6d3e57d",
       "citations": {
         "internal/code/code.go::Analyze": {
           "surface": "498b2762e77d0628",
@@ -1026,13 +1291,13 @@
         "internal/pages/pages.go::Linkify": {
           "surface": "b31743bf804e9b22",
           "body": "ff79ab1e5f006210",
-          "raw": "aad7733c037ca72c",
+          "raw": "4276e81309cb19ab",
           "hasher": "go/2"
         },
         "internal/pages/pages.go::Parse": {
           "surface": "21d7718c70908c49",
-          "body": "b7199f790d64bb50",
-          "raw": "aad7733c037ca72c",
+          "body": "69b45d784d25fc64",
+          "raw": "4276e81309cb19ab",
           "hasher": "go/2"
         }
       },
@@ -1060,21 +1325,24 @@
           "hasher": "go/2"
         },
         "internal/pages/pages.go": {
-          "body": "e7850256720a835d",
+          "body": "63022fc79fd3c80f",
           "symbols": {
+            "Action": "75dfe11cbbcd9aa6",
             "Citation": "4ff1d172532f8877",
             "Citation.Ref": "d428f6f2d2b262be",
+            "Feature": "a5cf0a84e0b6a327",
+            "Hero": "93665241ccacfd85",
             "Linkify": "b31743bf804e9b22",
             "Load": "92343c81f51a3dd1",
             "Match": "b6ece7cdf64077ba",
-            "Page": "88cf0c7a66dda464",
+            "Page": "397f1260720056e8",
             "Page.Anchored": "91797e9211489847",
             "Parse": "21d7718c70908c49",
             "fenceMarker": "da58d0423dfd6529",
             "findCitations": "a7fd3bcc744cf263",
             "firstHeading": "a09462356d2e5c85",
             "firstNonEmpty": "a4fc998c56dbd5b9",
-            "frontmatter": "a3e46e688c5f9c60",
+            "frontmatter": "9285ec73cee51084",
             "linkifyLine": "22fde92b484bff29",
             "splitFrontmatter": "392c5658a5874645",
             "titleFromPath": "0ccab65379cf0320"
@@ -1089,7 +1357,7 @@
             "splitFrontmatter",
             "titleFromPath"
           ],
-          "raw": "aad7733c037ca72c",
+          "raw": "4276e81309cb19ab",
           "hasher": "go/2"
         },
         "internal/pages/pages_test.go": {
