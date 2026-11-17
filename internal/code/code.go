@@ -129,3 +129,22 @@ func isVirtualenv(dir string) bool {
 	_, err := os.Stat(filepath.Join(dir, "pyvenv.cfg"))
 	return err == nil
 }
+
+// IsTest reports whether a path is a test file by common conventions:
+// tests/test/__tests__ directories, test_*.py, *_test.py, conftest.py,
+// *_test.go, and *.test.* / *.spec.* files.
+func IsTest(p string) bool {
+	for _, seg := range strings.Split(filepath.ToSlash(filepath.Dir(p)), "/") {
+		if seg == "tests" || seg == "test" || seg == "__tests__" {
+			return true
+		}
+	}
+	base := strings.ToLower(filepath.Base(p))
+	switch {
+	case strings.HasSuffix(base, "_test.go"):
+		return true
+	case strings.HasSuffix(base, ".py") && (strings.HasPrefix(base, "test_") || strings.HasSuffix(base, "_test.py") || base == "conftest.py"):
+		return true
+	}
+	return strings.Contains(base, ".test.") || strings.Contains(base, ".spec.")
+}

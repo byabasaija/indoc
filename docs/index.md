@@ -24,7 +24,7 @@ indoc never calls an AI model. Your coding agent writes the pages; indoc does th
 | A cited symbol's signature changed, or the symbol is gone | **stale** / **broken**: check fails |
 | A public signature was added, removed, or changed under `sources` | **stale**: check fails |
 | A cited symbol's body changed | **drift**: reported; fails on `strict: true` pages or with `--strict` |
-| Only implementation or private helpers changed under `sources` | **drift**: reported; fails with `--strict` |
+| Only implementation, private helpers, or tests changed under `sources` | **drift**: reported; fails with `--strict` |
 | Comments, docstrings, logging calls, formatting | ignored |
 
 A page that was edited must be recorded again with `indoc ack` (or `indoc bundle`). Nothing re-records an unchanged stale page except naming it explicitly, so no routine command can hide a real warning.

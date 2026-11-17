@@ -44,7 +44,7 @@ Lines marked `✗` fail the check. With `--strict`, drift, unanchored pages, and
 | edited | The page changed since it was recorded | `indoc ack` |
 | unstamped | A new page | `indoc ack` |
 | removed | A recorded page was deleted | `indoc ack` |
-| drift | Implementation or private helpers changed; signatures did not | Review; fails only with `--strict` |
+| drift | Implementation, private helpers, or tests changed; public signatures did not | Review; fails only with `--strict` |
 | unanchored | No `sources` and no citations | Add them; fails only with `--strict` |
 
 ## Recording pages

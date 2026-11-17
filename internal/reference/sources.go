@@ -3,6 +3,8 @@ package reference
 import (
 	"path"
 	"strings"
+
+	"github.com/byabasaija/indoc/internal/code"
 )
 
 var languages = map[string]string{
@@ -25,23 +27,4 @@ func Sources(files []string) []SourceFile {
 	return out
 }
 
-func isTest(p string) bool {
-	for _, seg := range strings.Split(path.Dir(p), "/") {
-		if seg == "tests" || seg == "test" || seg == "__tests__" {
-			return true
-		}
-	}
-	base := strings.ToLower(path.Base(p))
-	switch {
-	case strings.HasSuffix(base, "_test.go"):
-		return true
-	case strings.HasSuffix(base, ".py") && (strings.HasPrefix(base, "test_") || strings.HasSuffix(base, "_test.py") || base == "conftest.py"):
-		return true
-	}
-	for _, s := range []string{".test.", ".spec."} {
-		if strings.Contains(base, s) {
-			return true
-		}
-	}
-	return false
-}
+func isTest(p string) bool { return code.IsTest(p) }

@@ -275,3 +275,15 @@ func TestIsPrivate(t *testing.T) {
 		}
 	}
 }
+
+func TestTestFileChangesAreDrift(t *testing.T) {
+	f := newFixture(t)
+	f.write("app/checkout/test_dispatcher.py", "def test_route():\n    pass\n")
+	f.ack("docs/routing.md")
+	f.write("app/checkout/test_dispatcher.py", "def test_route():\n    pass\n\ndef test_new(x):\n    pass\n")
+	got := f.check()
+	expect(t, got, "drift docs/routing.md app/checkout/test_dispatcher.py")
+	if got[0].Detail != "tests changed" {
+		t.Errorf("detail = %q", got[0].Detail)
+	}
+}

@@ -50,9 +50,11 @@ For pages whose readers depend on exact behavior, such as a partner API or a CLI
 
 Cite the symbols a page actually explains. Citations inside fenced code blocks are ignored.
 
+3. **It becomes a link.** When `source_url` is set in `.indoc/config.yaml`, `indoc bundle` turns each citation into a link to the symbol's current line (`internal/pages/pages.go::Linkify`). Line numbers are resolved at build time, so links stay right as code moves.
+
 ## Sources
 
-`sources:` covers more code than you cite. Under those globs, a page goes stale when a public signature is added, removed, or changed, or a file is added or removed. Body-only changes and changes to private helpers (`_name` in Python, lowercase names in Go) are reported as drift without failing CI.
+`sources:` covers more code than you cite. Under those globs, a page goes stale when a public signature is added, removed, or changed, or a file is added or removed. Body-only changes, changes to private helpers (`_name` in Python, lowercase names in Go), and changes to test files are reported as drift without failing CI.
 
 Docstrings, comments, logging calls (`logger.info(...)`), and formatting, including trailing commas, are ignored everywhere.
 

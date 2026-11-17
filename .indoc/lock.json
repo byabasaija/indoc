@@ -2,7 +2,7 @@
   "version": 1,
   "pages": {
     "docs/ci.md": {
-      "page": "a6a3a28660d5e247",
+      "page": "1297501e6b35f61c",
       "citations": {
         "internal/cli/check.go::runCheck": {
           "surface": "4d82fe88e3e7a473",
@@ -35,7 +35,7 @@
           }
         },
         "internal/drift/drift.go": {
-          "body": "f62926542a2b540a",
+          "body": "5d9a01e399b7f4a9",
           "symbols": {
             "Ack": "bdb11477c7c441cf",
             "AckResult": "9848b62df55748a4",
@@ -67,7 +67,7 @@
           }
         },
         "internal/drift/drift_test.go": {
-          "body": "0dc7c92c1543fc9e",
+          "body": "532241d687c95fdb",
           "symbols": {
             "TestAckWithoutTargetsNeverSilencesUnchangedStalePage": "b69c1af2d399f822",
             "TestCitedBodyChangeIsDriftUnlessStrict": "a7b49e9e94fbb0b7",
@@ -80,6 +80,7 @@
             "TestRenamedCitationIsBroken": "c46c6a19c6c1075a",
             "TestSignatureChangeIsStale": "1ecb8b51cfffb49a",
             "TestSourcesMatchingNothingIsBroken": "027389132e5095b6",
+            "TestTestFileChangesAreDrift": "f70593cf59da72d1",
             "TestUncitedBodyChangeIsDrift": "bb2827890ffcf18c",
             "TestUnparsedFileChangeIsDrift": "192cfd3403e75684",
             "TestUnstampedRemovedAndUnanchoredPages": "22b5302cac9ed7dc",
@@ -164,7 +165,7 @@
       }
     },
     "docs/index.md": {
-      "page": "71abd8aa0555a25b",
+      "page": "f121bc4f953d89c9",
       "citations": {
         "internal/code/code.go::Analyze": {
           "surface": "498b2762e77d0628",
@@ -187,7 +188,7 @@
           }
         },
         "internal/drift/drift.go": {
-          "body": "f62926542a2b540a",
+          "body": "5d9a01e399b7f4a9",
           "symbols": {
             "Ack": "bdb11477c7c441cf",
             "AckResult": "9848b62df55748a4",
@@ -219,7 +220,7 @@
           }
         },
         "internal/drift/drift_test.go": {
-          "body": "0dc7c92c1543fc9e",
+          "body": "532241d687c95fdb",
           "symbols": {
             "TestAckWithoutTargetsNeverSilencesUnchangedStalePage": "b69c1af2d399f822",
             "TestCitedBodyChangeIsDriftUnlessStrict": "a7b49e9e94fbb0b7",
@@ -232,6 +233,7 @@
             "TestRenamedCitationIsBroken": "c46c6a19c6c1075a",
             "TestSignatureChangeIsStale": "1ecb8b51cfffb49a",
             "TestSourcesMatchingNothingIsBroken": "027389132e5095b6",
+            "TestTestFileChangesAreDrift": "f70593cf59da72d1",
             "TestUncitedBodyChangeIsDrift": "bb2827890ffcf18c",
             "TestUnparsedFileChangeIsDrift": "192cfd3403e75684",
             "TestUnstampedRemovedAndUnanchoredPages": "22b5302cac9ed7dc",
@@ -383,7 +385,7 @@
           }
         },
         "internal/reference/sources.go": {
-          "body": "024b760f4256b55b",
+          "body": "a9c989c2226f1e54",
           "symbols": {
             "Sources": "09d2aa099f04de28",
             "isTest": "0d6d36f97904bc0e"
@@ -409,7 +411,7 @@
       }
     },
     "docs/writing-pages.md": {
-      "page": "315a89f9f21d6617",
+      "page": "51525e02a46fad43",
       "citations": {
         "internal/code/code.go::Analyze": {
           "surface": "498b2762e77d0628",
@@ -423,6 +425,10 @@
           "surface": "8df7959ee83484b4",
           "body": "b984c5618caadc81"
         },
+        "internal/pages/pages.go::Linkify": {
+          "surface": "b31743bf804e9b22",
+          "body": "ff79ab1e5f006210"
+        },
         "internal/pages/pages.go::Parse": {
           "surface": "21d7718c70908c49",
           "body": "b7199f790d64bb50"
@@ -430,22 +436,24 @@
       },
       "sources": {
         "internal/code/code.go": {
-          "body": "8669d30a7b117aab",
+          "body": "98b74f3a3dbb0f38",
           "symbols": {
             "Analyze": "498b2762e77d0628",
             "File": "dd4efa2226a2e880",
             "File.Lookup": "548418227fcfb633",
             "File.Surfaces": "7c6e4c8a2651c3e0",
+            "IsTest": "ac381bf5d8c73c92",
             "ListFiles": "4ae8ae2ed76bdf67",
             "Parsable": "ad7f83aeb7fc246d",
             "isVirtualenv": "1f9359d24de35af2"
           }
         },
         "internal/pages/pages.go": {
-          "body": "f0ffc11c97238c71",
+          "body": "202266fa51833f21",
           "symbols": {
             "Citation": "4ff1d172532f8877",
             "Citation.Ref": "d428f6f2d2b262be",
+            "Linkify": "b31743bf804e9b22",
             "Load": "92343c81f51a3dd1",
             "Match": "b6ece7cdf64077ba",
             "Page": "88cf0c7a66dda464",
@@ -456,13 +464,15 @@
             "firstHeading": "a09462356d2e5c85",
             "firstNonEmpty": "a4fc998c56dbd5b9",
             "frontmatter": "a3e46e688c5f9c60",
+            "linkifyLine": "22fde92b484bff29",
             "splitFrontmatter": "392c5658a5874645",
             "titleFromPath": "0ccab65379cf0320"
           }
         },
         "internal/pages/pages_test.go": {
-          "body": "2398193f6efa6c16",
+          "body": "b47d3cdc10aed218",
           "symbols": {
+            "TestLinkify": "1573063d76c9937b",
             "TestMatch": "ace37652a65aedac",
             "TestParseDocusaurusKeysAndFallbackTitles": "469c2144a116974d",
             "TestParseFrontmatterAndCitations": "d463991d1ab22c96",

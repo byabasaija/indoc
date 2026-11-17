@@ -7,6 +7,7 @@
 //	surface changed under sources globs        stale  (check fails)
 //	cited symbol's body changed                drift  (fails on strict pages, or with --strict)
 //	body-only change under sources globs       drift  (fails with --strict)
+//	any change to a test file under sources    drift  (fails with --strict)
 //	comments, docstrings, logging, formatting  ignored
 //
 // A page is compared only while its content matches the lock. Editing a page
@@ -279,6 +280,10 @@ func compareSources(r *Repo, p pages.Page, entry PageLock, covered []string) []F
 		}
 		if !f.Parsed || was.Symbols == nil {
 			out = append(out, Finding{Page: p.Path, Kind: Drift, Ref: path, Detail: "file changed"})
+			continue
+		}
+		if code.IsTest(path) {
+			out = append(out, Finding{Page: p.Path, Kind: Drift, Ref: path, Detail: "tests changed"})
 			continue
 		}
 		public, private := surfaceChanges(was.Symbols, f.Surfaces(), path)

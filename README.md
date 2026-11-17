@@ -38,7 +38,7 @@ which picks a handler from the merchant's payment provider.
 | A cited symbol's signature changed, or the symbol is gone | **stale** / **broken**: check fails |
 | A public signature was added, removed, or changed under `sources` | **stale**: check fails |
 | A cited symbol's body changed | **drift**: reported; fails on `strict: true` pages or with `--strict` |
-| Only implementation or private helpers changed under `sources` | **drift**: reported; fails with `--strict` |
+| Only implementation, private helpers, or tests changed under `sources` | **drift**: reported; fails with `--strict` |
 | Comments, docstrings, logging calls, formatting | ignored |
 
 Pages that describe externally visible behavior (a partner API, a CLI's output) can set `strict: true`; then any change to a cited symbol fails the check.
