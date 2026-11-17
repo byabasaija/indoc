@@ -1,0 +1,12 @@
+{
+  "name": "indoc",
+  "description": "Documentation that fails CI when it stops matching the code.",
+  "owner": { "name": "byabasaija", "url": "https://github.com/byabasaija" },
+  "plugins": [
+    {
+      "name": "indoc",
+      "source": "./plugin",
+      "description": "Write, check, and build documentation tied to your code."
+    }
+  ]
+}

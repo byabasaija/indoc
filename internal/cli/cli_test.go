@@ -356,3 +356,89 @@ func TestTypeScriptStaleness(t *testing.T) {
 		t.Fatalf("signature change: err=%v\n%s", err, out.String())
 	}
 }
+
+// TestMCPWorkflow drives `indoc mcp` the way an agent would: scan sets the
+// project up, the agent writes a page, bundle and check run through tools.
+func TestMCPWorkflow(t *testing.T) {
+	r := newRepo(t)
+	r.write("app/main.py", appPy)
+	call := func(id int, tool string, args map[string]any) map[string]any {
+		t.Helper()
+		args["root"] = r.root
+		req, _ := json.Marshal(map[string]any{"jsonrpc": "2.0", "id": id, "method": "tools/call",
+			"params": map[string]any{"name": tool, "arguments": args}})
+		var out bytes.Buffer
+		if err := mcpServer().Serve(bytes.NewReader(append(req, '\n')), &out); err != nil {
+			t.Fatal(err)
+		}
+		var resp map[string]any
+		if err := json.Unmarshal(out.Bytes(), &resp); err != nil {
+			t.Fatalf("%s: %v\n%s", tool, err, out.String())
+		}
+		result, ok := resp["result"].(map[string]any)
+		if !ok {
+			t.Fatalf("%s: %v", tool, resp)
+		}
+		return result
+	}
+	text := func(res map[string]any) string {
+		return res["content"].([]any)[0].(map[string]any)["text"].(string)
+	}
+
+	// First scan: sets up, no pages yet.
+	res := call(1, "indoc_scan", map[string]any{})
+	if res["isError"] == true || !strings.Contains(text(res), "Set up indoc") || !strings.Contains(text(res), "propose readers") {
+		t.Fatalf("first scan: %s", text(res))
+	}
+	if _, err := os.Stat(r.cfg); err != nil {
+		t.Fatal("scan did not create the config")
+	}
+
+	r.write("docs/index.md", admitPage)
+	res = call(2, "indoc_scan", map[string]any{})
+	scan := res["structuredContent"].(map[string]any)
+	if len(scan["pages"].([]any)) != 1 || scan["map"] == nil {
+		t.Fatalf("scan: %v", scan)
+	}
+
+	res = call(3, "indoc_bundle", map[string]any{})
+	if res["isError"] == true || !strings.Contains(text(res), "Wrote 1 pages") {
+		t.Fatalf("bundle: %s", text(res))
+	}
+	res = call(4, "indoc_check", map[string]any{})
+	if res["structuredContent"].(map[string]any)["failing"].(float64) != 0 {
+		t.Fatalf("check after bundle: %s", text(res))
+	}
+
+	r.write("app/main.py", strings.Replace(appPy, "def admit(patient)", "def admit(patient, ward)", 1))
+	res = call(5, "indoc_check", map[string]any{})
+	if res["isError"] == true || res["structuredContent"].(map[string]any)["failing"].(float64) != 2 {
+		t.Fatalf("check after signature change: %s", text(res))
+	}
+	res = call(6, "indoc_ack", map[string]any{"pages": []string{"docs/index.md"}})
+	if res["isError"] == true {
+		t.Fatalf("ack: %s", text(res))
+	}
+	if res = call(7, "indoc_check", map[string]any{}); res["structuredContent"].(map[string]any)["failing"].(float64) != 0 {
+		t.Fatalf("check after ack: %s", text(res))
+	}
+}
+
+func TestMCPSetupWithExistingDocs(t *testing.T) {
+	r := newRepo(t)
+	r.write("docs/partners.md", "# Partners\n")
+	r.write("docs/review-notes.md", "# Internal\n")
+	req := `{"jsonrpc":"2.0","id":1,"method":"tools/call","params":{"name":"indoc_scan","arguments":{"root":"` + r.root + `"}}}` + "\n"
+	var out bytes.Buffer
+	mcpServer().Serve(strings.NewReader(req), &out)
+	if !strings.Contains(out.String(), "docs/review-notes.md") || !strings.Contains(out.String(), "Ask the user which") {
+		t.Fatalf("existing docs must be listed and the user asked: %s", out.String())
+	}
+	req = `{"jsonrpc":"2.0","id":2,"method":"tools/call","params":{"name":"indoc_setup","arguments":{"root":"` + r.root + `","pages":["docs/partners.md"]}}}` + "\n"
+	out.Reset()
+	mcpServer().Serve(strings.NewReader(req), &out)
+	cfg, err := config.Load(r.cfg)
+	if err != nil || len(cfg.Pages) != 1 || cfg.Pages[0] != "docs/partners.md" {
+		t.Fatalf("setup did not set pages: %+v %v\n%s", cfg, err, out.String())
+	}
+}

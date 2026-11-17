@@ -1,0 +1,29 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+      - name: gofmt
+        run: test -z "$(gofmt -l cmd internal tools)"
+      - run: go vet ./...
+      - run: go test ./...
+      - name: indoc's own docs match its code
+        run: go run ./cmd/indoc check --strict
+
+  grammars:
+    # The committed tree-sitter modules must be exactly what the pinned sources build.
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: make grammars
+      - run: git diff --exit-code internal/treesitter/wasm

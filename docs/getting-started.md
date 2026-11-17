@@ -11,6 +11,10 @@ sources:
 
 ## Install
 
+The easiest way is the plugin for your coding agent, which needs nothing else installed; see [Using indoc from a coding agent](agents.md). The agent then runs the steps below for you.
+
+For the command itself, download a binary from the GitHub releases page, or:
+
 ```sh
 go install github.com/byabasaija/indoc/cmd/indoc@latest
 ```

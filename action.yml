@@ -1,0 +1,63 @@
+name: indoc check
+description: Fail when documentation no longer matches the code.
+author: byabasaija
+branding:
+  icon: book-open
+  color: blue
+
+inputs:
+  mode:
+    description: "default fails on stale, broken, and unrecorded pages; strict also fails on drift; warn reports without failing."
+    default: default
+  version:
+    description: "indoc version to run, for example 0.1.0. Defaults to the version of this action, or the latest release."
+    default: ""
+  working-directory:
+    description: Repository root containing .indoc/.
+    default: "."
+
+runs:
+  using: composite
+  steps:
+    - name: Install indoc
+      shell: bash
+      env:
+        INPUT_VERSION: ${{ inputs.version }}
+        ACTION_REF: ${{ github.action_ref }}
+      run: |
+        set -euo pipefail
+        version="${INPUT_VERSION#v}"
+        if [ -z "$version" ] && [[ "${ACTION_REF:-}" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+          version="${ACTION_REF#v}"
+        fi
+        if [ -n "$version" ]; then
+          base="https://github.com/byabasaija/indoc/releases/download/v$version"
+        else
+          base="https://github.com/byabasaija/indoc/releases/latest/download"
+        fi
+        case "${RUNNER_OS}-${RUNNER_ARCH}" in
+          Linux-X64) archive=indoc_linux_amd64.tar.gz ;;
+          Linux-ARM64) archive=indoc_linux_arm64.tar.gz ;;
+          macOS-X64) archive=indoc_darwin_amd64.tar.gz ;;
+          macOS-ARM64) archive=indoc_darwin_arm64.tar.gz ;;
+          *) echo "indoc: unsupported runner ${RUNNER_OS}-${RUNNER_ARCH}" >&2; exit 1 ;;
+        esac
+        dir="$RUNNER_TEMP/indoc"
+        mkdir -p "$dir"
+        curl -fsSL "$base/$archive" -o "$dir/$archive"
+        curl -fsSL "$base/checksums.txt" -o "$dir/checksums.txt"
+        (cd "$dir" && grep " $archive\$" checksums.txt | shasum -a 256 -c -)
+        tar -xzf "$dir/$archive" -C "$dir" indoc
+        echo "$dir" >> "$GITHUB_PATH"
+
+    - name: Check docs
+      shell: bash
+      working-directory: ${{ inputs.working-directory }}
+      env:
+        MODE: ${{ inputs.mode }}
+      run: |
+        case "$MODE" in
+          strict) indoc check --strict ;;
+          warn) indoc check --warn ;;
+          *) indoc check ;;
+        esac

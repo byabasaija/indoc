@@ -379,12 +379,15 @@ Each phase ends with a concrete check against a real repo, shop unless noted.
 * **Phase 4b complete.** Next: Phase 5.
 * Rust was dropped: no demand yet, and every grammar costs binary size and maintenance. The pipeline adds a language in a day when a user needs one.
 
-### Phase 5: MCP + plugins
-* `indoc mcp` subcommand (same binary).
-* Claude Code plugin, Copilot CLI plugin, Cursor MCP config. Plugin provisions the binary.
-* `indoc-check` GitHub Action: one-line CI setup (`uses: byabasaija/indoc-check@v1`), downloads a release binary, no Go toolchain needed. Supports `mode: warn` for teams trialing it.
+### Phase 5: MCP + plugins (built 2026-11-17; release pending)
+* `indoc mcp` subcommand (same binary): five tools (`indoc_scan`, `indoc_setup`, `indoc_check`, `indoc_ack`, `indoc_bundle`) sharing the CLI's code paths. The protocol layer is ~250 lines with no dependencies and speaks both MCP eras: the `initialize` handshake (2024-11-05 to 2025-11-25) and 2026-07-28 (`server/discover`, per-request `_meta`, `resultType`). First scan sets the project up; existing Markdown makes the agent ask the user what to publish.
+* One plugin directory (`plugin/`) for Claude Code and Copilot CLI: Copilot reads `.claude-plugin/plugin.json`, `.mcp.json`, and `${CLAUDE_PLUGIN_ROOT}`. The server starts as `sh ${CLAUDE_PLUGIN_ROOT}/bin/indoc mcp` because Copilot expands plugin variables in `args` but not `command`. Marketplace at `.claude-plugin/marketplace.json`.
+* Launcher `plugin/bin/indoc` downloads the release matching the plugin version, verifies it against `checksums.txt`, and caches it in the plugin data directory. Tested against a locally served release: download, cache, MCP through the launcher, and refusal of a tampered archive.
+* `.github/workflows/release.yml`: on a `v*` tag, static builds for macOS, Linux, Windows (amd64, arm64), `checksums.txt`, GitHub release; refuses if the plugin's pinned version differs from the tag.
+* `action.yml`: `uses: byabasaija/indoc@vX.Y.Z`, with `mode: default | strict | warn`.
+* `.github/workflows/ci.yml`: gofmt, vet, tests, indoc's own `check --strict`, and grammar reproducibility.
+* **Remaining:** choose a license (`LICENSE` is empty), tag and publish v0.1.0, then the exit test below on a fresh machine with each host. Cursor and other MCP clients: document running `indoc mcp`.
 * **Exit:** fresh machine, one plugin install, "document this project" → bundled site, no indoc commands typed.
-
 ### Phase 6: Viewer
 * Pre-rendered page-per-file output replacing the hash-routed SPA; default theme per section 8.
 * Syntax highlighting, Mermaid, dark mode, folder-based navigation, source links.

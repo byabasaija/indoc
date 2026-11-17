@@ -47,6 +47,41 @@ Citations are verified: a renamed function breaks the citation, and the build re
 
 ## Install
 
+### In your coding agent (recommended)
+
+Install the plugin once, then ask your agent to "document this project". It sets indoc up, agrees on readers and an outline with you, writes the pages, and builds the site. Later, "update the stale docs" fixes what changed. The plugin downloads the indoc binary for your platform on first use and verifies its checksum; nothing else needs installing.
+
+**Claude Code**
+
+```
+/plugin marketplace add byabasaija/indoc
+/plugin install indoc@indoc
+```
+
+**GitHub Copilot CLI**
+
+```
+copilot plugin install byabasaija/indoc:plugin
+```
+
+The plugin provides an MCP server with five tools (`indoc_scan`, `indoc_setup`, `indoc_check`, `indoc_ack`, `indoc_bundle`) and a skill that tells the agent how to use them. Any other MCP client can run `indoc mcp` directly.
+
+### In CI
+
+```yaml
+  docs:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: byabasaija/indoc@v0.1.0
+        # with:
+        #   mode: warn   # report without failing while you try it out
+```
+
+### As a command
+
+Download a binary from [Releases](https://github.com/byabasaija/indoc/releases), or:
+
 ```sh
 go install github.com/byabasaija/indoc/cmd/indoc@latest
 ```
@@ -55,7 +90,6 @@ go install github.com/byabasaija/indoc/cmd/indoc@latest
 
 ```sh
 indoc init      # create .indoc/config.yaml
-                # ask your agent to document the project (see below)
 indoc bundle    # build the site, record pages in the lock
 indoc check     # in CI: fail when docs no longer match the code
 ```
@@ -68,10 +102,7 @@ indoc check     # in CI: fail when docs no longer match the code
 | `indoc ack [page...]` | Record new or edited pages. Name a page to confirm it is still correct after a code change. |
 | `indoc bundle` | Build the static site |
 | `indoc preview` | Serve the site on localhost and rebuild on save |
-
-### With a coding agent
-
-The skill in [`.github/skills/indoc/SKILL.md`](.github/skills/indoc/SKILL.md) tells an agent how to work with indoc: agree on readers and an outline with you, write pages with citations, and fix stale pages after code changes. Ask it to "document this project" or "update the stale docs".
+| `indoc mcp` | Run the MCP server on stdio |
 
 ### Already using Docusaurus or MkDocs?
 

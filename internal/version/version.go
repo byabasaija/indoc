@@ -18,4 +18,3 @@ var (
 func Info() string {
 	return fmt.Sprintf("indoc %s (commit: %s, built at: %s)", Version, GitCommit, BuildDate)
 }
-

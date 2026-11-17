@@ -1,8 +1,121 @@
 {
   "version": 1,
   "pages": {
+    "docs/agents.md": {
+      "page": "55bbfe162f3fbf46",
+      "citations": {
+        "internal/cli/mcp.go::mcpServer": {
+          "surface": "9a5340343b623d99",
+          "body": "d69184ba2c3b16f2",
+          "raw": "fb17706cbe45b115",
+          "hasher": "go/2"
+        },
+        "internal/cli/mcp.go::setup": {
+          "surface": "edddf1d25b166fce",
+          "body": "0bfae943ab8f8106",
+          "raw": "fb17706cbe45b115",
+          "hasher": "go/2"
+        },
+        "internal/mcp/mcp.go::Server.Serve": {
+          "surface": "188edc5ed29e340a",
+          "body": "2fcfd3b1f51cf090",
+          "raw": "efc766bae77eeb10",
+          "hasher": "go/2"
+        }
+      },
+      "sources": {
+        "internal/cli/mcp.go": {
+          "body": "9eb47037b8b40949",
+          "symbols": {
+            "failed": "e2d8ad0f8686e095",
+            "init": "c78f10468427bc77",
+            "jsonResult": "9f55bbb8e304d7b0",
+            "mcpServer": "9a5340343b623d99",
+            "parseArgs": "5742436b2e50f95d",
+            "setup": "edddf1d25b166fce",
+            "toolAck": "42ce2831f7f94ddc",
+            "toolArgs": "bcdfd02fff46879e",
+            "toolBundle": "b7b189252a902197",
+            "toolCheck": "520a6a0ff0e78eef",
+            "toolScan": "8a5357d04f22f339",
+            "toolSetup": "c8f8a8077adb524b"
+          },
+          "private": [
+            "failed",
+            "init",
+            "jsonResult",
+            "mcpServer",
+            "parseArgs",
+            "setup",
+            "toolAck",
+            "toolArgs",
+            "toolBundle",
+            "toolCheck",
+            "toolScan",
+            "toolSetup"
+          ],
+          "raw": "fb17706cbe45b115",
+          "hasher": "go/2"
+        },
+        "internal/mcp/mcp.go": {
+          "body": "9bf0cc05f7dfe1f7",
+          "symbols": {
+            "Server": "713d47dada53873a",
+            "Server.Serve": "188edc5ed29e340a",
+            "Server.handle": "27274a4c5b2af67c",
+            "Tool": "5b48d08dc9902b28",
+            "request": "4402962a865a9095",
+            "response": "ac4dd5a4aea4e7ca",
+            "rpcError": "51dae43f82bf9863",
+            "supported": "09efda6994eb51db"
+          },
+          "private": [
+            "Server.handle",
+            "request",
+            "response",
+            "rpcError",
+            "supported"
+          ],
+          "raw": "efc766bae77eeb10",
+          "hasher": "go/2"
+        },
+        "internal/mcp/mcp_test.go": {
+          "body": "d0e9bb8ff55a8a94",
+          "symbols": {
+            "TestLegacyHandshake": "2a77380395f16ff1",
+            "TestModernRequests": "dc380d54a26bf671",
+            "TestOutputIsOneLinePerMessage": "5c314c7bb8a1517d",
+            "exchange": "89c6d5bedefaf0d1",
+            "mustJSON": "8f1b1bbc1dcd0f8e",
+            "server": "ec96881fd2ef352a"
+          },
+          "private": [
+            "exchange",
+            "mustJSON",
+            "server"
+          ],
+          "raw": "6e8a1122422a1d38",
+          "hasher": "go/2"
+        },
+        "plugin/.mcp.json": {
+          "body": "3e496a14626783ed",
+          "raw": "3e496a14626783ed",
+          "hasher": "bytes"
+        },
+        "plugin/bin/indoc": {
+          "body": "dcbfcdcd193b8478",
+          "raw": "dcbfcdcd193b8478",
+          "hasher": "bytes"
+        },
+        "plugin/skills/indoc/SKILL.md": {
+          "body": "d330c7d8b5e00533",
+          "raw": "d330c7d8b5e00533",
+          "hasher": "bytes"
+        }
+      }
+    },
     "docs/ci.md": {
-      "page": "cb8ead3179dabef9",
+      "page": "2e29655ee7375a93",
       "citations": {
         "internal/cli/check.go::runCheck": {
           "surface": "4d82fe88e3e7a473",
@@ -148,7 +261,7 @@
       }
     },
     "docs/getting-started.md": {
-      "page": "4fca30d0ca9dc1aa",
+      "page": "6fb7264d58111052",
       "citations": {
         "internal/cli/bundle.go::runBundle": {
           "surface": "afbcb60d55daccfa",

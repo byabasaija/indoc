@@ -18,14 +18,18 @@ sources:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-go@v5
-        with:
-          go-version: stable
-      - run: go install github.com/byabasaija/indoc/cmd/indoc@latest
-      - run: indoc check
+      - uses: byabasaija/indoc@v0.1.0
 ```
 
-Use `indoc check --warn` while trying it out: it prints the same report and always exits 0.
+The action downloads the matching indoc release, verifies its checksum, and runs `indoc check` in the repository root. Inputs:
+
+| Input | Default | Meaning |
+|---|---|---|
+| `mode` | `default` | `strict` also fails on drift; `warn` prints the same report and always passes |
+| `version` | the action's tag | indoc version to run |
+| `working-directory` | `.` | Directory containing `.indoc/` |
+
+Use `mode: warn` while trying it out. Without the action, install indoc any way you like and run `indoc check`.
 
 ## Reading the report
 
