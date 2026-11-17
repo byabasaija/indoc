@@ -21,7 +21,7 @@ internal/cli              commands: init, scan, check, ack, bundle, preview, ver
         │       └── internal/glob     `**` glob matching
         │
         └── internal/bundler    static site (embedded viewer), via internal/doc + internal/render
-                └── internal/reference   extractors: Django/DRF, Python env, generic regex
+                └── internal/reference   extractors: Django/DRF, FastAPI, Cobra, Python env, generic regex
                         └── internal/lang/python (ParseModule)   static module reader
 ```
 
@@ -70,6 +70,9 @@ A page is compared only while its content matches the lock. `drift.Ack` with no 
 - **Module reader** (`python.ParseModule`): imports, module- and class-level assignments, module-level call statements, classes with bases and methods, functions with decorators, and an expression parser for the forms configuration uses (strings, dotted names, calls, lists, tuples, `+`, `*spread`, `a if b else c`). Everything else is opaque.
 - **Django**: finds `ROOT_URLCONF` in settings, follows `urlpatterns` (`=`, `+=`, `append`, `extend`, `insert`, spreads, `if` blocks marked conditional) through `include()` (string, tuple, module object, inline list) and DRF routers (`register`, `@action`, `lookup_field`, empty prefixes, `DefaultRouter` root). HTTP methods come from handler methods on view classes and their project bases, known framework views, `http_method_names`, and `@api_view`. `settings.X` routes resolve to the literal in settings files, noting overrides. Routes shadowed by an earlier identical path are warned about. Verified against Django's resolver by an opt-in differential test.
 - **Python env**: token-level reads through django-environ (including `env.db()` and friends), python-decouple, `os.environ`, `os.getenv`, with type and default. Defaults that may be secrets are redacted. `.env.example` is cross-checked; `.env` is never read.
+- **FastAPI**: applications assigned from `FastAPI()`; decorator routes, `api_route`, `add_api_route`, websockets; `include_router` with prefixes (recursively, including `APIRouter(prefix=...)`); mounts (FastAPI sub-apps expanded, others listed as `MOUNT`); built-in docs routes per `openapi_url`/`docs_url`/`redoc_url`. Verified against FastAPI's route table by an opt-in test.
+- **Pydantic settings**: annotated fields of `BaseSettings` subclasses (also through project base classes) with `env_prefix` from `model_config` and `Field(alias=...)`.
+- **Cobra**: `cobra.Command` literals (package-level or local), `AddCommand` tree, `Flags()`/`PersistentFlags()` definitions, via `go/ast`. A test checks it against indoc's runtime command tree.
 - **Management commands**: `<app>/management/commands/<name>.py` with `class Command`, its `help`, and `add_argument` names.
 - **Generic**: the original regex extractor for decorator-style routes and Go/JS env reads, labeled best effort.
 

@@ -40,17 +40,40 @@ func Extract(root string, files []string) (*Report, error) {
 		report.Coverage = append(report.Coverage, *djangoCov)
 	}
 
+	fastRoutes, fastCov := extractFastAPI(root, nonTest(files))
+	if fastCov != nil {
+		routes = append(routes, fastRoutes...)
+		report.Coverage = append(report.Coverage, *fastCov)
+	}
+
+	cobraCommands, cobraCov := extractCobra(root, nonTest(files))
+	if cobraCov != nil {
+		commands = append(commands, cobraCommands...)
+		report.Coverage = append(report.Coverage, *cobraCov)
+	}
+
 	envEntries, envCov := extractPythonEnv(root, sources, files)
 	if envCov != nil {
 		config = append(config, envEntries...)
 		report.Coverage = append(report.Coverage, *envCov)
 	}
 
-	genericSections, err := generic(root, sources)
+	genericSources := sources
+	if fastCov != nil || djangoCov != nil {
+		// A framework extractor owns Python routes; keep the regex fallback
+		// for other languages.
+		genericSources = nil
+		for _, src := range sources {
+			if src.Language != "Python" {
+				genericSources = append(genericSources, src)
+			}
+		}
+	}
+	genericSections, err := generic(root, genericSources)
 	if err != nil {
 		return nil, err
 	}
-	genericCov := Coverage{Extractor: "generic (best effort)", Files: len(sources)}
+	genericCov := Coverage{Extractor: "generic (best effort)", Files: len(genericSources)}
 	for _, s := range genericSections {
 		genericCov.Entries += len(s.Entries)
 		switch s.Kind {

@@ -25,9 +25,17 @@ Routes inside `if` blocks (often `if settings.DEBUG:`) are marked conditional. A
 
 The extractor is tested against Django's own URL resolver on real projects; see `internal/reference/django_differential_test.go`.
 
+## FastAPI
+
+For every `FastAPI()` application, indoc lists routes from `@app.get(...)`-style decorators, `api_route`, `add_api_route`, and websockets, follows `include_router` (with its `prefix`, nested routers, and each `APIRouter(prefix=...)`), lists sub-applications mounted with `mount` under their path, and adds the built-in `/openapi.json`, Swagger UI, and ReDoc routes, honoring `docs_url`, `redoc_url`, and `openapi_url`. A route an earlier route with the same path and method makes unreachable is reported.
+
+## Cobra
+
+Go commands built with Cobra are listed by their full command path (`indoc check`), with their flags (`-o/--out`, global flags marked), arguments from `Use`, and `Short` description. Commands created but never attached with `AddCommand` are reported.
+
 ## Environment variables
 
-Reads through django-environ (`env("X")`, `env.bool("X", default=False)`, `env.db()`), python-decouple (`config("X")`), `os.environ`, and `os.getenv` are listed with their type, default, or "required". If the repository has a `.env.example`, variables missing from it are marked, and variables in it that nothing reads are reported. `.env` itself is never read.
+Reads through django-environ (`env("X")`, `env.bool("X", default=False)`, `env.db()`), python-decouple (`config("X")`), `os.environ`, and `os.getenv` are listed with their type, default, or "required". Fields of pydantic `BaseSettings` classes are listed as the variables they read: `env_prefix` plus the field name, or the field's alias. If the repository has a `.env.example`, variables missing from it are marked, and variables in it that nothing reads are reported. `.env` itself is never read.
 
 Defaults that may be secrets are never published: values of variables whose names contain `SECRET`, `PASSWORD`, `TOKEN`, `KEY` and similar are hidden, and credentials inside URLs are masked.
 

@@ -113,11 +113,13 @@ Precise staleness and `path::Symbol` citations need a parser for the language. E
 | Framework | Routes | Configuration | Commands | Status |
 |---|---|---|---|---|
 | Django + DRF | ✅ URLconf through `include()`, routers, `@action`; HTTP methods from views, viewsets, `@api_view`, `http_method_names` | ✅ django-environ, python-decouple, `os.environ` | ✅ management commands | Supported |
-| Python (any) | | ✅ `os.environ`, `os.getenv` | | Supported |
-| Flask/FastAPI-style decorators, Express `app.get`, Go `HandleFunc`/`GET` | best effort | `process.env`, `os.Getenv` | | Best effort |
-| FastAPI routers and settings, Cobra commands | | | | Planned |
+| FastAPI | ✅ decorators, `APIRouter` prefixes, nested `include_router`, `add_api_route`, websockets, mounts, built-in docs routes | ✅ pydantic `BaseSettings` (`env_prefix`, aliases) | | Supported |
+| Cobra (Go) | | `os.Getenv` | ✅ command tree, flags, arguments | Supported |
+| Python (any) | | ✅ `os.environ`, `os.getenv`, pydantic settings | | Supported |
+| Express `app.get`, Go `HandleFunc`/`GET`, Flask-style decorators | best effort | `process.env` | | Best effort |
+| Flask blueprints, Next.js, NestJS, Rails, Laravel | | | | Planned |
 
-Django extraction matches Django's own URL resolver route for route, including HTTP methods, on six real projects (522 routes). Routes provided by installed packages (admin, allauth) are listed as external includes rather than guessed.
+Extraction is checked against each framework's own route table: Django's URL resolver on six real projects (523 routes), FastAPI's router on a real project and a fixture covering every supported construct, and Cobra's command tree on indoc's own CLI. All match route for route, including HTTP methods. Routes provided by installed packages (admin, allauth) are listed as external includes rather than guessed.
 
 Every extractor reports what it could not resolve, and `indoc scan` shows it. It also warns about things worth fixing: a route that can never be reached because an earlier pattern has the same path, and variables missing from `.env.example`. Default values that may be secrets (names containing `SECRET`, `PASSWORD`, `TOKEN`, `KEY`, ...) and credentials inside URLs are never published.
 

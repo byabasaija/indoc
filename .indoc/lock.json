@@ -249,7 +249,7 @@
       }
     },
     "docs/reference.md": {
-      "page": "2fcea491ba3d7aba",
+      "page": "4f1e328815056146",
       "citations": {
         "internal/reference/reference.go::Coverage": {
           "surface": "a4c40678d4643931",
@@ -257,10 +257,22 @@
         },
         "internal/reference/reference.go::Extract": {
           "surface": "17595d9732df58da",
-          "body": "32618d79f16117dd"
+          "body": "9330b2e907184ec3"
         }
       },
       "sources": {
+        "internal/reference/cobra.go": {
+          "body": "eda87f27b8322b6b",
+          "symbols": {
+            "cobraCommand": "1342157094aec72d",
+            "commandLiteral": "b95f2065285c2f09",
+            "commandPath": "8704ed431078d7a5",
+            "extractCobra": "ff2a98ea5d59d7c5",
+            "firstWord": "03be2f65e40c2312",
+            "flagDefinition": "95c886d20445ddda",
+            "stringValue": "05b4bb0b6430817d"
+          }
+        },
         "internal/reference/commands.go": {
           "body": "9a1d6681de0588dc",
           "symbols": {
@@ -269,7 +281,7 @@
           }
         },
         "internal/reference/django.go": {
-          "body": "5d8d218479abc7fc",
+          "body": "19deacc9c718a450",
           "symbols": {
             "actionDecorator": "db41f608ef7cb574",
             "django": "2c1450a77781995c",
@@ -340,8 +352,36 @@
             "writeFile": "0a9163586fc6f3ea"
           }
         },
+        "internal/reference/fastapi.go": {
+          "body": "11b48be533ef2d79",
+          "symbols": {
+            "argText": "3ae2471426d46c65",
+            "builtinDocs": "bbe5c8ad072e363b",
+            "builtinRoute": "9ebac1b29f2bd4ce",
+            "extractFastAPI": "30cf836c4cf78741",
+            "fastapi": "4d3d441eca9779ce",
+            "fastapi.add": "bf91f11ad6edd475",
+            "fastapi.app": "ecd8ac541b758476",
+            "fastapi.fastapiCtor": "badc0701a8cec88a",
+            "fastapi.note": "ee0e4aa9c787404c",
+            "fastapi.router": "92192e5323ce0916",
+            "literalPath": "54baca091432749e",
+            "methodList": "3023e7ee82e94c66",
+            "readFile": "463ce554b30fc414",
+            "shadowWarnings": "ae544a80f131d9b1"
+          }
+        },
+        "internal/reference/fastapi_test.go": {
+          "body": "d635b665b8acca88",
+          "symbols": {
+            "TestFastAPIDifferential": "ba4523dc28c35bdf",
+            "TestFastAPIExtraction": "8ee828ae91dda99f",
+            "compareFastAPI": "36a5157f630bfd7a",
+            "orderedOrAll": "0154f7429ed026f6"
+          }
+        },
         "internal/reference/pyenv.go": {
-          "body": "0143a177da5386ad",
+          "body": "65cc3c7f290d400f",
           "symbols": {
             "callAt": "c07a10ab4da6b180",
             "contains": "ff1822e7196e7478",
@@ -349,9 +389,11 @@
             "envRead": "781e95f786145fd4",
             "envReadAt": "e7a66370243de42c",
             "extractPythonEnv": "f75f1fc75d426ef2",
+            "isSettingsClass": "25f80a73d8762893",
             "optionalCall": "b9d2d5c229aa70d9",
             "readEnvExample": "75e0352ec3a3ea10",
             "redactDefault": "4068a865f17a2730",
+            "settingsFields": "8b62218f48a2185f",
             "significant": "dfb827be5b577967",
             "subscriptName": "a4ebaab710038d71"
           }
@@ -375,7 +417,7 @@
           }
         },
         "internal/reference/reference.go": {
-          "body": "3a6c441652d54d3f",
+          "body": "b4855aa789bdb7a0",
           "symbols": {
             "Coverage": "a4c40678d4643931",
             "Extract": "17595d9732df58da",
@@ -406,6 +448,13 @@
             "module_outside": "b5428a0e4ddeb7fc",
             "outside": "f881b6009cbb7353",
             "walk": "066b258472351972"
+          }
+        },
+        "internal/reference/testdata/fastapi_routes.py": {
+          "body": "b38fdbbaf2083a52",
+          "symbols": {
+            "row": "66a02dbb956cc27c",
+            "walk": "43a0842ee20f3de2"
           }
         }
       }

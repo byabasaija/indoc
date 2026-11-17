@@ -134,6 +134,19 @@ func extractPythonEnv(root string, files []SourceFile, all []string) ([]doc.RefE
 		}
 	}
 
+	for i, m := range mods {
+		for _, e := range settingsFields(py, paths[i], m) {
+			if _, seen := reads[e.Name]; seen {
+				continue
+			}
+			if !contains(cov.Evidence, "pydantic-settings") {
+				cov.Evidence = append(cov.Evidence, "pydantic-settings")
+			}
+			reads[e.Name] = &envRead{entry: e, file: paths[i]}
+			order = append(order, e.Name)
+		}
+	}
+
 	example, exampleFile := readEnvExample(root, all)
 	var out []doc.RefEntry
 	for _, name := range order {
@@ -342,4 +355,83 @@ func readEnvExample(root string, all []string) (map[string]bool, string) {
 		return keys, f
 	}
 	return nil, ""
+}
+
+// settingsFields lists the environment variables a pydantic BaseSettings
+// subclass reads: one per annotated field, named env_prefix + FIELD (or the
+// field's alias).
+func settingsFields(py *pyProject, file string, m *python.Module) []doc.RefEntry {
+	var out []doc.RefEntry
+	classes := make([]*python.Class, 0, len(m.Classes))
+	for _, c := range m.Classes {
+		classes = append(classes, c)
+	}
+	sort.Slice(classes, func(i, j int) bool { return classes[i].Line < classes[j].Line })
+	for _, cls := range classes {
+		if !isSettingsClass(py, file, cls, 0) {
+			continue
+		}
+		prefix := ""
+		for _, a := range cls.Assigns {
+			if c, ok := a.Value.(*python.Call); ok && a.Target == "model_config" {
+				if s, ok := c.Kw("env_prefix").(*python.Str); ok {
+					prefix = s.Value
+				}
+			}
+		}
+		for _, a := range cls.Assigns {
+			if a.Annotation == nil || strings.HasPrefix(a.Target, "_") || a.Target == "model_config" ||
+				strings.HasPrefix(a.Annotation.Text(), "ClassVar") {
+				continue
+			}
+			name := strings.ToUpper(prefix + a.Target)
+			def := a.Value
+			if c, ok := a.Value.(*python.Call); ok && lastSeg(c.FuncName()) == "Field" {
+				for _, kw := range []string{"validation_alias", "alias"} {
+					if s, ok := c.Kw(kw).(*python.Str); ok && s.Literal {
+						name = s.Value
+						break
+					}
+				}
+				def = c.Arg(0, "default")
+				if def == nil && c.Kw("default_factory") != nil {
+					def = &python.Opaque{Src: "(computed)"}
+				}
+			}
+			detail := a.Annotation.Text()
+			if def == nil || def.Text() == "..." {
+				detail += ", required"
+			} else {
+				detail += ", default " + short(redactDefault(name, def.Text()))
+			}
+			out = append(out, doc.RefEntry{
+				Name:    name,
+				Detail:  detail,
+				Handler: cls.Name + "." + a.Target,
+				Source:  fmt.Sprintf("%s:%d", file, a.Line),
+			})
+		}
+	}
+	return out
+}
+
+func isSettingsClass(py *pyProject, file string, cls *python.Class, depth int) bool {
+	if depth > 5 {
+		return false
+	}
+	for _, b := range cls.Bases {
+		n, ok := b.(*python.Dotted)
+		if !ok {
+			continue
+		}
+		if lastSeg(n.Path) == "BaseSettings" {
+			return true
+		}
+		if r := py.lookup(file, n.Path); r.kind == "class" {
+			if isSettingsClass(py, r.file, py.load(r.file).Classes[r.name], depth+1) {
+				return true
+			}
+		}
+	}
+	return false
 }

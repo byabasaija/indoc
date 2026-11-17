@@ -355,8 +355,9 @@ Each phase ends with a concrete check against a real repo, shop unless noted.
 
   The existing partner guide was wrong on three points the code made visible: the API key is required only for partner sessions (not on every call), a wrong or amount-mismatched code returns `400 invalid_code`, and an code is valid only for the amount it was issued for. Partner pages are `strict: true`. Setup is the only page without citations; it cites the `justfile` via `sources:`.
 
-### Phase 4: FastAPI + Cobra
+### Phase 4: FastAPI + Cobra (done 2026-11-17)
 * **Exit:** lexai (or another FastAPI project) and indoc itself produce complete reference pages.
+* **Result:** FastAPI extraction matches FastAPI's own route table (expanded through included routers) on fastapi-app (6/6) and on a fixture covering decorators, `api_route`, `add_api_route`, nested `include_router` with prefixes, websockets, mounted sub-apps, static mounts, custom docs URLs, and duplicate paths (14/14). lexai and another-fastapi-app cannot be imported safely (lexai creates a database at import), so they were checked by reading the source: all routes and environment variables found. Pydantic `BaseSettings` fields are extracted as environment variables. Cobra extraction matches indoc's runtime command tree exactly (8 commands, all flags). The six Django projects still match after the changes.
 
 ### Phase 4b: Multi-language spike
 * wazero + tree-sitter WebAssembly prototype with TS and Rust grammars and `tags.scm` queries.

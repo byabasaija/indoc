@@ -26,13 +26,15 @@ type Import struct {
 	Line   int
 }
 
-// Assign is `target = value` or `target += value`.
+// Assign is `target = value`, `target += value`, or an annotated
+// declaration `target: T [= value]`. Value is nil for a bare annotation.
 type Assign struct {
-	Target string
-	Op     string // "=" or "+="
-	Value  Expr
-	Line   int
-	Cond   bool // inside if/for/while/match at module level
+	Target     string
+	Op         string // "=", "+=", or ":" (annotation without a value)
+	Value      Expr
+	Annotation Expr // nil when not annotated
+	Line       int
+	Cond       bool // inside if/for/while/match at module level
 }
 
 // CallStmt is a bare call statement such as `router.register(...)`.
@@ -331,11 +333,13 @@ func splitTop(toks []Token, sep string) [][]Token {
 	return out
 }
 
-// parseAssign recognizes `name = value`, `name: T = value`, and `name += value`.
+// parseAssign recognizes `name = value`, `name += value`, `name: T = value`,
+// and `name: T`.
 func parseAssign(s []Token) (Assign, bool) {
 	if len(s) < 3 || s[0].Kind != Name || isKeyword(s[0].Text) {
 		return Assign{}, false
 	}
+	annotated := s[1].Kind == Op && s[1].Text == ":"
 	depth := 0
 	for i := 1; i < len(s); i++ {
 		t := s[i]
@@ -352,11 +356,18 @@ func parseAssign(s []Token) (Assign, bool) {
 				continue
 			}
 			// Only a plain name (optionally annotated) may precede the operator.
-			if i != 1 && !(s[1].Text == ":" && t.Text == "=") {
+			if i != 1 && !(annotated && t.Text == "=") {
 				return Assign{}, false
 			}
-			return Assign{Target: s[0].Text, Op: t.Text, Value: ParseExpr(s[i+1:])}, true
+			a := Assign{Target: s[0].Text, Op: t.Text, Value: ParseExpr(s[i+1:])}
+			if annotated {
+				a.Annotation = ParseExpr(s[2:i])
+			}
+			return a, true
 		}
+	}
+	if annotated {
+		return Assign{Target: s[0].Text, Op: ":", Annotation: ParseExpr(s[2:])}, true
 	}
 	return Assign{}, false
 }

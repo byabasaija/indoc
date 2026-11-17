@@ -149,7 +149,7 @@ func (d *django) walkFile(file, prefix string, cond bool) {
 	}
 	var ops []op
 	for i := range m.Assigns {
-		if m.Assigns[i].Target == "urlpatterns" {
+		if m.Assigns[i].Target == "urlpatterns" && m.Assigns[i].Value != nil {
 			ops = append(ops, op{line: m.Assigns[i].Line, assign: &m.Assigns[i]})
 		}
 	}
@@ -229,7 +229,7 @@ func (d *django) expand(file string, x python.Expr, current []element, line int,
 		r := d.py.lookup(file, v.Path)
 		if r.kind == "assign" {
 			for _, a := range d.py.load(r.file).Assigns {
-				if a.Target == r.name {
+				if a.Target == r.name && a.Value != nil {
 					return d.expand(r.file, a.Value, nil, a.Line, cond || a.Cond)
 				}
 			}
@@ -338,7 +338,7 @@ func (d *django) setting(x python.Expr) (value, why string, ok bool) {
 	var others []string
 	for _, f := range d.settings {
 		for _, a := range d.py.load(f).Assigns {
-			if a.Target != name {
+			if a.Target != name || a.Value == nil {
 				continue
 			}
 			if s, isStr := a.Value.(*python.Str); isStr && s.Literal && literal == "" {
@@ -396,7 +396,7 @@ func (d *django) include(file string, line int, prefix string, target python.Exp
 			d.walkFile(r.file, prefix, cond)
 		case "assign":
 			for _, a := range d.py.load(r.file).Assigns {
-				if a.Target == r.name {
+				if a.Target == r.name && a.Value != nil {
 					for _, el := range d.expand(r.file, a.Value, nil, a.Line, cond) {
 						d.element(el, prefix, cond)
 					}
@@ -580,7 +580,7 @@ func (d *django) router(file, variable, prefix string, cond bool) bool {
 	var ctor *python.Call
 	chosen := false
 	for _, a := range m.Assigns {
-		if a.Target != variable {
+		if a.Target != variable || a.Value == nil {
 			continue
 		}
 		v := a.Value

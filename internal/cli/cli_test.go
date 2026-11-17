@@ -6,10 +6,15 @@ import (
 	"errors"
 	"os"
 	"path/filepath"
+	"sort"
 	"strings"
 	"testing"
 
+	"github.com/byabasaija/indoc/internal/code"
 	"github.com/byabasaija/indoc/internal/config"
+	"github.com/byabasaija/indoc/internal/reference"
+	"github.com/spf13/cobra"
+	"github.com/spf13/pflag"
 )
 
 func TestCommandsRegistered(t *testing.T) {
@@ -249,4 +254,73 @@ func TestBundleLinksCitationsAndSources(t *testing.T) {
 			t.Errorf("payload missing %s", want)
 		}
 	}
+}
+
+// TestCobraExtractionMatchesCommandTree checks the static Cobra extractor
+// against indoc's own command tree at runtime.
+func TestCobraExtractionMatchesCommandTree(t *testing.T) {
+	root, err := filepath.Abs("../..")
+	if err != nil {
+		t.Fatal(err)
+	}
+	files, err := code.ListFiles(root, nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	rep, err := reference.Extract(root, files)
+	if err != nil {
+		t.Fatal(err)
+	}
+	static := map[string]string{}
+	for _, s := range rep.Sections {
+		if s.Kind == "commands" {
+			for _, e := range s.Entries {
+				static[e.Name] = flagNames(e.Detail)
+			}
+		}
+	}
+
+	runtime := map[string]string{}
+	var walk func(c *cobra.Command)
+	walk = func(c *cobra.Command) {
+		if c.Name() == "help" || c.Name() == "completion" {
+			return
+		}
+		var names []string
+		c.LocalFlags().VisitAll(func(f *pflag.Flag) {
+			if f.Name != "help" {
+				names = append(names, f.Name)
+			}
+		})
+		sort.Strings(names)
+		runtime[c.CommandPath()] = strings.Join(names, " ")
+		for _, sub := range c.Commands() {
+			walk(sub)
+		}
+	}
+	walk(rootCmd)
+
+	if len(static) != len(runtime) {
+		t.Errorf("commands: static %d, runtime %d\nstatic: %v\nruntime: %v", len(static), len(runtime), static, runtime)
+	}
+	for path, flags := range runtime {
+		if static[path] != flags {
+			t.Errorf("%s: static flags %q, runtime %q", path, static[path], flags)
+		}
+	}
+}
+
+// flagNames turns "-o/--out --json (global)" into "json out".
+func flagNames(detail string) string {
+	var names []string
+	for _, f := range strings.Fields(detail) {
+		if f == "(global)" {
+			continue
+		}
+		if i := strings.LastIndex(f, "--"); i >= 0 {
+			names = append(names, f[i+2:])
+		}
+	}
+	sort.Strings(names)
+	return strings.Join(names, " ")
 }

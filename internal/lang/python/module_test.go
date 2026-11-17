@@ -169,3 +169,21 @@ func TestDecodeString(t *testing.T) {
 		}
 	}
 }
+
+func TestAnnotatedAssignments(t *testing.T) {
+	m := ParseModule("class Settings(BaseSettings):\n    database_url: str\n    timeout: int = 30\n    tags: list[str] = Field(default_factory=list)\n")
+	c := m.Classes["Settings"]
+	if c == nil || len(c.Assigns) != 3 {
+		t.Fatalf("assigns = %+v", c)
+	}
+	a := c.Assigns
+	if a[0].Target != "database_url" || a[0].Op != ":" || a[0].Value != nil || a[0].Annotation.Text() != "str" {
+		t.Errorf("bare annotation = %+v", a[0])
+	}
+	if a[1].Op != "=" || a[1].Value.Text() != "30" || a[1].Annotation.Text() != "int" {
+		t.Errorf("annotated with value = %+v", a[1])
+	}
+	if a[2].Annotation.Text() != "list[str]" || a[2].Value.(*Call).FuncName() != "Field" {
+		t.Errorf("Field default = %+v", a[2])
+	}
+}
