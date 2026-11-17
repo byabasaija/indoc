@@ -245,7 +245,7 @@ make grammars                              # rebuild tree-sitter grammars (Docke
 make vendor                                # refresh Prism and Mermaid
 ```
 
-[ARCHITECTURE.md](ARCHITECTURE.md) explains how the pieces fit and why, [documentation/accuracy.md](documentation/accuracy.md) how each part is tested against the real tools, and [ROADMAP.md](ROADMAP.md) what's next and what indoc won't do.
+[ARCHITECTURE.md](ARCHITECTURE.md) explains how the pieces fit and why, [RELEASING.md](RELEASING.md) how to cut a release, [documentation/accuracy.md](documentation/accuracy.md) how each part is tested against the real tools, and [ROADMAP.md](ROADMAP.md) what's next and what indoc won't do.
 
 ## License
 
