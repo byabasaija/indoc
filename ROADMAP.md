@@ -337,11 +337,23 @@ Each phase ends with a concrete check against a real repo, shop unless noted.
 * **Exit:** shop reference shows all 53 URL patterns (resolved full paths) and every env var, or names exactly which could not be resolved.
 * **Result:** a differential test runs Django's own URL resolver in each project's environment and compares route by route. Six private Django projects: **522 routes, 0 missing, 0 extra, 0 wrong HTTP methods.** Third-party URL trees (admin, allauth, wagtail, debug toolbar) are reported as external includes. Env vars on shop: 31 found, a superset of what `grep` finds (25; it misses multi-line calls). Found along the way: an unreachable DRF API root in app-e (now a warning) and secret defaults that would have been published (now redacted).
 
-### Phase 3: Citations + project map
-* Citation validation in `check`/`bundle`; "view source" links when `repo_url` is set.
+### Phase 3: Citations + project map (done 2026-11-17)
+* Citation validation in `check`/`bundle` (Phase 1); "view source" links via a `source_url` template inferred from the git remote.
 * Scan returns the project map: frameworks, entry points, most-imported modules, git hot files, existing docs, task runner targets.
 * Rewrite the skill around outline-first authoring.
 * **Exit:** regenerating shop docs produces partner and developer pages where every guide cites code; side-by-side review against the first run.
+* **Result:** following the skill on shop (in a copy; the repository was not modified):
+
+| | First run (old workflow) | Phase 3 workflow |
+| :--- | :--- | :--- |
+| Narrative | overview ~70 words, 3 guides ~100 words each | 6 pages, ~2,300 words |
+| Readers | none stated | partner integrators (existing guide, kept and corrected) and developers |
+| Citations | 0 | 38, all verified, all linked to the exact line |
+| Commands | none | from the `justfile` and CI workflow |
+| Reference | empty | 67 routes, 31 environment variables, 3 management commands |
+| Drift detection | none | changing `verify_withdrawal_otp`'s signature fails `check` on exactly the two pages that describe it |
+
+  The existing partner guide was wrong on three points the code made visible: the API key is required only for partner sessions (not on every call), a wrong or amount-mismatched code returns `400 invalid_code`, and an code is valid only for the amount it was issued for. Partner pages are `strict: true`. Setup is the only page without citations; it cites the `justfile` via `sources:`.
 
 ### Phase 4: FastAPI + Cobra
 * **Exit:** lexai (or another FastAPI project) and indoc itself produce complete reference pages.

@@ -88,7 +88,8 @@ func TestMatch(t *testing.T) {
 func TestLinkify(t *testing.T) {
 	body := "See `app/x.py::A.run` and app/y.go::Serve.\n" +
 		"```\napp/x.py::A.run\n```\n" +
-		"Already [`app/x.py::A.run`](http://x) linked; unknown `app/z.py::Nope`.\n"
+		"Already [`app/x.py::A.run`](http://x) linked; unknown `app/z.py::Nope`.\n" +
+		"In parentheses (`app/x.py::A.run`) and [text](app/x.py::A.run).\n"
 	got := Linkify(body, func(c Citation) string {
 		if c.Path == "app/z.py" {
 			return ""
@@ -97,7 +98,8 @@ func TestLinkify(t *testing.T) {
 	})
 	want := "See [`app/x.py::A.run`](https://src/app/x.py#A.run) and [app/y.go::Serve](https://src/app/y.go#Serve).\n" +
 		"```\napp/x.py::A.run\n```\n" +
-		"Already [`app/x.py::A.run`](http://x) linked; unknown `app/z.py::Nope`.\n"
+		"Already [`app/x.py::A.run`](http://x) linked; unknown `app/z.py::Nope`.\n" +
+		"In parentheses ([`app/x.py::A.run`](https://src/app/x.py#A.run)) and [text](app/x.py::A.run).\n"
 	if got != want {
 		t.Errorf("Linkify:\n%s\nwant:\n%s", got, want)
 	}

@@ -449,7 +449,7 @@
           }
         },
         "internal/pages/pages.go": {
-          "body": "202266fa51833f21",
+          "body": "e7850256720a835d",
           "symbols": {
             "Citation": "4ff1d172532f8877",
             "Citation.Ref": "d428f6f2d2b262be",
@@ -470,7 +470,7 @@
           }
         },
         "internal/pages/pages_test.go": {
-          "body": "b47d3cdc10aed218",
+          "body": "a4ffb56386b75fbc",
           "symbols": {
             "TestLinkify": "1573063d76c9937b",
             "TestMatch": "ace37652a65aedac",

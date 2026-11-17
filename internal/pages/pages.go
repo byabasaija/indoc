@@ -290,8 +290,8 @@ func linkifyLine(line string, link func(Citation) string) string {
 		if ticked {
 			start, end = start-1, end+1
 		}
-		// Leave citations that are already link text or a link target alone.
-		if start > 0 && (line[start-1] == '[' || line[start-1] == '(') {
+		// Leave citations that are already link text ([x]) or a link target (](x)) alone.
+		if start > 0 && line[start-1] == '[' || start > 1 && line[start-2:start] == "](" {
 			continue
 		}
 		url := link(c)
