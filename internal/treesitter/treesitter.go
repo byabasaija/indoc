@@ -282,7 +282,10 @@ func decode(l *language, raw []byte) (*Node, error) {
 		head, flags := word(i, 0), word(i, 1)
 		sym, field := int(head>>16), int(head&0xffff)
 		nd := &nodes[i]
-		if sym < len(l.symbols) {
+		switch {
+		case sym == 0xFFFF: // ts_builtin_sym_error
+			nd.Type = "ERROR"
+		case sym < len(l.symbols):
 			nd.Type = l.symbols[sym]
 		}
 		if field < len(l.fields) {
