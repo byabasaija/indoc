@@ -73,7 +73,7 @@ The plugin provides an MCP server with five tools (`indoc_scan`, `indoc_setup`, 
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: byabasaija/indoc@v0.1.0
+      - uses: byabasaija/indoc@v0.2.0
         # with:
         #   mode: warn   # report without failing while you try it out
 ```

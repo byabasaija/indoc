@@ -103,8 +103,8 @@
           "hasher": "bytes"
         },
         "plugin/bin/indoc": {
-          "body": "dcbfcdcd193b8478",
-          "raw": "dcbfcdcd193b8478",
+          "body": "bcf6266af752fb72",
+          "raw": "bcf6266af752fb72",
           "hasher": "bytes"
         },
         "plugin/skills/indoc/SKILL.md": {
@@ -115,7 +115,7 @@
       }
     },
     "docs/ci.md": {
-      "page": "2e29655ee7375a93",
+      "page": "06f158c0382cb038",
       "citations": {
         "internal/cli/check.go::runCheck": {
           "surface": "4d82fe88e3e7a473",
