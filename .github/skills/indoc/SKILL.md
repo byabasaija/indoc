@@ -16,7 +16,9 @@ indoc keeps Markdown pages tied to code. Pages list the code they cover (`source
 
 ## 2. Understand the project
 
-Run `indoc scan --json`. It returns the pages, every check finding with its reason, and reference facts (routes, environment variables) extracted from source. Then read the code: entry points, the main request or command flow, configuration, and any existing docs.
+Run `indoc scan --json`. It returns the pages, every check finding with its reason, reference facts (routes, environment variables, commands) extracted from source, and `coverage`: what each extractor detected and could not resolve. Then read the code: entry points, the main request or command flow, configuration, and any existing docs.
+
+Tell the user about `coverage` warnings worth acting on, such as unreachable routes or variables missing from `.env.example`. Do not paper over unresolved items by writing route or variable tables by hand.
 
 ## 3. Agree on an outline before writing new docs
 

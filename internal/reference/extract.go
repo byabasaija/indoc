@@ -26,16 +26,15 @@ var (
 	quotedPath  = regexp.MustCompile(`["'](/[^"']*)["']`)
 	envPatterns = []*regexp.Regexp{
 		regexp.MustCompile(`os\.Getenv\(\s*"([A-Z][A-Z0-9_]*)"`),
-		regexp.MustCompile(`os\.environ(?:\.get)?\(\s*["']([A-Z][A-Z0-9_]*)["']`),
-		regexp.MustCompile(`os\.getenv\(\s*["']([A-Z][A-Z0-9_]*)["']`),
 		regexp.MustCompile(`process\.env\.([A-Z][A-Z0-9_]+)`),
 		regexp.MustCompile(`process\.env\[\s*["']([A-Z][A-Z0-9_]+)["']\s*\]`),
 	}
 )
 
-// Extract reads source files under root and returns route and configuration
-// sections. File paths are relative to root and appear that way in citations.
-func Extract(root string, files []SourceFile) ([]doc.RefSection, error) {
+// generic is the best-effort regex extractor: decorator-style routes
+// (Flask/FastAPI, Express, Go) and environment reads in Go and JavaScript.
+// Python environment reads are handled by extractPythonEnv.
+func generic(root string, files []SourceFile) ([]doc.RefSection, error) {
 	var routes []doc.RefEntry
 	var config []doc.RefEntry
 	seenRoutes := map[string]bool{}
@@ -57,6 +56,9 @@ func Extract(root string, files []SourceFile) ([]doc.RefSection, error) {
 			}
 			seenRoutes[key] = true
 			routes = append(routes, entry)
+		}
+		if file.Language == "Python" {
+			continue
 		}
 		for _, entry := range configIn(path, content) {
 			if seenConfig[entry.Name] {

@@ -31,6 +31,7 @@ func TestDifferentialCPython(t *testing.T) {
 	}
 
 	var files []string
+	mtimes := map[string]int64{}
 	for _, root := range filepath.SplitList(corpus) {
 		root = expandHome(root)
 		filepath.WalkDir(root, func(path string, d fs.DirEntry, err error) error {
@@ -42,6 +43,9 @@ func TestDifferentialCPython(t *testing.T) {
 			}
 			if !d.IsDir() && strings.HasSuffix(path, ".py") {
 				files = append(files, path)
+				if info, err := d.Info(); err == nil {
+					mtimes[path] = info.ModTime().UnixNano()
+				}
 			}
 			return nil
 		})
@@ -52,7 +56,7 @@ func TestDifferentialCPython(t *testing.T) {
 
 	want := cpythonSymbols(t, python, files)
 
-	var agreed, mismatched, skipped, symbols int
+	var agreed, mismatched, skipped, symbols, changed int
 	var report []string
 	for _, path := range files {
 		ref, ok := want[path]
@@ -65,6 +69,13 @@ func TestDifferentialCPython(t *testing.T) {
 			skipped++
 			continue
 		}
+		// CPython read the file earlier; a file edited since then would be a
+		// false mismatch.
+		if info, err := os.Stat(path); err != nil || info.ModTime().UnixNano() != mtimes[path] {
+			changed++
+			continue
+		}
+		ParseModule(string(src)) // must never panic on real code
 		got := ourSymbols(string(src))
 		symbols += len(ref)
 		if diff := diffSymbols(ref, got); diff != "" {
@@ -77,8 +88,8 @@ func TestDifferentialCPython(t *testing.T) {
 		agreed++
 	}
 
-	t.Logf("files: %d agreed, %d mismatched, %d skipped (CPython could not parse); %d reference symbols",
-		agreed, mismatched, skipped, symbols)
+	t.Logf("files: %d agreed, %d mismatched, %d skipped (CPython could not parse), %d changed during the run; %d reference symbols",
+		agreed, mismatched, skipped, changed, symbols)
 	if mismatched > 0 {
 		t.Errorf("%d files disagree with CPython; first %d:\n\n%s",
 			mismatched, len(report), strings.Join(report, "\n\n"))

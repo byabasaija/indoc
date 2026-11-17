@@ -1,0 +1,345 @@
+package reference
+
+import (
+	"bufio"
+	"fmt"
+	"os"
+	"path"
+	"path/filepath"
+	"regexp"
+	"sort"
+	"strings"
+
+	"github.com/byabasaija/indoc/internal/doc"
+	"github.com/byabasaija/indoc/internal/lang/python"
+)
+
+var envName = regexp.MustCompile(`^[A-Z][A-Z0-9_]*$`)
+
+// Defaults are published in the docs site, so values that may be secrets are
+// never shown: by variable name, and credentials embedded in URLs.
+var (
+	secretName    = regexp.MustCompile(`(?i)(SECRET|PASSWORD|PASSWD|PASS$|_PASS_|TOKEN|(^|_)KEY($|_)|APIKEY|PRIVATE|CREDENTIAL|SIGNING|SALT|DSN|AUTH)`)
+	urlCredential = regexp.MustCompile(`(://)([^/@\s:"']+):([^/@\s"']+)@`)
+)
+
+// redactDefault returns what may be shown for a variable's default value.
+func redactDefault(name, value string) string {
+	if secretName.MatchString(name) && value != `""` && value != `''` && value != "None" {
+		return "(set in code; not shown)"
+	}
+	return urlCredential.ReplaceAllString(value, "${1}${2}:***@")
+}
+
+// envMethods are django-environ readers; the value is the type shown.
+var envMethods = map[string]string{
+	"str": "str", "bool": "bool", "int": "int", "float": "float", "list": "list",
+	"tuple": "tuple", "dict": "dict", "json": "json", "url": "url", "path": "path",
+	"decimal": "decimal", "bytes": "bytes", "db": "database URL", "db_url": "database URL",
+	"cache": "cache URL", "cache_url": "cache URL", "email": "email URL", "email_url": "email URL",
+	"search_url": "search URL", "get_value": "",
+}
+
+// envDefaults are the variables django-environ reads when called without a name.
+var envDefaults = map[string]string{
+	"db": "DATABASE_URL", "db_url": "DATABASE_URL", "cache": "CACHE_URL", "cache_url": "CACHE_URL",
+	"email": "EMAIL_URL", "email_url": "EMAIL_URL", "search_url": "SEARCH_URL",
+}
+
+// envExamples are committed example files. `.env` itself is never read: it
+// holds secrets.
+var envExamples = map[string]bool{
+	".env.example": true, ".env.sample": true, ".env.template": true, ".env.dist": true,
+	"env.example": true, "example.env": true, ".env.local.example": true,
+}
+
+type envRead struct {
+	entry doc.RefEntry
+	file  string
+}
+
+func extractPythonEnv(root string, files []SourceFile, all []string) ([]doc.RefEntry, *Coverage) {
+	cov := &Coverage{Extractor: "python-env"}
+	py := newPyProject(root, nil)
+
+	// Names bound to django-environ readers anywhere in the project.
+	envObjects := map[string]bool{}
+	usesEnviron := false
+	var mods []*python.Module
+	var paths []string
+	for _, f := range files {
+		if f.Language != "Python" {
+			continue
+		}
+		m := py.load(f.Path)
+		mods = append(mods, m)
+		paths = append(paths, f.Path)
+		for _, imp := range m.Imports {
+			if imp.Module == "environ" || imp.Local == "environ" && imp.Name == "" {
+				usesEnviron = true
+			}
+		}
+		for _, a := range m.Assigns {
+			if c, ok := a.Value.(*python.Call); ok {
+				if fn := c.FuncName(); fn == "environ.Env" || fn == "Env" || fn == "environ.FileAwareEnv" {
+					envObjects[a.Target] = true
+				}
+			}
+		}
+	}
+	if usesEnviron && len(envObjects) == 0 {
+		envObjects["env"] = true
+	}
+	if len(envObjects) > 0 {
+		cov.Evidence = append(cov.Evidence, "django-environ")
+	}
+
+	reads := map[string]*envRead{}
+	var order []string
+	for i, m := range mods {
+		file := paths[i]
+		src, err := os.ReadFile(filepath.Join(root, filepath.FromSlash(file)))
+		if err != nil || len(src) > maxFileBytes {
+			continue
+		}
+		decouple, osEnviron, osGetenv := "", "", ""
+		for _, imp := range m.Imports {
+			switch {
+			case imp.Module == "decouple" && imp.Name == "config":
+				decouple = imp.Local
+			case imp.Module == "os" && imp.Name == "environ":
+				osEnviron = imp.Local
+			case imp.Module == "os" && imp.Name == "getenv":
+				osGetenv = imp.Local
+			}
+		}
+		if decouple != "" && !contains(cov.Evidence, "python-decouple") {
+			cov.Evidence = append(cov.Evidence, "python-decouple")
+		}
+		cov.Files++
+		toks := significant(python.Tokenize(string(src)))
+		for j := 0; j < len(toks); j++ {
+			name, detail, line, ok := envReadAt(toks, j, envObjects, decouple, osEnviron, osGetenv)
+			if !ok {
+				continue
+			}
+			if r, seen := reads[name]; seen {
+				if r.entry.Detail == "" && detail != "" {
+					r.entry.Detail = detail
+				}
+				continue
+			}
+			reads[name] = &envRead{entry: doc.RefEntry{Name: name, Detail: detail, Source: fmt.Sprintf("%s:%d", file, line)}, file: file}
+			order = append(order, name)
+		}
+	}
+
+	example, exampleFile := readEnvExample(root, all)
+	var out []doc.RefEntry
+	for _, name := range order {
+		e := reads[name].entry
+		if exampleFile != "" && !example[name] {
+			e.Description = "Not in " + exampleFile + "."
+		}
+		out = append(out, e)
+	}
+	if exampleFile != "" {
+		var unread []string
+		for k := range example {
+			if _, ok := reads[k]; !ok {
+				unread = append(unread, k)
+			}
+		}
+		sort.Strings(unread)
+		if len(unread) > 0 {
+			cov.Warnings = append(cov.Warnings, fmt.Sprintf("in %s but not read by Python code: %s", exampleFile, strings.Join(unread, ", ")))
+		}
+	}
+	cov.Entries = len(out)
+	if cov.Entries == 0 && len(cov.Evidence) == 0 {
+		return nil, nil
+	}
+	return out, cov
+}
+
+func contains(list []string, s string) bool {
+	for _, x := range list {
+		if x == s {
+			return true
+		}
+	}
+	return false
+}
+
+func significant(toks []python.Token) []python.Token {
+	out := toks[:0:0]
+	for _, t := range toks {
+		switch t.Kind {
+		case python.Comment, python.NL, python.Newline, python.Indent, python.Dedent:
+			continue
+		}
+		out = append(out, t)
+	}
+	return out
+}
+
+// envReadAt recognizes an environment read starting at toks[i].
+func envReadAt(toks []python.Token, i int, envObjects map[string]bool, decouple, osEnviron, osGetenv string) (name, detail string, line int, ok bool) {
+	t := toks[i]
+	if t.Kind != python.Name || (i > 0 && toks[i-1].Text == ".") {
+		return
+	}
+	at := func(k int, text string) bool { return i+k < len(toks) && toks[i+k].Text == text }
+	line = t.Line
+
+	switch {
+	case envObjects[t.Text] && at(1, "("):
+		c := callAt(toks, i)
+		return envCall(c, "", false, line)
+	case envObjects[t.Text] && at(1, ".") && i+3 < len(toks) && toks[i+3].Text == "(":
+		method := toks[i+2].Text
+		kind, known := envMethods[method]
+		if !known {
+			return
+		}
+		c := callAt(toks, i)
+		if c == nil {
+			return
+		}
+		if c.Arg(0, "var") == nil {
+			if name, ok := envDefaults[method]; ok {
+				if def := c.Kw("default"); def != nil {
+					return name, kind + ", default " + short(redactDefault(name, def.Text())), line, true
+				}
+				return name, kind + ", required", line, true
+			}
+		}
+		return envCall(c, kind, true, line)
+	case decouple != "" && t.Text == decouple && at(1, "("):
+		return envCall(callAt(toks, i), "", true, line)
+	case t.Text == "os" && at(1, ".") && at(2, "environ"):
+		if at(3, "[") {
+			return subscriptName(toks, i+4, line)
+		}
+		if at(3, ".") && at(4, "get") && at(5, "(") {
+			return optionalCall(callAt(toks, i), line)
+		}
+	case t.Text == "os" && at(1, ".") && at(2, "getenv") && at(3, "("):
+		return optionalCall(callAt(toks, i), line)
+	case osEnviron != "" && t.Text == osEnviron:
+		if at(1, "[") {
+			return subscriptName(toks, i+2, line)
+		}
+		if at(1, ".") && at(2, "get") && at(3, "(") {
+			return optionalCall(callAt(toks, i), line)
+		}
+	case osGetenv != "" && t.Text == osGetenv && at(1, "("):
+		return optionalCall(callAt(toks, i), line)
+	}
+	return
+}
+
+// callAt parses the call whose callee starts at toks[i].
+func callAt(toks []python.Token, i int) *python.Call {
+	j := i
+	for j < len(toks) && toks[j].Text != "(" {
+		j++
+	}
+	depth := 0
+	for k := j; k < len(toks); k++ {
+		switch toks[k].Text {
+		case "(", "[", "{":
+			depth++
+		case ")", "]", "}":
+			depth--
+			if depth == 0 {
+				c, _ := python.ParseExpr(toks[i : k+1]).(*python.Call)
+				return c
+			}
+		}
+	}
+	return nil
+}
+
+// envCall reads `env("X", default=...)`-style calls. When positionalDefault
+// is set, the second positional argument is the default (env.str, config).
+func envCall(c *python.Call, kind string, positionalDefault bool, line int) (string, string, int, bool) {
+	if c == nil {
+		return "", "", 0, false
+	}
+	s, ok := c.Arg(0, "var").(*python.Str)
+	if !ok || !s.Literal || !envName.MatchString(s.Value) {
+		if s2, ok2 := c.Arg(0, "option").(*python.Str); ok2 && s2.Literal && envName.MatchString(s2.Value) {
+			s = s2
+		} else {
+			return "", "", 0, false
+		}
+	}
+	def := c.Kw("default")
+	if def == nil && positionalDefault && len(c.Args) > 1 {
+		def = c.Args[1]
+	}
+	parts := []string{}
+	if kind != "" {
+		parts = append(parts, kind)
+	}
+	if def == nil {
+		parts = append(parts, "required")
+	} else {
+		parts = append(parts, "default "+short(redactDefault(s.Value, def.Text())))
+	}
+	return s.Value, strings.Join(parts, ", "), line, true
+}
+
+func optionalCall(c *python.Call, line int) (string, string, int, bool) {
+	if c == nil || len(c.Args) == 0 {
+		return "", "", 0, false
+	}
+	s, ok := c.Args[0].(*python.Str)
+	if !ok || !s.Literal || !envName.MatchString(s.Value) {
+		return "", "", 0, false
+	}
+	if len(c.Args) > 1 {
+		return s.Value, "default " + short(redactDefault(s.Value, c.Args[1].Text())), line, true
+	}
+	return s.Value, "optional", line, true
+}
+
+func subscriptName(toks []python.Token, i, line int) (string, string, int, bool) {
+	if i >= len(toks) || toks[i].Kind != python.String {
+		return "", "", 0, false
+	}
+	s, ok := python.ParseExpr(toks[i : i+1]).(*python.Str)
+	if !ok || !envName.MatchString(s.Value) {
+		return "", "", 0, false
+	}
+	return s.Value, "required", line, true
+}
+
+// readEnvExample returns the keys of the first committed example env file.
+func readEnvExample(root string, all []string) (map[string]bool, string) {
+	for _, f := range all {
+		if !envExamples[path.Base(f)] {
+			continue
+		}
+		file, err := os.Open(filepath.Join(root, filepath.FromSlash(f)))
+		if err != nil {
+			continue
+		}
+		keys := map[string]bool{}
+		sc := bufio.NewScanner(file)
+		for sc.Scan() {
+			line := strings.TrimSpace(sc.Text())
+			line = strings.TrimPrefix(line, "export ")
+			if line == "" || strings.HasPrefix(line, "#") {
+				continue
+			}
+			if k, _, ok := strings.Cut(line, "="); ok && envName.MatchString(strings.TrimSpace(k)) {
+				keys[strings.TrimSpace(k)] = true
+			}
+		}
+		file.Close()
+		return keys, f
+	}
+	return nil, ""
+}

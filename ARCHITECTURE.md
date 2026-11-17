@@ -21,7 +21,8 @@ internal/cli              commands: init, scan, check, ack, bundle, preview, ver
         │       └── internal/glob     `**` glob matching
         │
         └── internal/bundler    static site (embedded viewer), via internal/doc + internal/render
-                └── internal/reference   route and env-var extraction
+                └── internal/reference   extractors: Django/DRF, Python env, generic regex
+                        └── internal/lang/python (ParseModule)   static module reader
 ```
 
 Dependencies point down. Language parsers know nothing about pages; pages know nothing about parsers; `drift` joins them.
@@ -61,6 +62,16 @@ Pages are Markdown files selected by `pages:` globs in `.indoc/config.yaml`. Pub
 | Citation into a language without a parser | unverified | `--strict` |
 
 A page is compared only while its content matches the lock. `drift.Ack` with no targets records only new and edited pages; an unchanged stale page is re-recorded only when named explicitly. `drift.Stamp` refuses pages with broken citations. `check` is read-only.
+
+## Reference extraction
+
+`reference.Extract` runs each applicable extractor and returns sections plus a `Coverage` per extractor (evidence, files read, entries, unresolved items, warnings). Nothing imports or runs project code.
+
+- **Module reader** (`python.ParseModule`): imports, module- and class-level assignments, module-level call statements, classes with bases and methods, functions with decorators, and an expression parser for the forms configuration uses (strings, dotted names, calls, lists, tuples, `+`, `*spread`, `a if b else c`). Everything else is opaque.
+- **Django**: finds `ROOT_URLCONF` in settings, follows `urlpatterns` (`=`, `+=`, `append`, `extend`, `insert`, spreads, `if` blocks marked conditional) through `include()` (string, tuple, module object, inline list) and DRF routers (`register`, `@action`, `lookup_field`, empty prefixes, `DefaultRouter` root). HTTP methods come from handler methods on view classes and their project bases, known framework views, `http_method_names`, and `@api_view`. `settings.X` routes resolve to the literal in settings files, noting overrides. Routes shadowed by an earlier identical path are warned about. Verified against Django's resolver by an opt-in differential test.
+- **Python env**: token-level reads through django-environ (including `env.db()` and friends), python-decouple, `os.environ`, `os.getenv`, with type and default. Defaults that may be secrets are redacted. `.env.example` is cross-checked; `.env` is never read.
+- **Management commands**: `<app>/management/commands/<name>.py` with `class Command`, its `help`, and `add_argument` names.
+- **Generic**: the original regex extractor for decorator-style routes and Go/JS env reads, labeled best effort.
 
 ## Site
 

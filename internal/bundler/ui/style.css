@@ -578,8 +578,11 @@ article tbody tr:hover, .ref tbody tr:hover { background: var(--accent-soft); }
 .ref-wrap { overflow: auto; }
 .ref { width: 100%; border-collapse: collapse; }
 .path, .source { font-family: var(--mono); font-size: 0.88em; }
-.source, .entry-desc { color: var(--muted); }
+.source, .entry-desc, .entry-handler { color: var(--muted); }
 .entry-desc { margin-top: 5px; font-family: var(--sans); font-size: 0.9rem; }
+.entry-handler { margin-top: 4px; font-family: var(--mono); font-size: 0.82em; }
+.detail { font-family: var(--mono); font-size: 0.85em; }
+td .method + .method { margin-left: 4px; }
 
 .method {
   display: inline-block;
@@ -598,7 +601,7 @@ article tbody tr:hover, .ref tbody tr:hover { background: var(--accent-soft); }
 .method-post { color: #2563eb; }
 .method-put, .method-patch { color: #b45309; }
 .method-delete { color: #b91c1c; }
-.method-any, .method-head, .method-options { color: var(--muted); }
+.method-any, .method-head, .method-options, .method-include { color: var(--muted); }
 
 :root[data-theme="dark"] .method-post { color: #93c5fd; }
 :root[data-theme="dark"] .method-put,

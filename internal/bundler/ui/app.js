@@ -203,7 +203,9 @@
     var table = document.createElement("table");
     table.className = "ref";
     var head = document.createElement("tr");
-    var columns = page.kind === "routes" ? ["Method", "Path", "Source"] : ["Name", "Source"];
+    var columns = page.kind === "routes" ? ["Method", "Path", "Source"]
+      : page.kind === "commands" ? ["Command", "Arguments", "Source"]
+      : ["Name", "Details", "Source"];
     columns.forEach(function (name) {
       var th = document.createElement("th");
       th.textContent = name;
@@ -215,20 +217,26 @@
       var row = document.createElement("tr");
       if (page.kind === "routes") {
         var methodCell = document.createElement("td");
-        var badge = document.createElement("span");
-        var method = entry.detail || "ANY";
-        badge.className = "method method-" + method.toLowerCase();
-        badge.textContent = method;
-        methodCell.appendChild(badge);
+        (entry.detail || "ANY").split(/,\s*/).forEach(function (method) {
+          var badge = document.createElement("span");
+          badge.className = "method method-" + method.toLowerCase();
+          badge.textContent = method;
+          methodCell.appendChild(badge);
+        });
         row.appendChild(methodCell);
       }
       var nameCell = cell(row, entry.name, "path");
-      if (entry.description) {
+      var notes = [];
+      if (page.kind === "routes" && entry.handler) notes.push(entry.handler);
+      if (page.kind === "commands" && entry.handler) notes.push(entry.handler);
+      if (entry.description) notes.push(entry.description);
+      notes.forEach(function (text, i) {
         var desc = document.createElement("div");
-        desc.className = "entry-desc";
-        desc.textContent = entry.description;
+        desc.className = i === 0 && entry.handler ? "entry-handler" : "entry-desc";
+        desc.textContent = text;
         nameCell.appendChild(desc);
-      }
+      });
+      if (page.kind !== "routes") cell(row, entry.detail || "", "detail");
       cell(row, entry.source, "source");
       table.appendChild(row);
     });
@@ -302,7 +310,7 @@
   function entryText(page) {
     if (!page.entries) return "";
     return page.entries.map(function (entry) {
-      return [entry.name, entry.detail, entry.description].join(" ");
+      return [entry.name, entry.detail, entry.handler, entry.description].join(" ");
     }).join(" ");
   }
 

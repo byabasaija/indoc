@@ -48,6 +48,8 @@ type scanReport struct {
 	Pages       []scanPage       `json:"pages"`
 	Findings    []drift.Finding  `json:"findings"`
 	Reference   []doc.RefSection `json:"reference"`
+	// Coverage says what each extractor detected and could not resolve.
+	Coverage []reference.Coverage `json:"coverage"`
 	// Files is the number of repository files; Parsed of those have a
 	// language parser and support path::Symbol citations.
 	Files  int `json:"files"`
@@ -59,15 +61,17 @@ func runScan(configPath string, out io.Writer, asJSON bool) error {
 	if err != nil {
 		return err
 	}
-	sections, err := reference.Extract(p.paths.Root, reference.Sources(p.repo.Files))
+	ref, err := reference.Extract(p.paths.Root, p.repo.Files)
 	if err != nil {
 		return err
 	}
+	sections := ref.Sections
 	report := scanReport{
 		ProjectName: p.cfg.ProjectName,
 		OutputDir:   p.cfg.OutputDir,
 		Findings:    nonNil(drift.Check(p.repo, p.pages, p.lock)),
 		Reference:   sections,
+		Coverage:    ref.Coverage,
 		Files:       len(p.repo.Files),
 	}
 	for _, f := range p.repo.Files {
@@ -96,7 +100,18 @@ func runScan(configPath string, out io.Writer, asJSON bool) error {
 	for _, sp := range report.Pages {
 		fmt.Fprintf(out, "  %-40s %d sources, %d citations\n", sp.Path, len(sp.Sources), len(sp.Citations))
 	}
-	fmt.Fprintf(out, "\nreference: %s\n\n", summarizeReference(sections))
+	fmt.Fprintf(out, "\nreference: %s\n", summarizeReference(sections))
+	for _, c := range ref.Coverage {
+		fmt.Fprintf(out, "  %s: %d entries from %d files", c.Extractor, c.Entries, c.Files)
+		if len(c.Unresolved) > 0 {
+			fmt.Fprintf(out, ", %d unresolved", len(c.Unresolved))
+		}
+		fmt.Fprintln(out)
+		for _, w := range c.Warnings {
+			fmt.Fprintf(out, "    warning: %s\n", w)
+		}
+	}
+	fmt.Fprintln(out)
 	printFindings(out, len(p.pages), report.Findings, false)
 	return nil
 }

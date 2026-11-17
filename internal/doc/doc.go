@@ -12,6 +12,8 @@ const (
 	KindRoutes = "routes"
 	// KindConfig is a reference section extracted from environment variable reads.
 	KindConfig = "config"
+	// KindCommands is a reference section of command-line commands.
+	KindCommands = "commands"
 )
 
 // Document is the site the agent writes and the bundler compiles.
@@ -52,10 +54,11 @@ type RefSection struct {
 	Entries []RefEntry `json:"entries" yaml:"entries"`
 }
 
-// RefEntry is a single route or configuration value.
+// RefEntry is a single route, configuration value, or command.
 type RefEntry struct {
 	Name        string `json:"name" yaml:"name"`
 	Detail      string `json:"detail,omitempty" yaml:"detail,omitempty"`
+	Handler     string `json:"handler,omitempty" yaml:"handler,omitempty"`
 	Description string `json:"description,omitempty" yaml:"description,omitempty"`
 	Source      string `json:"source,omitempty" yaml:"source,omitempty"`
 }
@@ -158,8 +161,8 @@ func Validate(d *Document) error {
 	}
 	seenRefs := map[string]bool{}
 	for i, section := range d.Reference {
-		if section.Kind != KindRoutes && section.Kind != KindConfig {
-			return fmt.Errorf("reference[%d] kind must be %q or %q", i, KindRoutes, KindConfig)
+		if section.Kind != KindRoutes && section.Kind != KindConfig && section.Kind != KindCommands {
+			return fmt.Errorf("reference[%d] kind must be %q, %q, or %q", i, KindRoutes, KindConfig, KindCommands)
 		}
 		if section.ID == "" {
 			return fmt.Errorf("reference[%d] id is required", i)
@@ -256,6 +259,8 @@ func defaultRefTitle(kind string) string {
 		return "Routes"
 	case KindConfig:
 		return "Configuration"
+	case KindCommands:
+		return "Commands"
 	default:
 		return kind
 	}

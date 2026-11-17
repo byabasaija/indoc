@@ -102,13 +102,18 @@ Precise staleness and `path::Symbol` citations need a parser for the language. E
 
 ## Reference extraction
 
-`indoc bundle` adds reference pages extracted from source, so routes and environment variables are never hand-copied.
+`indoc bundle` adds reference pages extracted from source, so routes, environment variables, and commands are never hand-copied. Extraction is static: indoc never imports or runs your code.
 
-| Source | Routes | Environment variables | Status |
-|---|---|---|---|
-| Flask/FastAPI-style decorators, Express `app.get`, Go `HandleFunc`/`GET` | ✅ | `os.getenv`, `os.environ`, `process.env`, `os.Getenv` | Best effort |
-| Django + DRF | | | Planned next |
-| FastAPI routers and settings, Cobra commands | | | Planned |
+| Framework | Routes | Configuration | Commands | Status |
+|---|---|---|---|---|
+| Django + DRF | ✅ URLconf through `include()`, routers, `@action`; HTTP methods from views, viewsets, `@api_view`, `http_method_names` | ✅ django-environ, python-decouple, `os.environ` | ✅ management commands | Supported |
+| Python (any) | | ✅ `os.environ`, `os.getenv` | | Supported |
+| Flask/FastAPI-style decorators, Express `app.get`, Go `HandleFunc`/`GET` | best effort | `process.env`, `os.Getenv` | | Best effort |
+| FastAPI routers and settings, Cobra commands | | | | Planned |
+
+Django extraction matches Django's own URL resolver route for route, including HTTP methods, on six real projects (522 routes). Routes provided by installed packages (admin, allauth) are listed as external includes rather than guessed.
+
+Every extractor reports what it could not resolve, and `indoc scan` shows it. It also warns about things worth fixing: a route that can never be reached because an earlier pattern has the same path, and variables missing from `.env.example`. Default values that may be secrets (names containing `SECRET`, `PASSWORD`, `TOKEN`, `KEY`, ...) and credentials inside URLs are never published.
 
 See [ROADMAP.md](ROADMAP.md) for what is next and what indoc deliberately does not do.
 

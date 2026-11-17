@@ -112,7 +112,7 @@
       },
       "sources": {
         "internal/cli/bundle.go": {
-          "body": "86d45f585aca5704",
+          "body": "f34d5e2156dc4c5c",
           "symbols": {
             "assemble": "ae682a0fc0ffc73a",
             "buildSite": "a025c648708f8f48",
@@ -235,6 +235,168 @@
             "fixture.load": "e2e339212501112d",
             "fixture.write": "b7c86aa511848740",
             "newFixture": "acec58cf9f0581c7"
+          }
+        }
+      }
+    },
+    "docs/reference.md": {
+      "page": "2fcea491ba3d7aba",
+      "citations": {
+        "internal/reference/reference.go::Coverage": {
+          "surface": "a4c40678d4643931",
+          "body": ""
+        },
+        "internal/reference/reference.go::Extract": {
+          "surface": "17595d9732df58da",
+          "body": "32618d79f16117dd"
+        }
+      },
+      "sources": {
+        "internal/reference/commands.go": {
+          "body": "9a1d6681de0588dc",
+          "symbols": {
+            "commandArguments": "d835cd1666d32e57",
+            "extractManagementCommands": "8b62c1da13d1975e"
+          }
+        },
+        "internal/reference/django.go": {
+          "body": "5d8d218479abc7fc",
+          "symbols": {
+            "actionDecorator": "db41f608ef7cb574",
+            "django": "2c1450a77781995c",
+            "django.add": "1e19cf6e2e732989",
+            "django.allowedMethods": "41e332e04f0a97bd",
+            "django.classMethods": "274279391dd0ca71",
+            "django.collectActions": "a35ae29fb4b449fc",
+            "django.collectMethods": "734235a34f85ce7f",
+            "django.element": "8a7ecc3c5142b90b",
+            "django.expand": "f8bc21941e022f4c",
+            "django.external": "bc25a8ecb9a41294",
+            "django.include": "09d45e54f92ed816",
+            "django.note": "4525e514ed24169a",
+            "django.router": "47dd38a8f9ed1a30",
+            "django.setting": "9b37b61b99a90fe9",
+            "django.shadowed": "6dfb12e1f7e59f41",
+            "django.viewMethods": "5ca8220f3b940555",
+            "django.viewset": "75d92992c5d70ebc",
+            "django.walkFile": "d5311a15119ee878",
+            "element": "5cc01bfd3752be44",
+            "extractDjango": "608205490bfe2d53",
+            "lastSeg": "23537a828f4fc6aa",
+            "ordered": "8b56f310e529afeb",
+            "short": "a6cd2c360b178dae",
+            "upperStrings": "60a70566482bf82e"
+          }
+        },
+        "internal/reference/django_differential_test.go": {
+          "body": "5564104946b75e19",
+          "symbols": {
+            "TestDjangoDifferential": "5cc7f1ff2b6986ed",
+            "expandHome": "f8b41f1df9563f28",
+            "indexOf": "7700a087417b5297",
+            "normalizeDjangoPath": "d03978a2a4d336e4",
+            "orderedList": "5cff58ff5f1086e8"
+          }
+        },
+        "internal/reference/django_test.go": {
+          "body": "574b26acbd6f1794",
+          "symbols": {
+            "TestDjangoDetectedWithoutURLconfWarns": "425453a2b180b636",
+            "TestDjangoExtraction": "9def1ef9291daafe",
+            "TestRedactDefault": "53a2d759c2ffe092",
+            "section": "f99b29194b6cfe91",
+            "writeFixture": "72e59015914ba5c3"
+          }
+        },
+        "internal/reference/extract.go": {
+          "body": "ee3d51c73d0294ad",
+          "symbols": {
+            "SourceFile": "131c92f89d100e24",
+            "bytesContainNUL": "8e7d02757d319d9f",
+            "canonicalGoMethod": "dad52a4a80bcac54",
+            "configIn": "a9bcd1e50247cf69",
+            "firstPath": "a895b5421eac761e",
+            "generic": "ef7326f525218b77",
+            "readSource": "5143b732fb007a7a",
+            "routeMethod": "b3f57e6a59c8cc9d",
+            "routesIn": "e2355ae8e1e2a3e8",
+            "window": "665652a7482ff585"
+          }
+        },
+        "internal/reference/extract_test.go": {
+          "body": "a5d1dd29d3a105b9",
+          "symbols": {
+            "TestExtractRoutesAndConfig": "0ac4f86f8958cc69",
+            "stringsJoin": "528469df168e4948",
+            "writeFile": "0a9163586fc6f3ea"
+          }
+        },
+        "internal/reference/pyenv.go": {
+          "body": "0143a177da5386ad",
+          "symbols": {
+            "callAt": "c07a10ab4da6b180",
+            "contains": "ff1822e7196e7478",
+            "envCall": "b2f42c0a311ddc63",
+            "envRead": "781e95f786145fd4",
+            "envReadAt": "e7a66370243de42c",
+            "extractPythonEnv": "f75f1fc75d426ef2",
+            "optionalCall": "b9d2d5c229aa70d9",
+            "readEnvExample": "75e0352ec3a3ea10",
+            "redactDefault": "4068a865f17a2730",
+            "significant": "dfb827be5b577967",
+            "subscriptName": "a4ebaab710038d71"
+          }
+        },
+        "internal/reference/pyproject.go": {
+          "body": "ee2bc503263ff275",
+          "symbols": {
+            "dirOf": "d055f82835eb63ac",
+            "join": "f34ab20a62468fa8",
+            "newPyProject": "61204c2a2224cf80",
+            "nonEmpty": "d66138addda929de",
+            "pyProject": "f6387957a9357932",
+            "pyProject.importTarget": "7166421b92054065",
+            "pyProject.load": "39ada80ba95de41f",
+            "pyProject.lookup": "844f13ff046204de",
+            "pyProject.lookupDepth": "e58d22e110277b01",
+            "pyProject.moduleFile": "088a02f401422cfa",
+            "pyProject.moduleName": "9715a610c62f4176",
+            "pyProject.resolveAbsolute": "ef32031d239acca1",
+            "ref": "16f5b8afb206d21b"
+          }
+        },
+        "internal/reference/reference.go": {
+          "body": "3a6c441652d54d3f",
+          "symbols": {
+            "Coverage": "a4c40678d4643931",
+            "Extract": "17595d9732df58da",
+            "Report": "70504ac63e96eb8e",
+            "appendNew": "b08d8f22235162b4",
+            "nonTest": "2a254ab8c4186979"
+          }
+        },
+        "internal/reference/sources.go": {
+          "body": "024b760f4256b55b",
+          "symbols": {
+            "Sources": "09d2aa099f04de28",
+            "isTest": "0d6d36f97904bc0e"
+          }
+        },
+        "internal/reference/sources_test.go": {
+          "body": "3b3e5b7d528ea511",
+          "symbols": {
+            "TestSources": "d4393cefcf847a37"
+          }
+        },
+        "internal/reference/testdata/django_urls.py": {
+          "body": "5d5983c00d512dbc",
+          "symbols": {
+            "all_outside": "3c207ac4d3cc5ce7",
+            "leaves": "716a2f9e8ddd7252",
+            "methods": "767813871d8ebb7b",
+            "module_outside": "b5428a0e4ddeb7fc",
+            "outside": "f881b6009cbb7353",
+            "walk": "066b258472351972"
           }
         }
       }

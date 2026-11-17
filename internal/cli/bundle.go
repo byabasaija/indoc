@@ -75,11 +75,11 @@ func buildSite(p *project, outDir string) error {
 		return fmt.Errorf("broken citations or sources:\n%s", strings.Join(broken, "\n"))
 	}
 
-	sections, err := reference.Extract(p.paths.Root, reference.Sources(p.repo.Files))
+	ref, err := reference.Extract(p.paths.Root, p.repo.Files)
 	if err != nil {
 		return err
 	}
-	document := assemble(p, sections)
+	document := assemble(p, ref.Sections)
 	return bundler.Write(document, outDir, p.paths.Root)
 }
 

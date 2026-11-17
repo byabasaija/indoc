@@ -165,7 +165,7 @@ The plugin is the primary *onboarding* path. The CLI is the primary *interface f
 
 ## 6. Extractor contract
 
-Each framework is one package under `internal/extract/<framework>/` implementing:
+Each framework is an extractor in `internal/reference` (built on the static module reader in `internal/lang/python`) that returns entries plus a `Coverage` report. The original sketch:
 
 ```go
 type Extractor interface {
@@ -331,10 +331,11 @@ Each phase ends with a concrete check against a real repo, shop unless noted.
 * `check` works on any Markdown docs folder (check-only adoption), including Docusaurus.
 * **Exit:** shop's `partner-integration.md` bundles with `code-review-gaps-*.md` excluded; replay test meets the section 12 targets.
 
-### Phase 2: Extractor interface + Django/DRF
-* `internal/extract` package, coverage reporting, zero-result warnings.
+### Phase 2: Extractor interface + Django/DRF (done 2026-11-17)
+* Coverage reporting per extractor, zero-result warnings.
 * Django URLconf resolution, DRF routers, settings, management commands.
 * **Exit:** shop reference shows all 53 URL patterns (resolved full paths) and every env var, or names exactly which could not be resolved.
+* **Result:** a differential test runs Django's own URL resolver in each project's environment and compares route by route. Six private Django projects: **522 routes, 0 missing, 0 extra, 0 wrong HTTP methods.** Third-party URL trees (admin, allauth, wagtail, debug toolbar) are reported as external includes. Env vars on shop: 31 found, a superset of what `grep` finds (25; it misses multi-line calls). Found along the way: an unreachable DRF API root in app-e (now a warning) and secret defaults that would have been published (now redacted).
 
 ### Phase 3: Citations + project map
 * Citation validation in `check`/`bundle`; "view source" links when `repo_url` is set.

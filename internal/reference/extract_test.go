@@ -42,7 +42,7 @@ func TestExtractRoutesAndConfig(t *testing.T) {
 	writeFile(t, goFile, goSrc)
 	writeFile(t, js, jsSrc)
 
-	sections, err := Extract("", []SourceFile{
+	sections, err := generic("", []SourceFile{
 		{Path: py, Language: "Python"},
 		{Path: goFile, Language: "Go"},
 		{Path: js, Language: "JavaScript"},
@@ -67,7 +67,7 @@ func TestExtractRoutesAndConfig(t *testing.T) {
 	}
 
 	config := sections[1].Entries
-	if len(config) != 3 || config[0].Name != "API_KEY" || config[1].Name != "DATABASE_URL" || config[2].Name != "PORT" {
+	if len(config) != 2 || config[0].Name != "API_KEY" || config[1].Name != "PORT" { // Python env reads: extractPythonEnv
 		t.Fatalf("config = %+v", config)
 	}
 }
