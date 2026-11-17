@@ -1137,7 +1137,7 @@
         "internal/site/site.go::Build": {
           "surface": "b40cda3ec9f95359",
           "body": "d8620248c3acc27f",
-          "raw": "75dfef16bb097090",
+          "raw": "82937f948cef8c90",
           "hasher": "go/2"
         }
       },
@@ -1208,8 +1208,8 @@
           "hasher": "go/2"
         },
         "internal/site/assets/indoc.css": {
-          "body": "d1a11247a8084fd8",
-          "raw": "d1a11247a8084fd8",
+          "body": "ff03f73cb362c213",
+          "raw": "ff03f73cb362c213",
           "hasher": "bytes"
         },
         "internal/site/assets/indoc.js": {
@@ -1303,7 +1303,7 @@
             "writer.finish",
             "writer.write"
           ],
-          "raw": "75dfef16bb097090",
+          "raw": "82937f948cef8c90",
           "hasher": "go/2"
         },
         "internal/site/site_test.go": {

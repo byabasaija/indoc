@@ -30,6 +30,7 @@
   color-scheme: light;
 }
 :root[data-theme="dark"] {
+  --accent: #e6edf3;
   --bg: #0d1117;
   --bg-subtle: #151b23;
   --bg-hover: #1c2330;
@@ -51,6 +52,7 @@
 }
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
+    --accent: #e6edf3;
     --bg: #0d1117;
     --bg-subtle: #151b23;
     --bg-hover: #1c2330;

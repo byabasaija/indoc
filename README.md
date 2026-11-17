@@ -26,8 +26,8 @@
 
 <p align="center">
   <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="design/screenshots/site-dark.png">
-    <img src="design/screenshots/site-light.png" width="860" alt="A documentation site built by indoc: sidebar, a page with highlighted code, and an on-this-page outline">
+    <source media="(prefers-color-scheme: dark)" srcset="design/screenshots/landing-dark.png">
+    <img src="design/screenshots/landing-light.png" width="860" alt="indoc's own documentation site, built by indoc: landing page with hero, call-to-action buttons, and feature cards">
   </picture>
 </p>
 
@@ -138,6 +138,12 @@ These rules were tuned by replaying 100 commits of a real production codebase: 8
 ## What you get
 
 **A docs site.** One pre-rendered HTML page per Markdown file, readable without JavaScript.
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="design/screenshots/site-dark.png">
+  <img src="design/screenshots/site-light.png" width="720" alt="A page in an indoc site: sidebar from folders, highlighted code, a verified citation linked to the code, and an on-this-page outline">
+</picture>
+
 - Sidebar from your folders, full-text search, light and dark themes
 - Syntax highlighting and copy buttons on code blocks, Mermaid diagrams
 - A landing page with hero and feature cards, set in frontmatter
