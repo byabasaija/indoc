@@ -248,3 +248,9 @@ func significant(toks []Token) []string {
 	}
 	return out
 }
+
+// FileHash hashes the whole file's significant tokens, so module-level edits
+// (settings, urlpatterns) are visible even though no symbol owns them.
+func FileHash(src string) string {
+	return lang.Hash(significant(Tokenize(src)))
+}

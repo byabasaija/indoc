@@ -114,3 +114,8 @@ func tokens(src []byte) []string {
 		}
 	}
 }
+
+// FileHash hashes the whole file's significant tokens.
+func FileHash(src []byte) string {
+	return lang.Hash(tokens(src))
+}
