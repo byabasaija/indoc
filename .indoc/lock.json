@@ -14,7 +14,7 @@
         },
         "internal/drift/drift.go::Stamp": {
           "surface": "8df7959ee83484b4",
-          "body": "b984c5618caadc81"
+          "body": "e41312428930fb82"
         }
       },
       "sources": {
@@ -23,7 +23,11 @@
           "symbols": {
             "init": "c78f10468427bc77",
             "runAck": "6fb2e8932df90711"
-          }
+          },
+          "private": [
+            "init",
+            "runAck"
+          ]
         },
         "internal/cli/check.go": {
           "body": "d6f983ccbdfc9a33",
@@ -32,15 +36,21 @@
             "nonNil": "4d04765194c8424f",
             "printFindings": "d018303009c90dd8",
             "runCheck": "4d82fe88e3e7a473"
-          }
+          },
+          "private": [
+            "init",
+            "nonNil",
+            "printFindings",
+            "runCheck"
+          ]
         },
         "internal/drift/drift.go": {
-          "body": "5d9a01e399b7f4a9",
+          "body": "4ccc61c8164b8d4b",
           "symbols": {
             "Ack": "bdb11477c7c441cf",
             "AckResult": "9848b62df55748a4",
             "Check": "44441a0b4c307a7a",
-            "FileLock": "a5d3541a7c3edd5e",
+            "FileLock": "dce2a0c1be7170a2",
             "Finding": "5732b8238ac08f38",
             "Finding.Fails": "7c6f4d383dc2bc4e",
             "LoadLock": "c194e5c08d9c855d",
@@ -61,19 +71,28 @@
             "compareSources": "f4ee5ca9a53c24e7",
             "describe": "a44bb99c5d92c380",
             "hashBytes": "60fe68dca6b8818d",
-            "isPrivate": "3737ed6a34adaac4",
             "pathSet": "7c4b5bc9f1fc6c51",
-            "surfaceChanges": "14f658006d1acefa"
-          }
+            "surfaceChanges": "8c2b2db2df65687a"
+          },
+          "private": [
+            "Repo.covered",
+            "analysis",
+            "checkCitations",
+            "compareCitations",
+            "compareSources",
+            "describe",
+            "hashBytes",
+            "pathSet",
+            "surfaceChanges"
+          ]
         },
         "internal/drift/drift_test.go": {
-          "body": "532241d687c95fdb",
+          "body": "c7f9fc72aca5e501",
           "symbols": {
             "TestAckWithoutTargetsNeverSilencesUnchangedStalePage": "b69c1af2d399f822",
             "TestCitedBodyChangeIsDriftUnlessStrict": "a7b49e9e94fbb0b7",
             "TestCommentsAndFormattingAreIgnored": "077ac7ce3e281816",
             "TestEditedPageNeedsAck": "6dddb032ffa7eacd",
-            "TestIsPrivate": "8756beba8372dbd1",
             "TestLockRoundTrip": "a0b24990fab53d39",
             "TestNewAndRemovedFilesAreStale": "b6344dfa25ae7e03",
             "TestPrivateHelpersAreDrift": "52d4c671db4955ae",
@@ -91,7 +110,16 @@
             "fixture.load": "e2e339212501112d",
             "fixture.write": "b7c86aa511848740",
             "newFixture": "acec58cf9f0581c7"
-          }
+          },
+          "private": [
+            "expect",
+            "fixture",
+            "fixture.ack",
+            "fixture.check",
+            "fixture.load",
+            "fixture.write",
+            "newFixture"
+          ]
         }
       }
     },
@@ -165,11 +193,11 @@
       }
     },
     "docs/index.md": {
-      "page": "f121bc4f953d89c9",
+      "page": "217dff2e648cc185",
       "citations": {
         "internal/code/code.go::Analyze": {
           "surface": "498b2762e77d0628",
-          "body": "2e0954cb9308b791"
+          "body": "3b43e1327db60280"
         },
         "internal/drift/drift.go::Check": {
           "surface": "44441a0b4c307a7a",
@@ -185,15 +213,18 @@
           "body": "0a5a18a4470a4f0b",
           "symbols": {
             "main": "d9d99ddd4952251a"
-          }
+          },
+          "private": [
+            "main"
+          ]
         },
         "internal/drift/drift.go": {
-          "body": "5d9a01e399b7f4a9",
+          "body": "4ccc61c8164b8d4b",
           "symbols": {
             "Ack": "bdb11477c7c441cf",
             "AckResult": "9848b62df55748a4",
             "Check": "44441a0b4c307a7a",
-            "FileLock": "a5d3541a7c3edd5e",
+            "FileLock": "dce2a0c1be7170a2",
             "Finding": "5732b8238ac08f38",
             "Finding.Fails": "7c6f4d383dc2bc4e",
             "LoadLock": "c194e5c08d9c855d",
@@ -214,19 +245,28 @@
             "compareSources": "f4ee5ca9a53c24e7",
             "describe": "a44bb99c5d92c380",
             "hashBytes": "60fe68dca6b8818d",
-            "isPrivate": "3737ed6a34adaac4",
             "pathSet": "7c4b5bc9f1fc6c51",
-            "surfaceChanges": "14f658006d1acefa"
-          }
+            "surfaceChanges": "8c2b2db2df65687a"
+          },
+          "private": [
+            "Repo.covered",
+            "analysis",
+            "checkCitations",
+            "compareCitations",
+            "compareSources",
+            "describe",
+            "hashBytes",
+            "pathSet",
+            "surfaceChanges"
+          ]
         },
         "internal/drift/drift_test.go": {
-          "body": "532241d687c95fdb",
+          "body": "c7f9fc72aca5e501",
           "symbols": {
             "TestAckWithoutTargetsNeverSilencesUnchangedStalePage": "b69c1af2d399f822",
             "TestCitedBodyChangeIsDriftUnlessStrict": "a7b49e9e94fbb0b7",
             "TestCommentsAndFormattingAreIgnored": "077ac7ce3e281816",
             "TestEditedPageNeedsAck": "6dddb032ffa7eacd",
-            "TestIsPrivate": "8756beba8372dbd1",
             "TestLockRoundTrip": "a0b24990fab53d39",
             "TestNewAndRemovedFilesAreStale": "b6344dfa25ae7e03",
             "TestPrivateHelpersAreDrift": "52d4c671db4955ae",
@@ -244,7 +284,16 @@
             "fixture.load": "e2e339212501112d",
             "fixture.write": "b7c86aa511848740",
             "newFixture": "acec58cf9f0581c7"
-          }
+          },
+          "private": [
+            "expect",
+            "fixture",
+            "fixture.ack",
+            "fixture.check",
+            "fixture.load",
+            "fixture.write",
+            "newFixture"
+          ]
         }
       }
     },
@@ -460,11 +509,11 @@
       }
     },
     "docs/writing-pages.md": {
-      "page": "51525e02a46fad43",
+      "page": "6d37fbc7fff6a4d5",
       "citations": {
         "internal/code/code.go::Analyze": {
           "surface": "498b2762e77d0628",
-          "body": "2e0954cb9308b791"
+          "body": "3b43e1327db60280"
         },
         "internal/drift/drift.go::Finding.Fails": {
           "surface": "7c6f4d383dc2bc4e",
@@ -472,7 +521,7 @@
         },
         "internal/drift/drift.go::Stamp": {
           "surface": "8df7959ee83484b4",
-          "body": "b984c5618caadc81"
+          "body": "e41312428930fb82"
         },
         "internal/pages/pages.go::Linkify": {
           "surface": "b31743bf804e9b22",
@@ -485,17 +534,21 @@
       },
       "sources": {
         "internal/code/code.go": {
-          "body": "98b74f3a3dbb0f38",
+          "body": "94b45c3cf75476f4",
           "symbols": {
             "Analyze": "498b2762e77d0628",
             "File": "dd4efa2226a2e880",
             "File.Lookup": "548418227fcfb633",
+            "File.Private": "cd5018fa1ea28f10",
             "File.Surfaces": "7c6e4c8a2651c3e0",
             "IsTest": "ac381bf5d8c73c92",
             "ListFiles": "4ae8ae2ed76bdf67",
             "Parsable": "ad7f83aeb7fc246d",
             "isVirtualenv": "1f9359d24de35af2"
-          }
+          },
+          "private": [
+            "isVirtualenv"
+          ]
         },
         "internal/pages/pages.go": {
           "body": "e7850256720a835d",
@@ -516,7 +569,17 @@
             "linkifyLine": "22fde92b484bff29",
             "splitFrontmatter": "392c5658a5874645",
             "titleFromPath": "0ccab65379cf0320"
-          }
+          },
+          "private": [
+            "fenceMarker",
+            "findCitations",
+            "firstHeading",
+            "firstNonEmpty",
+            "frontmatter",
+            "linkifyLine",
+            "splitFrontmatter",
+            "titleFromPath"
+          ]
         },
         "internal/pages/pages_test.go": {
           "body": "a4ffb56386b75fbc",

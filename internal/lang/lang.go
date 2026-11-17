@@ -30,6 +30,9 @@ type Symbol struct {
 	EndLine       int    `json:"end_line"`
 	Surface       string `json:"surface"`
 	Body          string `json:"body"`
+	// Private marks symbols outside the documented interface, by the
+	// language's rule (unexported in JS/TS and Go, _name in Python).
+	Private bool `json:"private,omitempty"`
 }
 
 // Hash returns a short stable digest of a token sequence.

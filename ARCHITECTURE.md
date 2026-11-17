@@ -17,7 +17,8 @@ internal/cli              commands: init, scan, check, ack, bundle, preview, ver
         ├── internal/drift      lock file, Stamp, Check, Ack: the staleness rules
         │       ├── internal/pages    Markdown pages, frontmatter, path::Symbol citations
         │       ├── internal/code     file listing, per-language dispatch
-        │       │       └── internal/lang/{python,golang}   symbol parsers
+        │       │       └── internal/lang/{python,golang,jsts}   symbol parsers
+        │       │               └── internal/treesitter   WebAssembly grammars via wazero
         │       └── internal/glob     `**` glob matching
         │
         └── internal/bundler    static site (embedded viewer), via internal/doc + internal/render
@@ -39,7 +40,17 @@ Comments, layout, trailing commas, docstrings and other bare string statements, 
 - **Python** (`internal/lang/python`): a complete tokenizer (all string forms including PEP 701 f-strings, indentation, continuations) and a deliberately partial parser that understands only `def`, `async def`, `class`, and decorators. Pure Go; Python is never needed at runtime. An opt-in differential test compares it with CPython's `ast` module; see ROADMAP section 6 for results.
 - **Go** (`internal/lang/golang`): the standard library's `go/parser`.
 
+- **JavaScript, TypeScript, JSX, TSX** (`internal/lang/jsts`): tree-sitter syntax trees (below). Symbols are declarations as the TypeScript compiler sees them: functions, classes and their methods, constructors, accessors, arrow-function class fields, variables bound to functions or classes, interfaces, type aliases, enums, namespaces. Exported means public, including `export { a }` and CommonJS `module.exports`. Hashes skip comments, `console.*`/logger calls, semicolons, and trailing commas.
+
+Each parser sets `Symbol.Private`; the lock records private names so a removed symbol is classified correctly.
+
 Files in other languages are hashed as bytes: tracked, but only as drift.
+
+## Tree-sitter
+
+`internal/treesitter` runs tree-sitter grammars compiled to WebAssembly with wazero, a pure-Go runtime, so indoc remains a single static binary without cgo. Each grammar is one gzipped WASI module (runtime plus grammar, about 90-180 KB compressed) embedded in the binary; a module is compiled on first use (about 70 ms) and cached on disk afterwards (a few ms). A small C wrapper (`build/wrapper.c`) parses and returns the whole syntax tree as a flat pre-order array, which Go rebuilds into nodes; deciding what is a symbol happens in Go.
+
+`make grammars` rebuilds the modules in Docker from sources pinned by commit in `build/grammars.txt`, with the toolchain image pinned by digest. Builds are reproducible byte for byte. Embedded grammars: JavaScript, TypeScript, TSX, Python. Adding a language means adding a line to `grammars.txt`, a Go package with its symbol rules, and a differential test against that language's own parser.
 
 ## Pages and the lock
 

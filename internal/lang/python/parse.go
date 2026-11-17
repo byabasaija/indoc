@@ -172,6 +172,7 @@ header:
 		EndLine:       lastCodeLine(body, keywordLine),
 		Surface:       lang.Hash(surface),
 		Body:          lang.Hash(significant(p.without(bodyStart, p.i, exclude))),
+		Private:       privateQual(inner),
 	}
 }
 
@@ -364,4 +365,16 @@ func ignorable(stmt []Token) bool {
 // Docstrings and logging calls are excluded, as in symbol hashes.
 func FileHash(src string) string {
 	return lang.Hash(significant(Tokenize(src)))
+}
+
+// privateQual applies Python's convention: any _name segment (dunder methods
+// excepted) makes the symbol private.
+func privateQual(scopes []scope) bool {
+	for _, sc := range scopes {
+		n := sc.name
+		if strings.HasPrefix(n, "_") && !(strings.HasPrefix(n, "__") && strings.HasSuffix(n, "__")) {
+			return true
+		}
+	}
+	return false
 }

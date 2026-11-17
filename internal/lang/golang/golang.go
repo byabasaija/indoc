@@ -3,6 +3,8 @@
 package golang
 
 import (
+	"strings"
+
 	"go/ast"
 	"go/parser"
 	"go/scanner"
@@ -49,6 +51,7 @@ func Parse(src []byte) []lang.Symbol {
 				EndLine:       line(d.End()),
 				Surface:       lang.Hash(tokens(src[off(d.Pos()):off(sigEnd)])),
 				Body:          body,
+				Private:       !exported(q),
 			})
 		case *ast.GenDecl:
 			if d.Tok != token.TYPE {
@@ -65,6 +68,7 @@ func Parse(src []byte) []lang.Symbol {
 					EndLine:       line(ts.End()),
 					// A type's definition (fields, methods of an interface) is its surface.
 					Surface: lang.Hash(tokens(src[off(ts.Pos()):off(ts.End())])),
+					Private: !ast.IsExported(ts.Name.Name),
 				})
 			}
 		}
@@ -118,4 +122,14 @@ func tokens(src []byte) []string {
 // FileHash hashes the whole file's significant tokens.
 func FileHash(src []byte) string {
 	return lang.Hash(tokens(src))
+}
+
+// exported reports whether every segment of Recv.Method is exported.
+func exported(qual string) bool {
+	for _, seg := range strings.Split(qual, ".") {
+		if !ast.IsExported(seg) {
+			return false
+		}
+	}
+	return true
 }

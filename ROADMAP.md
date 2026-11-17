@@ -195,7 +195,7 @@ What staleness and extraction need from a parser is structural, not semantic: wh
 | :--- | :--- | :--- |
 | Go | Standard library `go/parser` + `go/ast` | Exact, maintained by the Go team, zero dependencies. |
 | Python | Hand-written in Go: full tokenizer + structural parser | See below. |
-| JS/TS, Rust, Java, C#, Ruby, PHP, … (later) | One shared path: tree-sitter grammars compiled to WebAssembly, run with a pure-Go runtime (wazero), using each grammar's `tags.scm` symbol queries | Hand-writing parsers does not scale past a few languages. With a shared runtime, a new language is a grammar plus a query file. Each language must pass a differential test against its own reference parser (e.g. `syn` for Rust) before it is marked supported. Requires a spike first: binary size (~0.5-3 MB per grammar) and speed. |
+| JS/TS (done), then others on demand | One shared path: tree-sitter grammars compiled to WebAssembly, run with a pure-Go runtime (wazero); symbol rules in Go | Hand-writing parsers does not scale past a few languages. With a shared runtime, a new language is a grammar plus a query file. Each language must pass a differential test against its own reference parser (e.g. `syn` for Rust) before it is marked supported. Requires a spike first: binary size (~0.5-3 MB per grammar) and speed. |
 
 **Python, in detail.** The tokenizer is exact and complete: strings (triple-quoted, raw, bytes, f-strings with nested quotes), comments, bracket nesting, line continuations, `INDENT`/`DEDENT`. The parser above it is deliberately partial: it recognises `def`, `async def`, `class`, decorators, and call expressions with literal arguments, and treats every other statement as opaque tokens. Because hashing runs over tokens, comment and whitespace changes are ignored without any extra work.
 
@@ -359,9 +359,22 @@ Each phase ends with a concrete check against a real repo, shop unless noted.
 * **Exit:** lexai (or another FastAPI project) and indoc itself produce complete reference pages.
 * **Result:** FastAPI extraction matches FastAPI's own route table (expanded through included routers) on fastapi-app (6/6) and on a fixture covering decorators, `api_route`, `add_api_route`, nested `include_router` with prefixes, websockets, mounted sub-apps, static mounts, custom docs URLs, and duplicate paths (14/14). lexai and another-fastapi-app cannot be imported safely (lexai creates a database at import), so they were checked by reading the source: all routes and environment variables found. Pydantic `BaseSettings` fields are extracted as environment variables. Cobra extraction matches indoc's runtime command tree exactly (8 commands, all flags). The six Django projects still match after the changes.
 
-### Phase 4b: Multi-language spike
-* wazero + tree-sitter WebAssembly prototype with TS and Rust grammars and `tags.scm` queries.
-* **Exit:** differential agreement on a real TS and Rust corpus, binary size and scan speed measured, go/no-go recorded here.
+### Phase 4b: tree-sitter parsing layer (JS/TS done 2026-11-17)
+* wazero + tree-sitter WebAssembly; full syntax trees to Go, symbol rules in Go (no `tags.scm`).
+* **Exit:** differential agreement on a real corpus, binary size and scan speed measured, go/no-go recorded here.
+* **Result: go.**
+
+| Measure | Result | Target |
+| :--- | :--- | :--- |
+| Correctness | 9,436 JS/TS/TSX files, 56,396 symbols, **0 mismatches** vs the TypeScript compiler (a production web app and a frontend `node_modules`). 57 minified bundles reported, not compared. | ≥ 99.5% |
+| Binary size | +4.3 MB (12.9 → 17.2 MB): ~0.5 MB gzipped grammars, the rest wazero | ≤ +6 MB |
+| Startup | 70 ms cold (compile), 3-4 ms with the on-disk cache | ≤ 300 ms |
+| Speed | ~5 MB/s per core; 4,684 JS files (41 MB) in 3.2 s on 8 workers | 5,000 files < 10 s |
+| Reproducibility | `make grammars` output identical byte for byte | — |
+
+  Getting to zero mismatches meant settling what a symbol is, mostly on the reference side: object-literal methods are not symbols (no stable name); `const A = class B {}` is one symbol named `A`; named class expressions count; `declare global` is not a namespace; computed names (`[Symbol.iterator]`) are skipped. Tree-sitter is about 7x slower than the hand-written Python parser per file (4 vs 29 MB/s); in absolute terms shop takes 0.35 s instead of 0.05 s.
+* **Next:** move Python onto tree-sitter, gated on the CPython differential, then port the Django, FastAPI, and env extractors onto syntax trees under their existing differentials, then delete the hand-written tokenizer and module reader. Go stays on `go/ast`. Then Express, Next.js, and NestJS route extraction on the JS/TS trees.
+* Rust was dropped: no demand yet, and every grammar costs binary size and maintenance. The pipeline adds a language in a day when a user needs one.
 
 ### Phase 5: MCP + plugins
 * `indoc mcp` subcommand (same binary).

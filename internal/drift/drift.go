@@ -57,6 +57,7 @@ type SymbolLock struct {
 type FileLock struct {
 	Body    string            `json:"body"`
 	Symbols map[string]string `json:"symbols,omitempty"`
+	Private []string          `json:"private,omitempty"` // private symbol keys, so removed ones are classified too
 }
 
 // NewLock returns an empty lock.
@@ -286,7 +287,7 @@ func compareSources(r *Repo, p pages.Page, entry PageLock, covered []string) []F
 			out = append(out, Finding{Page: p.Path, Kind: Drift, Ref: path, Detail: "tests changed"})
 			continue
 		}
-		public, private := surfaceChanges(was.Symbols, f.Surfaces(), path)
+		public, private := surfaceChanges(was, f)
 		switch {
 		case public != "":
 			out = append(out, Finding{Page: p.Path, Kind: Stale, Ref: path, Detail: public})
@@ -306,29 +307,35 @@ func compareSources(r *Repo, p pages.Page, entry PageLock, covered []string) []F
 
 // surfaceChanges describes added, removed, and re-signed symbols, split into
 // public ones (stale) and private ones (drift). Either may be "".
-func surfaceChanges(was, now map[string]string, file string) (public, private string) {
+func surfaceChanges(was FileLock, f code.File) (public, private string) {
+	now := f.Surfaces()
+	privateNow := f.Private()
+	privateWas := map[string]bool{}
+	for _, q := range was.Private {
+		privateWas[q] = true
+	}
 	type group struct{ changed, added, removed []string }
 	var pub, priv group
-	pick := func(q string) *group {
-		if isPrivate(q, file) {
+	pick := func(q string, isPrivate bool) *group {
+		if isPrivate {
 			return &priv
 		}
 		return &pub
 	}
 	for q, s := range now {
-		old, ok := was[q]
+		old, ok := was.Symbols[q]
 		switch {
 		case !ok:
-			g := pick(q)
+			g := pick(q, privateNow[q])
 			g.added = append(g.added, q)
 		case old != s:
-			g := pick(q)
+			g := pick(q, privateNow[q] && privateWas[q])
 			g.changed = append(g.changed, q)
 		}
 	}
-	for q := range was {
+	for q := range was.Symbols {
 		if _, ok := now[q]; !ok {
-			g := pick(q)
+			g := pick(q, privateWas[q])
 			g.removed = append(g.removed, q)
 		}
 	}
@@ -354,29 +361,6 @@ func describe(changed, added, removed []string) string {
 		parts = append(parts, group.label+": "+strings.Join(names, ", ")+suffix)
 	}
 	return strings.Join(parts, "; ")
-}
-
-// isPrivate reports whether any segment of a qualified name is private by the
-// language's convention: a leading underscore in Python (dunder methods are
-// public), a lowercase initial in Go. A "#2" duplicate suffix is ignored.
-func isPrivate(qual, file string) bool {
-	qual, _, _ = strings.Cut(qual, "#")
-	for _, seg := range strings.Split(qual, ".") {
-		if seg == "" {
-			continue
-		}
-		switch strings.ToLower(filepath.Ext(file)) {
-		case ".py":
-			if strings.HasPrefix(seg, "_") && !(strings.HasPrefix(seg, "__") && strings.HasSuffix(seg, "__")) {
-				return true
-			}
-		case ".go":
-			if r := seg[0]; r >= 'a' && r <= 'z' || r == '_' {
-				return true
-			}
-		}
-	}
-	return false
 }
 
 // Stamp records a page's current state. It fails if any citation does not
@@ -414,6 +398,10 @@ func Stamp(r *Repo, p pages.Page, pageSet map[string]bool) (PageLock, error) {
 		fl := FileLock{Body: f.Body}
 		if f.Parsed {
 			fl.Symbols = f.Surfaces()
+			for q := range f.Private() {
+				fl.Private = append(fl.Private, q)
+			}
+			sort.Strings(fl.Private)
 		}
 		if entry.Sources == nil {
 			entry.Sources = map[string]FileLock{}

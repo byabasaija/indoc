@@ -14,6 +14,7 @@ import (
 
 	"github.com/byabasaija/indoc/internal/lang"
 	"github.com/byabasaija/indoc/internal/lang/golang"
+	"github.com/byabasaija/indoc/internal/lang/jsts"
 	"github.com/byabasaija/indoc/internal/lang/python"
 )
 
@@ -34,10 +35,11 @@ func Parsable(path string) bool {
 	case ".py", ".go":
 		return true
 	}
-	return false
+	return jsts.Grammar(path) != ""
 }
 
-// Analyze parses src according to path's extension.
+// Analyze parses src according to path's extension. A file a parser cannot
+// handle is still tracked, by the hash of its bytes.
 func Analyze(path string, src []byte) File {
 	switch strings.ToLower(filepath.Ext(path)) {
 	case ".py":
@@ -45,6 +47,11 @@ func Analyze(path string, src []byte) File {
 		return File{Parsed: true, Symbols: python.Parse(s), Body: python.FileHash(s)}
 	case ".go":
 		return File{Parsed: true, Symbols: golang.Parse(src), Body: golang.FileHash(src)}
+	}
+	if jsts.Grammar(path) != "" {
+		if f, err := jsts.Parse(path, src); err == nil {
+			return File{Parsed: true, Symbols: f.Symbols, Body: f.Hash}
+		}
 	}
 	sum := sha256.Sum256(src)
 	return File{Body: hex.EncodeToString(sum[:])[:16]}
@@ -63,6 +70,23 @@ func (f File) Surfaces() map[string]string {
 			key = fmt.Sprintf("%s#%d", s.Qual, i)
 		}
 		out[key] = s.Surface
+	}
+	return out
+}
+
+// Private returns the keys of Surfaces whose symbols are private.
+func (f File) Private() map[string]bool {
+	out := map[string]bool{}
+	seen := map[string]int{}
+	for _, s := range f.Symbols {
+		seen[s.Qual]++
+		key := s.Qual
+		if n := seen[s.Qual]; n > 1 {
+			key = fmt.Sprintf("%s#%d", s.Qual, n)
+		}
+		if s.Private {
+			out[key] = true
+		}
 	}
 	return out
 }

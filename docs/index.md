@@ -16,7 +16,7 @@ indoc never calls an AI model. Your coding agent writes the pages; indoc does th
 ## How a check works
 
 1. `internal/drift/drift.go::Check` loads each page and compares it with its entry in the lock.
-2. Each covered file is analyzed by `internal/code/code.go::Analyze`, which uses a language parser where one exists (Python, Go) to hash every symbol's signature and body separately, ignoring comments and formatting.
+2. Each covered file is analyzed by `internal/code/code.go::Analyze`, which uses a language parser where one exists (JavaScript, TypeScript, Python, Go) to hash every symbol's signature and body separately, ignoring comments and formatting.
 3. Differences are classified by `internal/drift/drift.go::Finding.Fails`:
 
 | Change | Result |

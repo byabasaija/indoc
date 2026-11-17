@@ -324,3 +324,35 @@ func flagNames(detail string) string {
 	sort.Strings(names)
 	return strings.Join(names, " ")
 }
+
+func TestTypeScriptStaleness(t *testing.T) {
+	r := newRepo(t)
+	const api = "export async function createPayment(amount: number): Promise<string> {\n  return charge(amount);\n}\n\nfunction charge(n: number) {\n  return String(n);\n}\n"
+	r.write("src/payments.ts", api)
+	if err := runInit(r.cfg, &bytes.Buffer{}, nil, "", false); err != nil {
+		t.Fatal(err)
+	}
+	r.write("docs/index.md", "---\nsources: [src/**]\n---\nPayments start in `src/payments.ts::createPayment`.\n")
+	if err := runBundle(r.cfg, "", &bytes.Buffer{}); err != nil {
+		t.Fatal(err)
+	}
+	var out bytes.Buffer
+	if err := runCheck(r.cfg, &out, false, false, false); err != nil {
+		t.Fatalf("clean check: %v\n%s", err, out.String())
+	}
+
+	// A new private helper is drift: check passes.
+	r.write("src/payments.ts", api+"\nfunction audit() {}\n")
+	out.Reset()
+	if err := runCheck(r.cfg, &out, false, false, false); err != nil || !strings.Contains(out.String(), "DRIFT") {
+		t.Fatalf("private helper: err=%v\n%s", err, out.String())
+	}
+
+	// A signature change on the cited, exported function fails.
+	r.write("src/payments.ts", strings.Replace(api, "amount: number", "amount: number, currency: string", 1))
+	out.Reset()
+	if err := runCheck(r.cfg, &out, false, false, false); !errors.Is(err, errCheckFailed) ||
+		!strings.Contains(out.String(), "src/payments.ts::createPayment") {
+		t.Fatalf("signature change: err=%v\n%s", err, out.String())
+	}
+}

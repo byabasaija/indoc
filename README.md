@@ -100,11 +100,14 @@ source_url: https://git.example.com/team/app/src/branch/main/{path}#L{line}
 
 Precise staleness and `path::Symbol` citations need a parser for the language. Every other part of indoc works on any repository.
 
-| Language | Status |
-|---|---|
-| Python | ✅ Agrees with CPython's own parser on 409,406 symbols across 29,536 files |
-| Go | ✅ Go standard library parser |
-| Others | Files are tracked, but any change is reported as drift and citations cannot be verified. Planned: TypeScript/JavaScript, Rust, and more through a shared parser runtime. |
+| Language | Parser | Checked against |
+|---|---|---|
+| JavaScript, TypeScript, JSX, TSX | tree-sitter | The TypeScript compiler: 9,436 files, 56,396 symbols, all matching |
+| Python | indoc's own (moving to tree-sitter) | CPython: 29,536 files, 409,406 symbols, all matching |
+| Go | Go standard library | — |
+| Others | — | Files are tracked, but any change is reported as drift and citations cannot be verified |
+
+In JavaScript and TypeScript, exported declarations are public and everything else is private, so adding an internal helper does not fail `check`. Python uses `_name`, Go uses lowercase names.
 
 ## Reference extraction
 

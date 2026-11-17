@@ -261,21 +261,6 @@ func TestPrivateHelpersAreDrift(t *testing.T) {
 	}
 }
 
-func TestIsPrivate(t *testing.T) {
-	cases := map[string]bool{
-		"a.py|Handler._step": true, "a.py|_helper": true, "a.py|Handler.__init__": false,
-		"a.py|Handler.step": false, "a.py|_Internal.run": true, "a.py|f#2": false,
-		"a.go|Scanner.scan": true, "a.go|Scanner.Scan": false, "a.go|helper": true,
-		"a.rs|_x": false,
-	}
-	for in, want := range cases {
-		file, qual, _ := strings.Cut(in, "|")
-		if got := isPrivate(qual, file); got != want {
-			t.Errorf("isPrivate(%q, %q) = %v", qual, file, got)
-		}
-	}
-}
-
 func TestTestFileChangesAreDrift(t *testing.T) {
 	f := newFixture(t)
 	f.write("app/checkout/test_dispatcher.py", "def test_route():\n    pass\n")
