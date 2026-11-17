@@ -34,7 +34,7 @@ Use `mode: warn` while trying it out. Without the action, install indoc any way 
 ## Reading the report
 
 ```
-docs/dev/checkout-routing.md
+documentation/dev/checkout-routing.md
   ✗ STALE      shop/core/services/checkout/dispatcher.py::CheckoutDispatcher.dispatch  cited symbol's signature changed
     DRIFT      shop/core/services/checkout/session.py  implementation changed; signatures unchanged
 ```
@@ -56,7 +56,7 @@ Lines marked `✗` fail the check. With `--strict`, drift, unanchored pages, and
 `internal/drift/drift.go::Ack` updates the lock:
 
 - `indoc ack` records new and edited pages and forgets deleted ones. It **never** re-records an unchanged page, so it cannot silence a stale warning.
-- `indoc ack docs/page.md` records that page even if unchanged: "I reviewed it against the new code and it is still correct."
+- `indoc ack documentation/page.md` records that page even if unchanged: "I reviewed it against the new code and it is still correct."
 
 `indoc bundle` performs the first form automatically after building. A page with a broken citation can never be recorded (`internal/drift/drift.go::Stamp`).
 

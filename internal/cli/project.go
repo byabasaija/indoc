@@ -25,7 +25,7 @@ func openProject(configPath string) (*project, error) {
 		return nil, err
 	}
 	if len(cfg.Pages) == 0 {
-		return nil, fmt.Errorf("no pages configured: add globs under `pages:` in %s (for example docs/**/*.md)", paths.Config)
+		return nil, fmt.Errorf("no pages configured: add globs under `pages:` in %s (for example documentation/**/*.md)", paths.Config)
 	}
 	repo, err := drift.NewRepo(paths.Root, cfg.Exclude)
 	if err != nil {

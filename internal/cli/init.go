@@ -10,6 +10,7 @@ import (
 
 	"github.com/byabasaija/indoc/internal/code"
 	"github.com/byabasaija/indoc/internal/config"
+	"github.com/byabasaija/indoc/internal/glob"
 	"github.com/spf13/cobra"
 )
 
@@ -60,14 +61,14 @@ func runInit(configPath string, out io.Writer, pagesFlag []string, output string
 	if err != nil {
 		return err
 	}
-	var markdown, docsMarkdown []string
+	var markdown, inPagesDir []string
 	for _, f := range files {
 		if !strings.EqualFold(path.Ext(f), ".md") {
 			continue
 		}
 		markdown = append(markdown, f)
-		if strings.HasPrefix(f, "docs/") {
-			docsMarkdown = append(docsMarkdown, f)
+		if strings.HasPrefix(f, PagesDir+"/") {
+			inPagesDir = append(inPagesDir, f)
 		}
 	}
 
@@ -78,12 +79,13 @@ func runInit(configPath string, out io.Writer, pagesFlag []string, output string
 	case hasAny(paths.Root, docusaurusConfigs):
 		cfg.Pages = []string{"docs/**/*.md"}
 		reason = "Docusaurus project: using its docs/ folder."
-	case len(docsMarkdown) == 0:
-		cfg.Pages = []string{"docs/**/*.md"}
-		reason = "No existing docs/: new pages go in docs/."
+	case len(inPagesDir) == 0:
+		// Not docs/: that is where plans, reviews, and agent notes collect.
+		cfg.Pages = []string{PagesDir + "/**/*.md"}
+		reason = "New pages go in " + PagesDir + "/. Markdown elsewhere (docs/, notes, plans) is not published."
 	default:
 		cfg.Pages = []string{}
-		reason = "docs/ already has Markdown. Nothing is published until you choose."
+		reason = PagesDir + "/ already has Markdown. Nothing is published until you choose."
 	}
 
 	if err := cfg.Save(paths.Config); err != nil {
@@ -106,16 +108,26 @@ func runInit(configPath string, out io.Writer, pagesFlag []string, output string
 	if cfg.SourceURL != "" {
 		fmt.Fprintf(out, "source_url: %s (citations link to the code)\n", cfg.SourceURL)
 	}
-	if len(cfg.Pages) == 0 && len(markdown) > 0 {
+	var unpublished []string
+	for _, f := range markdown {
+		if !matchesAny(cfg.Pages, f) {
+			unpublished = append(unpublished, f)
+		}
+	}
+	if len(unpublished) > 0 {
 		fmt.Fprintln(out, "\nExisting Markdown files (not published):")
-		for i, f := range markdown {
+		for i, f := range unpublished {
 			if i == 30 {
-				fmt.Fprintf(out, "  ... and %d more\n", len(markdown)-30)
+				fmt.Fprintf(out, "  ... and %d more\n", len(unpublished)-30)
 				break
 			}
 			fmt.Fprintf(out, "  %s\n", f)
 		}
-		fmt.Fprintln(out, "\nChoose which to publish, for example:\n  indoc init --force --pages 'docs/partner-integration.md,docs/guides/**/*.md'")
+		if len(cfg.Pages) == 0 {
+			fmt.Fprintln(out, "\nChoose which to publish, for example:\n  indoc init --force --pages '"+PagesDir+"/**/*.md,docs/partner-integration.md'")
+		} else {
+			fmt.Fprintln(out, "\nTo publish any of them too, add them under `pages:`.")
+		}
 	}
 	if _, err := os.Stat(filepath.Join(paths.Root, config.LegacyPath)); err == nil {
 		fmt.Fprintf(out, "\n%s is the old config format and is no longer read; you can delete it.\n", config.LegacyPath)
@@ -123,6 +135,20 @@ func runInit(configPath string, out io.Writer, pagesFlag []string, output string
 	fmt.Fprintf(out, "\nBuild output: %s (gitignored). Commit %s and, once created, .indoc/lock.json.\n", cfg.OutputDir, paths.Config)
 	return nil
 }
+
+func matchesAny(patterns []string, name string) bool {
+	for _, p := range patterns {
+		if glob.Match(p, name) {
+			return true
+		}
+	}
+	return false
+}
+
+// PagesDir is where new pages go when the project has no Docusaurus site.
+// It is deliberately not docs/, which in most repositories also holds plans,
+// reviews, and agent notes that must never be published.
+const PagesDir = "documentation"
 
 func hasAny(root string, names []string) bool {
 	for _, n := range names {

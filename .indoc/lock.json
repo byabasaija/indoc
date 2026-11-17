@@ -1,19 +1,19 @@
 {
   "version": 1,
   "pages": {
-    "docs/agents.md": {
+    "documentation/agents.md": {
       "page": "8e8cb884353f96f1",
       "citations": {
         "internal/cli/mcp.go::mcpServer": {
           "surface": "9a5340343b623d99",
-          "body": "d69184ba2c3b16f2",
-          "raw": "fb17706cbe45b115",
+          "body": "c2c5d6a49e184108",
+          "raw": "5bba8556dcf86cc6",
           "hasher": "go/2"
         },
         "internal/cli/mcp.go::setup": {
           "surface": "edddf1d25b166fce",
           "body": "0bfae943ab8f8106",
-          "raw": "fb17706cbe45b115",
+          "raw": "5bba8556dcf86cc6",
           "hasher": "go/2"
         },
         "internal/mcp/mcp.go::Server.Serve": {
@@ -25,7 +25,7 @@
       },
       "sources": {
         "internal/cli/mcp.go": {
-          "body": "9eb47037b8b40949",
+          "body": "c589690bc690ef6b",
           "symbols": {
             "failed": "e2d8ad0f8686e095",
             "init": "c78f10468427bc77",
@@ -54,7 +54,7 @@
             "toolScan",
             "toolSetup"
           ],
-          "raw": "fb17706cbe45b115",
+          "raw": "5bba8556dcf86cc6",
           "hasher": "go/2"
         },
         "internal/mcp/mcp.go": {
@@ -108,14 +108,14 @@
           "hasher": "bytes"
         },
         "plugin/skills/indoc/SKILL.md": {
-          "body": "d330c7d8b5e00533",
-          "raw": "d330c7d8b5e00533",
+          "body": "07193cbedb0ace1f",
+          "raw": "07193cbedb0ace1f",
           "hasher": "bytes"
         }
       }
     },
-    "docs/ci.md": {
-      "page": "06f158c0382cb038",
+    "documentation/ci.md": {
+      "page": "fac8ae35c1f61986",
       "citations": {
         "internal/cli/check.go::runCheck": {
           "surface": "4d82fe88e3e7a473",
@@ -260,8 +260,8 @@
         }
       }
     },
-    "docs/getting-started.md": {
-      "page": "6fb7264d58111052",
+    "documentation/getting-started.md": {
+      "page": "970ace943e250e6c",
       "citations": {
         "internal/cli/bundle.go::runBundle": {
           "surface": "afbcb60d55daccfa",
@@ -271,8 +271,8 @@
         },
         "internal/cli/init.go::runInit": {
           "surface": "08c0804721543100",
-          "body": "7458fa34dd1c59ff",
-          "raw": "39f31bd127924bb2",
+          "body": "e879c3f80c5c96a3",
+          "raw": "46eb8d2921235293",
           "hasher": "go/2"
         },
         "internal/config/config.go::InferProjectName": {
@@ -313,18 +313,20 @@
           "hasher": "go/2"
         },
         "internal/cli/init.go": {
-          "body": "81d42e71a5beec20",
+          "body": "fb2488c3400af8ba",
           "symbols": {
             "hasAny": "b6d1a7c0ec76e5ea",
             "init": "c78f10468427bc77",
+            "matchesAny": "57c346473f9585b7",
             "runInit": "08c0804721543100"
           },
           "private": [
             "hasAny",
             "init",
+            "matchesAny",
             "runInit"
           ],
-          "raw": "39f31bd127924bb2",
+          "raw": "46eb8d2921235293",
           "hasher": "go/2"
         },
         "internal/config/config.go": {
@@ -369,7 +371,7 @@
         }
       }
     },
-    "docs/index.md": {
+    "documentation/index.md": {
       "page": "a410dc722c1b303a",
       "citations": {
         "internal/code/code.go::Analyze": {
@@ -490,7 +492,7 @@
         }
       }
     },
-    "docs/reference.md": {
+    "documentation/reference.md": {
       "page": "16b92482426b3bc7",
       "citations": {
         "internal/reference/reference.go::Coverage": {
@@ -1007,8 +1009,8 @@
         }
       }
     },
-    "docs/site.md": {
-      "page": "b7cf3b2606cd5dfc",
+    "documentation/site.md": {
+      "page": "db86d36909113318",
       "citations": {
         "internal/cli/bundle.go::editLink": {
           "surface": "7c023cbaf4f922aa",
@@ -1267,7 +1269,7 @@
         }
       }
     },
-    "docs/writing-pages.md": {
+    "documentation/writing-pages.md": {
       "page": "cdb47823e6d3e57d",
       "citations": {
         "internal/code/code.go::Analyze": {

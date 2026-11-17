@@ -13,7 +13,8 @@ Use the indoc MCP tools: `indoc_scan`, `indoc_setup`, `indoc_check`, `indoc_ack`
 
 Call `indoc_scan`. On first use it sets the project up.
 
-- If it says existing Markdown was found and nothing is published, **ask the user which files to publish**. Internal notes, code reviews, and plans must not be published. Then call `indoc_setup` with their globs (for example `["docs/partner-integration.md", "docs/guides/**/*.md"]`).
+- New pages go where the `pages:` globs point: `documentation/` by default, `docs/` in a Docusaurus project. Do not put them in `docs/` otherwise; that folder usually holds plans, reviews, and agent notes, which must not be published.
+- If it says existing Markdown was found and nothing is published, **ask the user which files to publish**. Internal notes, code reviews, and plans must not be published. Then call `indoc_setup` with their globs (for example `["documentation/**/*.md", "docs/partner-integration.md"]`).
 - Otherwise it returns `pages`, `findings`, `reference` (routes, environment variables, commands extracted from source), `coverage` (what each extractor detected and could not resolve), and `map`:
   - `frameworks`, `entry_points`, `languages` (`parsed` languages support `path::Symbol` citations)
   - `tasks`: the project's real commands (just, make, npm scripts, Python entry points). Use these in guides instead of inventing commands.
@@ -32,7 +33,7 @@ When there are no pages yet, or the user asks for new sections, **propose the re
 
 ## 3. Write pages
 
-Markdown files under the configured `pages:` globs (by default `docs/`):
+Markdown files under the configured `pages:` globs (by default `documentation/`):
 
 ```markdown
 ---

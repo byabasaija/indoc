@@ -17,10 +17,10 @@ The sidebar mirrors the folders your pages live in:
 
 | File | URL | In the sidebar |
 |---|---|---|
-| `docs/index.md` | `/` | The home page, linked from the logo |
-| `docs/faq.md` | `/faq/` | Top level |
-| `docs/guides/index.md` | `/guides/` | Names the "Guides" group and comes first in it |
-| `docs/guides/setup.md` | `/guides/setup/` | In the "Guides" group |
+| `documentation/index.md` | `/` | The home page, linked from the logo |
+| `documentation/faq.md` | `/faq/` | Top level |
+| `documentation/guides/index.md` | `/guides/` | Names the "Guides" group and comes first in it |
+| `documentation/guides/setup.md` | `/guides/setup/` | In the "Guides" group |
 
 Pages sort by `order`, then title. A group sorts by its `index.md`'s `order`, or the lowest `order` inside it. Reference pages go last, under "Reference". Links between Markdown files (`[setup](guides/setup.md#install)`) become links between pages, and local images are copied into the site.
 

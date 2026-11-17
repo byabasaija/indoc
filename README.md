@@ -6,7 +6,7 @@ Docs rot quietly. A function gets a new parameter, a route moves, and the guide 
 
 ```
 $ indoc check
-docs/dev/checkout-routing.md
+documentation/dev/checkout-routing.md
   ✗ STALE      shop/core/services/checkout/dispatcher.py::CheckoutDispatcher.dispatch  cited symbol's signature changed
     DRIFT      shop/core/services/checkout/session.py  implementation changed; signatures unchanged
 
@@ -116,7 +116,7 @@ Keep it. Add `sources:` and citations to your existing pages and run `indoc chec
 ├── lock.json     committed: what each page was verified against
 ├── .gitignore
 └── site/         build output, gitignored
-docs/             your pages (location set by `pages:` in config.yaml)
+documentation/    your pages (set by `pages:`; not docs/, where plans and notes live)
 ```
 
 To serve the site from an existing app, set `output_dir` to a folder the app serves. The site uses relative links, so it works under any path.
@@ -127,7 +127,7 @@ To serve the site from an existing app, set `output_dir` to a folder the app ser
 source_url: https://git.example.com/team/app/src/branch/main/{path}#L{line}
 ```
 
-The site is one pre-rendered HTML page per Markdown file, with search, dark mode, syntax highlighting, copy buttons, and Mermaid diagrams. The sidebar follows your folders. A landing page, logo, colors, header links, footer, `custom.css`, and `head.html` are set in config and frontmatter; see [docs/site.md](docs/site.md).
+The site is one pre-rendered HTML page per Markdown file, with search, dark mode, syntax highlighting, copy buttons, and Mermaid diagrams. The sidebar follows your folders. A landing page, logo, colors, header links, footer, `custom.css`, and `head.html` are set in config and frontmatter; see [documentation/site.md](documentation/site.md).
 
 ## Language support
 

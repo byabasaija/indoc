@@ -105,7 +105,7 @@ func TestWorkflow(t *testing.T) {
 	if err := runInit(r.cfg, &out, nil, "", false); err != nil {
 		t.Fatalf("init: %v", err)
 	}
-	if !strings.Contains(out.String(), "project: hospital") || !strings.Contains(out.String(), "docs/**/*.md") {
+	if !strings.Contains(out.String(), "project: hospital") || !strings.Contains(out.String(), "documentation/**/*.md") {
 		t.Fatalf("init output:\n%s", out.String())
 	}
 	if !strings.Contains(r.read(".indoc/.gitignore"), "site/") {
@@ -115,8 +115,8 @@ func TestWorkflow(t *testing.T) {
 		t.Fatal("second init without --force must fail")
 	}
 
-	r.write("docs/index.md", "# Hospital\n\nOverview of ``app/main.py::health``.\n")
-	r.write("docs/admit.md", admitPage)
+	r.write("documentation/index.md", "# Hospital\n\nOverview of ``app/main.py::health``.\n")
+	r.write("documentation/admit.md", admitPage)
 
 	out.Reset()
 	if err := runCheck(r.cfg, &out, false, false, false); !errors.Is(err, errCheckFailed) {
@@ -174,7 +174,7 @@ func TestWorkflow(t *testing.T) {
 	if err := runCheck(r.cfg, &out, false, false, false); err == nil {
 		t.Fatal("ack without targets silenced a stale page")
 	}
-	if err := runAck(r.cfg, &out, []string{"docs/admit.md", "docs/index.md"}); err != nil {
+	if err := runAck(r.cfg, &out, []string{"documentation/admit.md", "documentation/index.md"}); err != nil {
 		t.Fatal(err)
 	}
 	out.Reset()
@@ -202,7 +202,7 @@ func TestBundleRefusesBrokenCitations(t *testing.T) {
 	if err := runInit(r.cfg, &bytes.Buffer{}, nil, "", false); err != nil {
 		t.Fatal(err)
 	}
-	r.write("docs/index.md", "See `app/main.py::discharge`.\n")
+	r.write("documentation/index.md", "See `app/main.py::discharge`.\n")
 	err := runBundle(r.cfg, "", &bytes.Buffer{})
 	if err == nil || !strings.Contains(err.Error(), "app/main.py::discharge") {
 		t.Fatalf("bundle with broken citation: %v", err)
@@ -211,8 +211,8 @@ func TestBundleRefusesBrokenCitations(t *testing.T) {
 
 func TestInitWithExistingDocsPublishesNothing(t *testing.T) {
 	r := newRepo(t)
-	r.write("docs/partner-integration.md", "# Partners\n")
-	r.write("docs/code-review-gaps.md", "# Security gaps\n")
+	r.write("documentation/partner-integration.md", "# Partners\n")
+	r.write("documentation/code-review-gaps.md", "# Security gaps\n")
 	var out bytes.Buffer
 	if err := runInit(r.cfg, &out, nil, "", false); err != nil {
 		t.Fatal(err)
@@ -224,14 +224,14 @@ func TestInitWithExistingDocsPublishesNothing(t *testing.T) {
 	if len(cfg.Pages) != 0 {
 		t.Fatalf("existing docs were published by default: %v", cfg.Pages)
 	}
-	if !strings.Contains(out.String(), "docs/code-review-gaps.md") {
+	if !strings.Contains(out.String(), "documentation/code-review-gaps.md") {
 		t.Fatalf("init did not list existing docs:\n%s", out.String())
 	}
 	if err := runCheck(r.cfg, &out, false, false, false); err == nil || !strings.Contains(err.Error(), "no pages configured") {
 		t.Fatalf("check without pages: %v", err)
 	}
 
-	if err := runInit(r.cfg, &out, []string{"docs/partner-integration.md"}, "", true); err != nil {
+	if err := runInit(r.cfg, &out, []string{"documentation/partner-integration.md"}, "", true); err != nil {
 		t.Fatal(err)
 	}
 	if err := runBundle(r.cfg, "", &bytes.Buffer{}); err != nil {
@@ -239,6 +239,36 @@ func TestInitWithExistingDocsPublishesNothing(t *testing.T) {
 	}
 	if strings.Contains(r.site(), "Security gaps") {
 		t.Fatal("unselected page was published")
+	}
+}
+
+// docs/ full of plans and agent notes must not decide where pages go, or be
+// published.
+func TestInitIgnoresNotesInDocs(t *testing.T) {
+	r := newRepo(t)
+	r.write("app/main.py", appPy)
+	r.write("docs/plans/migration-plan.md", "# Plan\n")
+	r.write("docs/ai-design.md", "# Internal design\n")
+	var out bytes.Buffer
+	if err := runInit(r.cfg, &out, nil, "", false); err != nil {
+		t.Fatal(err)
+	}
+	cfg, err := config.Load(r.cfg)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(cfg.Pages) != 1 || cfg.Pages[0] != PagesDir+"/**/*.md" {
+		t.Fatalf("pages = %v, want %s/**/*.md", cfg.Pages, PagesDir)
+	}
+	if !strings.Contains(out.String(), "docs/ai-design.md") {
+		t.Fatalf("init did not list unpublished Markdown:\n%s", out.String())
+	}
+	r.write(PagesDir+"/index.md", "# App\n\nSee `app/main.py::health`.\n")
+	if err := runBundle(r.cfg, "", &bytes.Buffer{}); err != nil {
+		t.Fatal(err)
+	}
+	if site := r.site(); strings.Contains(site, "Internal design") || strings.Contains(site, "Plan") {
+		t.Fatal("notes under docs/ were published")
 	}
 }
 
@@ -258,7 +288,7 @@ func TestBundleLinksCitationsAndSources(t *testing.T) {
 		t.Fatal(err)
 	}
 	r.write(".indoc/config.yaml", r.read(".indoc/config.yaml")+"source_url: https://example.test/{path}#L{line}\n")
-	r.write("docs/index.md", admitPage)
+	r.write("documentation/index.md", admitPage)
 	if err := runBundle(r.cfg, "", &bytes.Buffer{}); err != nil {
 		t.Fatal(err)
 	}
@@ -349,7 +379,7 @@ func TestTypeScriptStaleness(t *testing.T) {
 	if err := runInit(r.cfg, &bytes.Buffer{}, nil, "", false); err != nil {
 		t.Fatal(err)
 	}
-	r.write("docs/index.md", "---\nsources: [src/**]\n---\nPayments start in `src/payments.ts::createPayment`.\n")
+	r.write("documentation/index.md", "---\nsources: [src/**]\n---\nPayments start in `src/payments.ts::createPayment`.\n")
 	if err := runBundle(r.cfg, "", &bytes.Buffer{}); err != nil {
 		t.Fatal(err)
 	}
@@ -411,7 +441,7 @@ func TestMCPWorkflow(t *testing.T) {
 		t.Fatal("scan did not create the config")
 	}
 
-	r.write("docs/index.md", admitPage)
+	r.write("documentation/index.md", admitPage)
 	res = call(2, "indoc_scan", map[string]any{})
 	scan := res["structuredContent"].(map[string]any)
 	if len(scan["pages"].([]any)) != 1 || scan["map"] == nil {
@@ -432,7 +462,7 @@ func TestMCPWorkflow(t *testing.T) {
 	if res["isError"] == true || res["structuredContent"].(map[string]any)["failing"].(float64) != 2 {
 		t.Fatalf("check after signature change: %s", text(res))
 	}
-	res = call(6, "indoc_ack", map[string]any{"pages": []string{"docs/index.md"}})
+	res = call(6, "indoc_ack", map[string]any{"pages": []string{"documentation/index.md"}})
 	if res["isError"] == true {
 		t.Fatalf("ack: %s", text(res))
 	}
@@ -443,19 +473,19 @@ func TestMCPWorkflow(t *testing.T) {
 
 func TestMCPSetupWithExistingDocs(t *testing.T) {
 	r := newRepo(t)
-	r.write("docs/partners.md", "# Partners\n")
-	r.write("docs/review-notes.md", "# Internal\n")
+	r.write("documentation/partners.md", "# Partners\n")
+	r.write("documentation/review-notes.md", "# Internal\n")
 	req := `{"jsonrpc":"2.0","id":1,"method":"tools/call","params":{"name":"indoc_scan","arguments":{"root":"` + r.root + `"}}}` + "\n"
 	var out bytes.Buffer
 	mcpServer().Serve(strings.NewReader(req), &out)
-	if !strings.Contains(out.String(), "docs/review-notes.md") || !strings.Contains(out.String(), "Ask the user which") {
+	if !strings.Contains(out.String(), "documentation/review-notes.md") || !strings.Contains(out.String(), "Ask the user which") {
 		t.Fatalf("existing docs must be listed and the user asked: %s", out.String())
 	}
-	req = `{"jsonrpc":"2.0","id":2,"method":"tools/call","params":{"name":"indoc_setup","arguments":{"root":"` + r.root + `","pages":["docs/partners.md"]}}}` + "\n"
+	req = `{"jsonrpc":"2.0","id":2,"method":"tools/call","params":{"name":"indoc_setup","arguments":{"root":"` + r.root + `","pages":["documentation/partners.md"]}}}` + "\n"
 	out.Reset()
 	mcpServer().Serve(strings.NewReader(req), &out)
 	cfg, err := config.Load(r.cfg)
-	if err != nil || len(cfg.Pages) != 1 || cfg.Pages[0] != "docs/partners.md" {
+	if err != nil || len(cfg.Pages) != 1 || cfg.Pages[0] != "documentation/partners.md" {
 		t.Fatalf("setup did not set pages: %+v %v\n%s", cfg, err, out.String())
 	}
 }

@@ -110,8 +110,10 @@ indoc's own files stay in one folder. Nothing else is added to the repo root.
 | Repo state | Pages location |
 | :--- | :--- |
 | Docusaurus config present | Its docs path |
-| No `docs/` | `docs/` |
-| `docs/` holds other material | Ask: opt files in under `docs/`, or a subfolder |
+| Otherwise | `documentation/` |
+| `documentation/` already holds Markdown | Nothing published; ask which files |
+
+Not `docs/` (decided 2026-11-17): in most repositories, and more so with coding agents, `docs/` is where plans, design notes, and reviews collect. Sharing it made every new page sit next to material that must never be published, and made `pages: docs/**` unsafe. `documentation/` is plain, reads as reader-facing, and is not a folder agents write notes into by habit.
 
 **Build output** defaults to `.indoc/site/`: gitignored, collides with nothing. Generated files are not committed by default. `init` asks how the site will be published:
 
@@ -453,7 +455,7 @@ shop's `docs/` contains partner docs next to `code-review-gaps-*.md` and agent p
 
 * Only files matched by `pages:` globs in `.indoc/config.yaml` are bundled.
 * `init` lists existing Markdown; the agent asks the user which to include.
-* No existing docs: default `pages: ["docs/**/*.md"]`.
+* Otherwise: default `pages: ["documentation/**/*.md"]`; Markdown elsewhere is listed, not published.
 * `docusaurus.config.js` present: use its docs path (already an explicit published set).
 
 ## 12. Acceptance bar

@@ -32,16 +32,18 @@ indoc init
 | Repository | `pages:` |
 |---|---|
 | Has a Docusaurus config | `docs/**/*.md` |
-| No Markdown under `docs/` | `docs/**/*.md` |
-| `docs/` already has Markdown | empty: nothing is published until you choose |
+| Anything else | `documentation/**/*.md` |
+| `documentation/` already has Markdown | empty: nothing is published until you choose |
 
 `init` also sets `source_url` from your git remote, so citations in the built site link to the code.
 
-The last case in the table is deliberate. A `docs/` folder often holds internal notes, review findings, or plans next to user documentation, and none of it should be published by accident. `init` lists the files it found; pick the ones to publish:
+Pages do not go in `docs/` unless the project is a Docusaurus site. In most repositories `docs/` collects plans, review findings, and notes written by coding agents, and none of it should be published by accident. `init` lists the Markdown it did not publish; to publish some of it as well, add it to `pages:`:
 
 ```sh
-indoc init --force --pages 'docs/partner-integration.md,docs/guides/**/*.md'
+indoc init --force --pages 'documentation/**/*.md,docs/partner-integration.md'
 ```
+
+The last row of the table is deliberate too: Markdown that is already there was not written for indoc, so you choose what to publish.
 
 ## Write pages
 

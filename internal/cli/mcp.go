@@ -52,7 +52,7 @@ func mcpServer() *mcp.Server {
 		Tools: []mcp.Tool{
 			{
 				Name: "indoc_setup", Title: "Set up indoc",
-				Description: "Create .indoc/config.yaml for the project, or set which Markdown files are published (pages globs such as docs/**/*.md). When the repository already has Markdown, nothing is published until pages are given: ask the user which files to publish.",
+				Description: "Create .indoc/config.yaml for the project, or set which Markdown files are published (pages globs such as documentation/**/*.md). When the repository already has Markdown, nothing is published until pages are given: ask the user which files to publish.",
 				InputSchema: obj(map[string]any{"pages": pagesSchema}),
 				Idempotent:  true,
 				Handler:     toolSetup,
