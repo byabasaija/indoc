@@ -1,0 +1,417 @@
+# indoc Roadmap
+
+**Status:** Draft
+**Date:** 2026-11-17
+
+---
+
+## 1. Problem
+
+The first real test (a Django codebase, shop) produced docs nobody would keep:
+
+| Symptom | Cause |
+| :--- | :--- |
+| Reference section empty | Extractor missed 53 Django `path()` routes and ~25 `env("X")` reads. Scan stayed silent about it. |
+| Overview ~400 chars, guides ~600 chars | Agent guide asks for "a small number of guides" and sets no quality bar or audience. |
+| Existing `docs/*.md` (20 KB of real partner docs) ignored | indoc only knows `.indoc/site.json`. |
+| `project_name: Shop API Documentation` | `init` default, never inferred. |
+
+The tool tells the agent to be brief, then hands it no facts. Generic output is the predictable result.
+
+## 2. Position
+
+We do not compete with Docusaurus on rendering (MDX, versioning, i18n, plugins). We will lose that fight and it does not matter.
+
+We compete on the thing no static site generator does: **knowing when the docs are wrong.** indoc hashes the source, knows which code each page describes, and fails CI when that code changes and the page does not.
+
+> **Docs that fail CI when they stop matching the code.**
+
+The static site is the packaging. Drift detection and grounded facts are the product.
+
+Two ways to adopt, and the first needs no migration:
+
+1. **Check-only:** keep Docusaurus, MkDocs, or plain Markdown as the renderer. Add `sources:` frontmatter and `indoc check` to CI. Nothing about the existing site changes.
+2. **Full:** indoc also builds the site.
+
+The pitch to an existing Docusaurus team is "add one CI job", not "migrate your docs".
+
+## 3. Two layers
+
+```
+┌──────────────────────────────────────────────────────────────┐
+│ CORE: any language, any repo                                 │
+│  • Markdown pages with `sources:` frontmatter                │
+│  • indoc check: stale pages fail CI                          │
+│  • citation validation (path::Symbol must resolve)           │
+│  • project map for the agent                                 │
+│  • static bundle                                             │
+├──────────────────────────────────────────────────────────────┤
+│ EXTRACTORS: per framework, optional enrichment               │
+│  • routes, settings/env vars, CLI commands                   │
+│  • Django + DRF, FastAPI first; more added over time         │
+└──────────────────────────────────────────────────────────────┘
+```
+
+A repo on an unsupported framework still gets everything in the core. It just has no generated reference pages. **An unsupported framework is a smaller feature set, not a broken tool**, and the README says so.
+
+## 4. Data model
+
+### Pages are Markdown files
+
+`.indoc/site.json` (prose escaped inside JSON) is removed. Pages are Markdown files matched by `pages:` globs in `.indoc/config.yaml` (opt-in; see section 11):
+
+```markdown
+---
+title: Integrate with the partner API
+order: 2
+audience: partner          # optional; groups pages in the viewer
+sources:                   # globs this page describes
+  - shop/api/partner/**
+  - shop/core/services/payments.py
+---
+
+Partners authenticate with ... (`shop/api/partner/auth.py::PartnerAuthentication`)
+```
+
+* `index.md` (or the page with `order: 0`) is the overview.
+* Pages with no frontmatter still work. The title comes from the first `# H1`. `indoc check` reports them as *unanchored*.
+* We read Docusaurus keys (`title`, `sidebar_position`, `sidebar_label`) so an existing Docusaurus `docs/` folder bundles without edits.
+
+### Reference is never authored
+
+`bundle` runs the extractors itself. The agent no longer copies a `reference` array, so it cannot corrupt it. Human-written descriptions for routes or settings go in an optional `.indoc/reference.yaml`, keyed by route or variable name. Keys that no longer match an extracted entry are reported.
+
+### Lock file (committed)
+
+`.indoc/lock.json` records, for each page: the page content hash and the surface and body hashes of each cited symbol and each file its `sources` match. `cache.json` stays local; the lock file is committed so CI can read it.
+
+### Where things live
+
+indoc's own files stay in one folder. Nothing else is added to the repo root.
+
+```
+.indoc/
+├── config.yaml       committed   (replaces root .indoc.yaml)
+├── lock.json         committed
+├── reference.yaml    committed   optional route/env descriptions
+├── .gitignore                    written by init: cache.json, site/
+├── cache.json        local
+└── site/             local       default build output
+```
+
+**Pages** are user content and live where the user chooses. `init` proposes:
+
+| Repo state | Pages location |
+| :--- | :--- |
+| Docusaurus config present | Its docs path |
+| No `docs/` | `docs/` |
+| `docs/` holds other material | Ask: opt files in under `docs/`, or a subfolder |
+
+**Build output** defaults to `.indoc/site/`: gitignored, collides with nothing. Generated files are not committed by default. `init` asks how the site will be published:
+
+* **Static host / CI:** keep the default; CI runs `indoc bundle`.
+* **Served by the app:** set `output_dir` to a folder the app already serves (Django: inside a `STATICFILES_DIRS` entry so `collectstatic` picks it up). Commit the output (deterministic, clean diffs) or run `indoc bundle` in the Dockerfile.
+
+**URL path** is the host app's choice, never indoc's. The bundle uses relative links only, so it works under `/docs/`, `/guide/`, or anywhere. Because indoc extracts routes, `init` warns about collisions, e.g. "FastAPI already serves Swagger at `/docs`; mount at `/guide/`."
+
+**OpenAPI is complementary.** drf-spectacular and FastAPI already generate exact request/response schemas. Route reference pages link to the project's Swagger/OpenAPI URLs; reading a committed OpenAPI file to enrich entries is a later extractor feature.
+
+## 5. Commands
+
+| Command | Purpose |
+| :--- | :--- |
+| `indoc init` | Infer project name (go.mod / pyproject / package.json / dir), detect frameworks, find existing docs, write `.indoc/`. No hand-editing required. |
+| `indoc scan --json` | Project map + changed files + **stale and drifting pages with reasons** + extraction coverage. Input for the agent. |
+| `indoc check` | Read-only. Exit 1 if a page is stale, a citation is broken, the lock is out of date, or (with `--strict`) a page drifts or is unanchored. `--warn` reports without failing. CI entry point. |
+| `indoc ack [page…]` | Update the lock. No args: re-stamp pages whose content changed. With a page: re-stamp it even if unchanged ("reviewed, still correct"). |
+| `indoc bundle` | Validate, extract, render the site. Re-stamps edited pages only. |
+| `indoc preview` | Bundle to a temp dir, serve on localhost, rebuild and reload on save. Replaces `serve`. |
+| `indoc mcp` | MCP server over stdio exposing scan / check / ack / bundle (Phase 5). |
+| `indoc version` | Version info. |
+
+**Staleness rule** (tiers in section 11): a page is stale when a cited symbol or covered surface differs from the lock and the page content does not. Editing the page clears it once re-stamped (`bundle` or `ack`). Nothing re-stamps an *unchanged* stale page except an explicit `ack <page>`, so no routine command can silence a real warning.
+
+### Why the CLI stays
+
+The binary is the engine; every other interface is a thin layer over it.
+
+* **CI has no agent.** `indoc check` in GitHub Actions is the CLI.
+* **Check-only adopters may not use an agent at all.** Humans run `check` and `ack`.
+* **Builds and Dockerfiles** run `indoc bundle`.
+* **MCP is `indoc mcp`**, the same binary. The plugin provisions it; users never type commands, but the commands still exist.
+
+The plugin is the primary *onboarding* path. The CLI is the primary *interface for machines and power users*.
+
+### Removed
+
+| Removed | Replaced by |
+| :--- | :--- |
+| `.indoc/site.json`, `site.schema.json` | Markdown pages with frontmatter |
+| `AGENT_GUIDE.md` template written by `init` | The skill / MCP prompt (one copy, shipped with indoc, not per repo) |
+| Agent copying the `reference` array | `bundle` runs extractors itself |
+| `previous` document in scan output and cache | Pages are files; the agent reads them |
+| `bundle --input` | Pages found via `pages:` globs |
+| Root `.indoc.yaml` | `.indoc/config.yaml` |
+| Default output `./static/docs` | `.indoc/site/` |
+| Hash-routed SPA viewer (`app.js`, `docs.js`) | Pre-rendered page per file |
+| `indoc serve` | `indoc preview` with rebuild on save |
+| Regex extractor as the only extractor | Framework extractors; regex kept as labeled "generic" fallback |
+
+## 6. Extractor contract
+
+Each framework is one package under `internal/extract/<framework>/` implementing:
+
+```go
+type Extractor interface {
+    Name() string
+    Detect(repo Repo) (Detection, bool)         // evidence: "manage.py, django in pyproject.toml"
+    Extract(repo Repo) (Result, error)
+}
+
+type Result struct {
+    Sections []doc.RefSection
+    Coverage Coverage                           // files read, entries found, what could not be resolved
+}
+```
+
+Rules every extractor follows:
+
+1. **Static only.** Never import or run the project's code.
+2. **Fail loudly.** If `Detect` succeeds and `Extract` finds 0 entries, scan reports a warning. Unresolved constructs (dynamic `include()`, computed prefixes) are listed, not dropped.
+3. **Fixture-tested.** Each extractor ships a `testdata/` mini-project and golden output. A framework is "Supported" only when its fixtures cover the patterns listed in its README row.
+4. **No cgo.** indoc stays one static binary on every platform. Parsers are pure Go. Revisit tree-sitter only if a third language makes hand-written parsing the bottleneck.
+
+### Parsers
+
+What staleness and extraction need from a parser is structural, not semantic: where each `def`/`class`/`func` starts and ends, its signature, its decorators, its body with comments and whitespace removed, and the literal arguments of calls like `path("x/", View)` or `env("KEY")`. No type inference, no import resolution beyond following `include("app.urls")` to a file.
+
+| Language | Parser | Why |
+| :--- | :--- | :--- |
+| Go | Standard library `go/parser` + `go/ast` | Exact, maintained by the Go team, zero dependencies. |
+| Python | Hand-written in Go: full tokenizer + structural parser | See below. |
+| JS/TS (later) | Decide at that point; leading option is tree-sitter grammars compiled to WebAssembly and run with a pure-Go runtime (wazero) | JSX, generics, and ASI make hand-writing a trap. Requires a spike before committing. |
+
+**Python, in detail.** The tokenizer is exact and complete: strings (triple-quoted, raw, bytes, f-strings with nested quotes), comments, bracket nesting, line continuations, `INDENT`/`DEDENT`. The parser above it is deliberately partial: it recognises `def`, `async def`, `class`, decorators, and call expressions with literal arguments, and treats every other statement as opaque tokens. Because hashing runs over tokens, comment and whitespace changes are ignored without any extra work.
+
+Alternatives rejected:
+
+* **Shelling out to `python3 -c 'import ast'`.** Exact, but requires Python at runtime (not guaranteed in a Go-based CI image), and an older interpreter fails on newer syntax.
+* **Existing pure-Go Python parsers.** The ones available target old grammar versions and fail on modern syntax (f-string nesting, `match`, type parameter syntax).
+* **tree-sitter via cgo.** Breaks the single static binary and cross-compilation.
+
+**Correctness is measured, not assumed.** A test-only harness (never a runtime dependency) runs CPython's `ast` module over a corpus (shop, the other Django and FastAPI repos available locally, plus Django and DRF source) and compares, per file: every symbol's name, qualified path, and start/end line. **Target: 100% agreement.** Every disagreement becomes a fixture.
+
+**Result (2026-11-17):** 29,536 files, 409,406 symbols, **100% agreement** with CPython 3.13 `ast` (name, qualified path, start and end line). Corpus: 11 local Django/FastAPI projects including their virtualenvs (Django, DRF, Pillow, pygments, and more) plus the CPython 3.13 standard library. 6 files skipped because CPython itself rejects them. The first run agreed on 84% of files; two tokenizer bugs (indentation measured after a bracket closed mid-line; backslash before `{` in f-strings) accounted for every mismatch and are now regression tests. Reproduce:
+
+```
+INDOC_PY_CORPUS=~/projects/shop INDOC_PYTHON=python3.13 \
+  go test ./internal/lang/python -run Differential -v
+```
+
+The current regex extractor becomes the "generic" fallback (Express-style, `os.getenv`, `process.env`) and is labeled *best-effort*.
+
+### First targets
+
+**Django (+ DRF):** covers 8 of the author's own projects.
+* `ROOT_URLCONF` → follow `include("app.urls")` to files, join prefixes.
+* `path()`, `re_path()`, `urlpatterns +=`, `name=` → route entries. Detail is the view (Django does not declare methods on routes).
+* DRF `DefaultRouter`/`SimpleRouter.register()` → list/detail routes; `@action` extras.
+* Settings: `django-environ` (`env()`, `env.str/bool/int/list()`), `python-decouple` `config()`, `os.environ`/`os.getenv`; defaults captured; cross-checked against `.env.example`.
+* Management commands (`management/commands/*.py`) → `commands` reference kind.
+
+**FastAPI:** covers 3 projects.
+* `@app/router.<method>()` with `APIRouter(prefix=)` and `include_router(prefix=)` resolved.
+* Pydantic `BaseSettings` fields → env vars (with `env_prefix`).
+
+**Go / Cobra:** dogfooding; indoc documents itself.
+* Commands, `Use`, `Short`, flags → `commands` reference kind.
+
+Later candidates, in order of demand: Express/NestJS, Next.js route handlers, Flask blueprints, Laravel, Rails, Spring. Each is added only with fixtures and a README row.
+
+## 7. Writing quality
+
+Deterministic checks the tool owns:
+
+* **Citations:** `path`, `path:line`, `path#L42` in pages must resolve. Broken → error.
+* **Uncited page:** warning. Generic prose shows up as a page with nothing to cite.
+* **Command blocks:** `just X`, `make X`, `npm run X`, `uv run X` targets must exist (Phase 3b).
+
+Agent workflow (skill / MCP prompt):
+
+1. Run scan; read the project map and existing docs.
+2. **Propose an audience and outline to the user before writing.** Example for shop: *partner integrators* (auth, endpoints, callbacks, errors) and *team developers* (setup, checkout routing, provider adapters).
+3. Write pages with `sources:` and citations. Every guide has real commands, real paths, and a real request/response or CLI example where one applies.
+4. Run `check` and `bundle`; fix errors.
+
+The "small number of guides" instruction is removed. The bar is "every claim cites code", not a page count.
+
+## 8. Structure and customization
+
+### Structure: no templates
+
+indoc never ships a fixed outline. Templates are how every docs site ends up looking the same.
+
+| Who | Decides |
+| :--- | :--- |
+| Files | Navigation: folders become sections, `order:` sorts pages. |
+| Agent | Proposes audiences and an outline from evidence in the repo. |
+| User | Approves the outline before pages are written. |
+| indoc | Only the generated Reference section. |
+
+The skill gives the agent questions and evidence to look for, not outlines: who calls this code, is there a public or partner API, library or deployed service, do existing docs already define audiences. Archetypes (library, CLI, service, app, monorepo) are hints, never output templates.
+
+### Presentation: three tiers
+
+1. **Plain Markdown (works today):** badges, contributor images (shields.io, contrib.rocks), screenshots.
+2. **Built in, config-driven:** `layout: landing` for `index.md` (hero, tagline, CTA buttons, feature cards); header links with live GitHub star count; footer; "Edit this page"; last-updated date from git; logo and colors.
+3. **Escape hatches:** `custom.css`, `head.html` (analytics, fonts, meta), `allow_html: true` for raw HTML in pages (off by default; agents write pages).
+
+Live data (star counts) is fetched in the browser, never at bundle time, so bundles stay deterministic. Failure degrades to a plain link.
+
+No plugin system, no MDX, no React components. Projects that need interactive widgets in docs should use Docusaurus; the README says so.
+
+### Default theme
+
+The user's repo supplies content and structure; user preferences supply branding. indoc supplies the **layout and quality bar**, and that is what makes a default site look credible with zero configuration. The reference design is `design/default-theme.webp` (a GitHub-style docs layout used as inspiration, not copied: no third-party names, mascots, or assets).
+
+| Element in the reference | Filled from |
+| :--- | :--- |
+| Header: logo, title, search, theme toggle | `appearance.logo`, `project_name` |
+| Left nav: pinned links, then categories | `links:` in config; categories = page folders |
+| Hero: image, title, tagline, primary/secondary action | `index.md` frontmatter with `layout: landing` |
+| Feature cards | `features:` in `index.md` frontmatter |
+| Right rail | Table of contents on pages; `featured:` on landing |
+| Edit this page, last edited by/on | `repo_url` + git history (author display optional) |
+
+### Bundle output
+
+Every page is pre-rendered to its own HTML file. No JavaScript is required to read the docs; JS only adds search, theme toggle, and the live star count. The current hash-routed single page (`#/guides/x`, blank without JS, not indexable) is replaced.
+
+```
+.indoc/site/                     (default; output_dir overrides)
+├── index.html                  landing page
+├── partner/authentication/index.html
+├── dev/checkout-routing/index.html
+├── reference/routes/index.html     generated
+├── reference/config/index.html     generated
+├── 404.html
+├── assets/
+│   ├── indoc.css               theme; brand colors injected as CSS variables
+│   ├── indoc.js                search, theme toggle, star count (small, no framework)
+│   ├── search-index.js         built at bundle time (.js, not .json, so search works from file://)
+│   ├── mermaid.min.js          only if a page uses Mermaid
+│   ├── logo.svg                copied from appearance.logo
+│   └── img/…                   images referenced by pages
+├── custom.css                  only if provided
+└── sitemap.xml                 when site_url is set
+```
+
+* Syntax highlighting happens at bundle time (pure-Go highlighter): no highlighting JS shipped.
+* No CDN requests. The folder works offline, from `file://`, from any static host, or mounted under a sub-path (`/docs/`) via relative links.
+* Deterministic: same inputs give byte-identical output, so the bundle can be committed or diffed.
+
+## 9. Phases
+
+Each phase ends with a concrete check against a real repo, shop unless noted.
+
+### Phase 1: Markdown pages + `check`
+* `pages:` globs, frontmatter parsing (incl. Docusaurus keys), overview detection.
+* Remove `site.json` path, `site.schema.json`, `AGENT_GUIDE.md` template.
+* Go symbol parser (`go/ast`); Python tokenizer + structural parser (signatures, bodies, surface hash per symbol).
+* CPython `ast` differential test over the local corpus at 100% symbol agreement.
+* `path::Symbol` citations, `lock.json`, tiered `indoc check`, `indoc ack`, stale/drift reasons in scan.
+* Move config to `.indoc/config.yaml`; default output `.indoc/site/`; `init` writes `.indoc/.gitignore`.
+* `init` infers project name, lists existing docs for opt-in, proposes a pages location, and asks how the site will be published.
+* `check` works on any Markdown docs folder (check-only adoption), including Docusaurus.
+* **Exit:** shop's `partner-integration.md` bundles with `code-review-gaps-*.md` excluded; replay test meets the section 12 targets.
+
+### Phase 2: Extractor interface + Django/DRF
+* `internal/extract` package, coverage reporting, zero-result warnings.
+* Django URLconf resolution, DRF routers, settings, management commands.
+* **Exit:** shop reference shows all 53 URL patterns (resolved full paths) and every env var, or names exactly which could not be resolved.
+
+### Phase 3: Citations + project map
+* Citation validation in `check`/`bundle`; "view source" links when `repo_url` is set.
+* Scan returns the project map: frameworks, entry points, most-imported modules, git hot files, existing docs, task runner targets.
+* Rewrite the skill around outline-first authoring.
+* **Exit:** regenerating shop docs produces partner and developer pages where every guide cites code; side-by-side review against the first run.
+
+### Phase 4: FastAPI + Cobra
+* **Exit:** lexai (or another FastAPI project) and indoc itself produce complete reference pages.
+
+### Phase 5: MCP + plugins
+* `indoc mcp` subcommand (same binary).
+* Claude Code plugin, Copilot CLI plugin, Cursor MCP config. Plugin provisions the binary.
+* `indoc-check` GitHub Action: one-line CI setup (`uses: byabasaija/indoc-check@v1`), downloads a release binary, no Go toolchain needed. Supports `mode: warn` for teams trialing it.
+* **Exit:** fresh machine, one plugin install, "document this project" → bundled site, no indoc commands typed.
+
+### Phase 6: Viewer
+* Pre-rendered page-per-file output replacing the hash-routed SPA; default theme per section 8.
+* Syntax highlighting, Mermaid, dark mode, folder-based navigation, source links.
+* Landing layout, header links with star count, footer, edit-this-page, last-updated.
+* `custom.css`, `head.html`, `allow_html`.
+* **Exit:** indoc's own docs site uses the landing layout and looks credible next to a default Docusaurus site.
+
+## 10. Not doing
+
+Saying no keeps indoc small enough to be excellent at one thing. Each item lists why, and what would make us reconsider.
+
+| Not doing | Why | Reconsider if |
+| :--- | :--- | :--- |
+| Calling an AI model from the binary | The agent the developer already pays for does the writing. No API keys, no billing, no prompt maintenance in Go. | Never; this is the architecture. |
+| Fixed outlines or page templates | Templates are why docs sites all look the same. The agent proposes from evidence; the user approves. | Never for output. Archetype hints for the agent are fine. |
+| Running or importing the user's code | Needs their dependencies, database, and secrets; unsafe in CI. Static analysis only. | A framework whose routes cannot be found statically at all, and only as an opt-in. |
+| Plugin system, MDX, React components in pages | This is how Docusaurus became Docusaurus. Every extension point is permanent maintenance. | Repeated requests that `custom.css`, `head.html`, and `allow_html` cannot cover. |
+| Versioned docs (v1 / v2 side by side) | Large feature, few projects need it. Git tags already version the Markdown. | Users with real multi-version needs ask, after Phase 6. |
+| Translations (i18n) | Large feature, and agent-written translations go stale twice as fast. | After drift detection is proven; translations could be anchored like pages. |
+| Bundling `docs/` (or any folder) by default | It published a security-gaps file in our very first test repo. Publishing is opt-in. | Never. |
+| Network access during `bundle` | Builds must be deterministic and work offline. Live data (stars) loads in the browser. | Never for build output. |
+| Committing build output by default | Generated files cause merge noise. Default output is gitignored; committing is a choice. | Never as a default. |
+| cgo / tree-sitter | indoc must stay one static binary on every platform. | A third language makes hand-written parsing the bottleneck. |
+| Duplicating OpenAPI / Swagger | drf-spectacular and FastAPI already produce exact schemas. We link to them, and may read them later. | Never as a replacement. |
+| Hosting docs for users (an "indoc cloud") | The output is static files; any host works. | Out of scope for the open-source tool. |
+| Competing on rendering features | We lose that fight. We compete on keeping docs correct. | Never; this is the positioning. |
+
+## 11. Decisions on the former open questions
+
+### Staleness is symbol-level, tiered
+
+Measured on shop (411 commits, 1,072 non-test source-file changes):
+
+| Change kind | Share |
+| :--- | :--- |
+| Whitespace/comment only | 3.5% |
+| Function bodies only | 67% |
+| Signatures, routes, env vars ("surface") | 29% |
+
+87% of commits touch source; 36% change surface. File-hash staleness would flag nearly every commit for any page anchored to a broad directory. Developers would learn to `ack` blindly and the feature would die. Normalizing whitespace removes only 3.5%.
+
+Rules:
+
+| Change | Result |
+| :--- | :--- |
+| Cited symbol changed (signature or body) | **Stale**: `check` fails |
+| Surface changed under `sources` globs | **Stale**: `check` fails |
+| Body-only change under `sources` globs | **Drift**: reported by `scan`, fails only with `check --strict` |
+| Whitespace/comments | Ignored |
+
+* Citations name symbols, not lines: `path::Symbol` or `path::Class.method`. The viewer resolves the current line when linking. Line numbers rot on every edit above them; a symbol only breaks on rename, which is exactly when the doc should be flagged.
+* Cited symbols are anchors automatically. `sources:` globs are for broader coverage.
+* This needs per-**language** symbol parsers (Python, Go, TS/JS), separate from per-**framework** extractors. Languages without one fall back to normalized file hashes and report drift only.
+
+### Publishing is opt-in
+
+shop's `docs/` contains partner docs next to `code-review-gaps-*.md` and agent planning files. Bundling `docs/` by default would publish a list of security gaps.
+
+* Only files matched by `pages:` globs in `.indoc/config.yaml` are bundled.
+* `init` lists existing Markdown; the agent asks the user which to include.
+* No existing docs: default `pages: ["docs/**/*.md"]`.
+* `docusaurus.config.js` present: use its docs path (already an explicit published set).
+
+## 12. Acceptance bar
+
+Every phase is measured against real repositories before the next starts. Staleness specifically:
+
+* **Replay test:** fixed page set for shop, replay the last 100 commits, run `check` at each.
+* **Targets:** under 15% of commits fail `check`; at least 80% of 20 hand-reviewed flags are judged real.
+* Miss either target → tune detection before Phase 2. Results are recorded in this file.

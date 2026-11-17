@@ -97,20 +97,34 @@ The bundle is the product; a particular hosting model is not. Web projects may m
 
 ---
 
-## 4. CLI Contract
+## 4. Agent Integration and Engine Contract
 
-The host agent invokes the binary directly. An MCP adapter can wrap these same commands later. The binary does not call a model.
+The CLI is the current interface to the Go engine, but it is not the desired end-user workflow. The target experience is one host-native plugin install, followed by a natural-language request such as "create documentation for this project." Users should not need to separately install the CLI, remember `indoc init`, or manually chain commands.
+
+For Copilot CLI, the plugin should provide:
+
+* A **skill** that makes the documentation workflow discoverable and guides the host agent through writing and updating the narrative.
+* An **MCP server** that exposes the deterministic engine operations. Project setup should happen automatically when needed; `init` should not be a command the user must learn.
+* A bundled or automatically provisioned engine so installing the plugin is sufficient. The plugin must not require a separate global `indoc` installation.
+
+The host agent remains responsible for reading code, asking the user for preferences when needed, and writing the overview and guides. The engine remains responsible for deterministic scanning, validation, and bundling. Keep the CLI as a developer and power-user interface, but make the plugin the primary onboarding path. MCP is therefore part of the one-install product experience, not a feature to defer beyond that goal.
+
+The plugin and MCP server are not implemented yet; the current workflow still depends on the CLI being installed and invoked by the host agent.
 
 The document is the system, not a page per file:
 
 * **Overview** and **guides** are prose the agent writes.
 * **Reference** is facts the scanner extracts: HTTP routes and environment variables. The agent copies that array through unchanged.
 
-### `indoc scan`
+### Current CLI operations
+
+These are the existing engine operations. The future MCP layer should expose equivalent capabilities without requiring users to invoke the commands themselves.
+
+#### `indoc scan`
 * **Purpose:** Hash source files against `.indoc/cache.json`, extract the current reference, and return the last bundled document.
 * **Output:** Added, modified, unchanged, and deleted files; `reference`; `stale_reference` for citations whose source file changed; `previous` overview and guides.
 
-### `indoc bundle`
+#### `indoc bundle`
 * **Purpose:** Validate a document JSON file and write the portable static viewer.
 * **Inputs:** `project_name`, `overview`, `guides[]`, `reference[]` (`kind` is `routes` or `config`).
 * **Output:** `index.html`, `style.css`, `app.js`, and `docs.js` in the output directory. The normalized document is stored in the cache for the next scan.
@@ -118,18 +132,29 @@ The document is the system, not a page per file:
 
 ---
 
-## 5. Delivery Sequence
+## 5. Copilot Plugin Distribution
 
-### Minimum viable tool
+Copilot CLI plugins can be installed directly from a GitHub repository, a repository subdirectory, or a Git URL. A marketplace is a GitHub repository containing a `marketplace.json` catalog; Copilot CLI includes `github/awesome-copilot` by default. The current CLI documentation does not specify acceptance criteria for adding a plugin to that built-in marketplace.
 
-First, make the end-to-end core useful and dependable:
+The initial distribution path should therefore be a repository users can install directly, or an indoc-owned marketplace. Treat inclusion in `awesome-copilot` as a separate discovery opportunity, not a launch dependency or a guaranteed approval.
 
-1. A developer can initialize a project and scan it for changes and deterministic reference facts.
-2. A host agent can use the scan output to create or update a concise overview and task-oriented guides without inventing reference entries.
-3. `indoc bundle` validates that content and emits a polished, self-contained static docs site that can be used without a docs backend.
-4. The artifact has a clear path for both web projects (optional mount in the existing app) and projects without a web app (publish or ship the files).
+References:
 
-### Later improvements
+* [Copilot CLI plugins](https://docs.github.com/copilot/concepts/agents/copilot-cli/about-cli-plugins)
+* [Copilot CLI plugin marketplaces](https://docs.github.com/copilot/how-tos/copilot-cli/customize-copilot/plugins-marketplace)
 
-Defer enhancements until that minimum workflow is complete and usable. Candidate follow-up work includes an MCP adapter, broader deterministic extraction (such as Django/Flask routes and command declarations), and additional viewer features such as syntax highlighting. These are not prerequisites for the initial tool.
+---
+
+## 6. Delivery Sequence
+
+### One-install agent workflow
+
+The initial release is not complete until a new user can install the host plugin once and ask their agent to generate useful docs without first learning indoc commands:
+
+1. The user installs the Copilot CLI plugin from a GitHub repository or marketplace.
+2. The user asks for documentation in natural language; the skill activates the workflow and gathers any needed preferences.
+3. The plugin handles project setup and invokes the engine through MCP. The host agent writes the narrative while preserving scanner-provided reference facts.
+4. The engine bundles the result and the agent reports where to preview or publish the static files.
+
+The Go engine and its CLI are implemented. The one-install plugin, MCP server, automatic setup, and end-to-end host validation remain release work. Broader extraction and additional viewer features such as syntax highlighting can remain later improvements.
 
