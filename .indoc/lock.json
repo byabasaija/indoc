@@ -1,6 +1,104 @@
 {
   "version": 1,
   "pages": {
+    "documentation/accuracy.md": {
+      "page": "fe0f31e492aad7e1",
+      "citations": {
+        "tools/replay/main.go::main": {
+          "surface": "d9d99ddd4952251a",
+          "body": "f6f9367267a81972",
+          "raw": "f4f046bf256d7592",
+          "hasher": "go/2"
+        }
+      },
+      "sources": {
+        "internal/lang/jsts/differential_test.go": {
+          "body": "184532ec18394fae",
+          "symbols": {
+            "TestDifferentialTypeScript": "d9f23ffb70c56921",
+            "diffLines": "6bbbd0bc0dd970a2",
+            "longestLine": "640154a45693c7ea"
+          },
+          "private": [
+            "diffLines",
+            "longestLine"
+          ],
+          "raw": "ecc0f94c722301e0",
+          "hasher": "go/2"
+        },
+        "internal/lang/python/differential_test.go": {
+          "body": "366b15a783aca0af",
+          "symbols": {
+            "TestDifferentialCPython": "49cfe6c74017d341",
+            "cpythonSymbols": "12327988f019e3ec",
+            "diffSymbols": "6c1d63576f45f126",
+            "expandHome": "f8b41f1df9563f28",
+            "fmtSym": "221eb609eaec7643",
+            "ourSymbols": "b1610c811ec22978",
+            "refSym": "cee257f9cc62a807",
+            "sortSyms": "c11ebbf809e0b476"
+          },
+          "private": [
+            "cpythonSymbols",
+            "diffSymbols",
+            "expandHome",
+            "fmtSym",
+            "ourSymbols",
+            "refSym",
+            "sortSyms"
+          ],
+          "raw": "50710f7acff6ab7d",
+          "hasher": "go/2"
+        },
+        "internal/reference/django_differential_test.go": {
+          "body": "5564104946b75e19",
+          "symbols": {
+            "TestDjangoDifferential": "5cc7f1ff2b6986ed",
+            "expandHome": "f8b41f1df9563f28",
+            "indexOf": "7700a087417b5297",
+            "normalizeDjangoPath": "d03978a2a4d336e4",
+            "orderedList": "5cff58ff5f1086e8"
+          },
+          "private": [
+            "expandHome",
+            "indexOf",
+            "normalizeDjangoPath",
+            "orderedList"
+          ],
+          "raw": "9aa85e90747dde5a",
+          "hasher": "go/2"
+        },
+        "tools/replay/main.go": {
+          "body": "488611f2076db65e",
+          "symbols": {
+            "diffsym": "ab171e6f33d695df",
+            "event": "b01d8ba1134b7426",
+            "fmtCounts": "0d23d3d0c4adb932",
+            "git": "74578a47d47e516c",
+            "hasDrift": "ff1d02e713e0e127",
+            "loadPages": "e02eebe7c1d619d6",
+            "main": "d9d99ddd4952251a",
+            "pct": "d1e4f4a6cfc46976",
+            "run": "e07698794995a94a",
+            "symbols": "261c87133c2b0bc6"
+          },
+          "private": [
+            "diffsym",
+            "event",
+            "fmtCounts",
+            "git",
+            "hasDrift",
+            "loadPages",
+            "main",
+            "pct",
+            "run",
+            "symbols"
+          ],
+          "raw": "f4f046bf256d7592",
+          "hasher": "go/2"
+        }
+      }
+    },
     "documentation/agents.md": {
       "page": "8e8cb884353f96f1",
       "citations": {

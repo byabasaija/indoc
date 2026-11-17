@@ -1,6 +1,6 @@
 # Architecture
 
-**Updated:** 2026-11-17. Plans and decisions live in [ROADMAP.md](ROADMAP.md); this file describes what is built.
+How indoc is put together, for contributors. What's planned is in [ROADMAP.md](ROADMAP.md); how each part was measured is in [documentation/accuracy.md](documentation/accuracy.md).
 
 ## Purpose
 
@@ -12,7 +12,10 @@ indoc never calls an AI model.
 
 ```
 cmd/indoc                 entry point
-internal/cli              commands: init, scan, check, ack, bundle, preview, version
+internal/cli              commands: init, scan, check, ack, bundle, preview, mcp, version
+        │
+        ├── internal/mcp        Model Context Protocol server (stdio) for coding agents
+        ├── internal/projectmap frameworks, entry points, tasks, hot files: the agent's map
         │
         ├── internal/drift      lock file, Stamp, Check, Ack: the staleness rules
         │       ├── internal/pages    Markdown pages, frontmatter, path::Symbol citations
@@ -22,7 +25,7 @@ internal/cli              commands: init, scan, check, ack, bundle, preview, ver
         │       └── internal/glob     `**` glob matching
         │
         └── internal/site       static site: pre-rendered pages, via internal/render (goldmark)
-                └── internal/reference   extractors: Django/DRF, FastAPI, Cobra, Python env, generic regex
+                └── internal/reference   extractors: Django/DRF, FastAPI, Express, Next.js, NestJS, Astro, Cobra, env
                         └── internal/lang/python (ParseModule)   static module view on tree-sitter
 ```
 
@@ -65,7 +68,7 @@ Pages are Markdown files selected by `pages:` globs in `.indoc/config.yaml`. Pub
 | Cited symbol's surface changed | stale | yes |
 | Cited symbol's body changed | drift (stale on `strict: true` pages) | `--strict` (yes on strict pages) |
 | Public surface added/removed/changed, or file added/removed, under `sources` | stale | yes |
-| Private surface changed under `sources` (`_name` in Python, lowercase in Go) | drift | `--strict` |
+| Private surface changed under `sources` (`_name` in Python, lowercase in Go, not exported in JS/TS) | drift | `--strict` |
 | Covered file changed with no surface change (or unparsed file changed) | drift | `--strict` |
 | Citation or `sources` glob does not resolve | broken | yes |
 | Page edited, new, or deleted since recorded | edited / unstamped / removed | yes |
@@ -85,6 +88,9 @@ A page is compared only while its content matches the lock. `drift.Ack` with no 
 - **Pydantic settings**: annotated fields of `BaseSettings` subclasses (also through project base classes) with `env_prefix` from `model_config` and `Field(alias=...)`.
 - **Cobra**: `cobra.Command` literals (package-level or local), `AddCommand` tree, `Flags()`/`PersistentFlags()` definitions, via `go/ast`. A test checks it against indoc's runtime command tree.
 - **Management commands**: `<app>/management/commands/<name>.py` with `class Command`, its `help`, and `add_argument` names.
+- **Express**: a static module resolver follows imports and exports across files (ES modules, CommonJS, TypeScript) to find which bindings hold an app or router; `app.METHOD`, `router.METHOD`, `route(path).METHOD` chains, and `use()` mounts of routers and sub-apps are joined into full paths.
+- **Next.js and Astro**: file-system routes. App Router and Pages Router pages and API routes for Next.js, `src/pages` for Astro; HTTP methods come from the handlers a module exports (`export function GET`, `export { handler as POST }`).
+- **NestJS**: `@Controller(path)` classes and their `@Get`/`@Post`/... methods, under `setGlobalPrefix`.
 - **Generic**: the original regex extractor for decorator-style routes and Go/JS env reads, labeled best effort.
 
 ## Site
@@ -94,6 +100,28 @@ A page is compared only while its content matches the lock. `drift.Ack` with no 
 `internal/site` renders Markdown at build time with `html/template`; every page is complete without JavaScript. URLs follow the page's path under the pages' common folder (`documentation/guides/setup.md` → `guides/setup/`), the first folder is the sidebar group, and all links are relative so the folder works from any path or from disk. Links to other pages' `.md` files are rewritten to page URLs; local images are copied under `assets/img/` with content-hashed names. Search is an index written as `assets/search-index.js` (a script, not JSON, so it loads from `file://`). The browser side is `indoc.js` plus vendored Prism; Mermaid is written only when a page uses it. A manifest (`.indoc-site`) lists the files indoc wrote, so later builds delete only those.
 
 `indoc preview` builds into a temporary directory, serves it on `127.0.0.1`, and rebuilds when pages or the config change. It never writes the lock or `output_dir`.
+
+## Agents
+
+`indoc mcp` runs `internal/mcp`, a dependency-free MCP server on stdio (newline-delimited JSON-RPC). It speaks both protocol eras: the `initialize` handshake (2024-11-05 through 2025-11-25) and per-request `_meta` with `server/discover` (2026-07-28). Its five tools (`indoc_scan`, `indoc_setup`, `indoc_check`, `indoc_ack`, `indoc_bundle`) call the same functions as the commands.
+
+`plugin/` is one plugin for Claude Code and Copilot CLI: a skill that tells the agent how to work (outline first, cite everything, never hand-write reference tables) and an MCP entry that starts `plugin/bin/indoc`. That launcher downloads the release binary matching the plugin version, verifies it against the release's `checksums.txt`, and caches it. The release workflow refuses a tag that differs from the plugin's pinned version.
+
+## Decisions
+
+**Symbols, not files.** In a measured production codebase 87% of commits touched source and two thirds of changes were function bodies only. File-level staleness would fail nearly every commit and teach developers to acknowledge blindly. Signatures fail; bodies drift; comments, docstrings, logging, and formatting are ignored. The rules were tuned by replaying history ([accuracy](documentation/accuracy.md)).
+
+**Citations name symbols, not lines.** Line numbers rot on every edit above them. A symbol breaks only when renamed, which is exactly when the page should be checked. Links resolve the current line at build time.
+
+**tree-sitter as WebAssembly, not cgo.** indoc must stay one static binary that cross-compiles everywhere. Hand-written parsers did not scale past one language; cgo would break static builds. wazero runs the grammars in pure Go for +4.3 MB, and each language is gated by a differential test against its own compiler.
+
+**No AI model in the binary.** The developer's agent writes; indoc does what must be exact. No API keys, no prompts to maintain in Go, nothing sent anywhere.
+
+**Static extraction only.** Importing a project needs its dependencies, database, and secrets, and is unsafe in CI. Extractors read source and report what they cannot resolve instead of guessing. Only opt-in tests run frameworks, to verify the extractors.
+
+**Highlighting in the browser.** Prism (47 KB, vendored) instead of a Go highlighter at build time, which added 5.4 MB to the binary for the same languages. Pages stay readable without JavaScript; only colors are missing.
+
+**Publishing is opt-in.** Only `pages:` globs are published, and new pages default to `documentation/`, because `docs/` in most repositories also holds plans, reviews, and agent notes.
 
 
 ## Files

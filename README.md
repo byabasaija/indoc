@@ -20,6 +20,7 @@
   <a href="#how-it-works">How it works</a> ·
   <a href="#indoc-vs-docusaurus-and-mkdocs">Compared to Docusaurus</a> ·
   <a href="documentation/getting-started.md">Docs</a> ·
+  <a href="documentation/accuracy.md">Accuracy</a> ·
   <a href="ROADMAP.md">Roadmap</a>
 </p>
 
@@ -132,7 +133,7 @@ which picks a payment provider for the customer's country.
 
 Fix the page, or run `indoc ack <page>` to confirm it is still correct. Either way, the review is recorded in git.
 
-These rules were tuned by replaying 100 commits of a real production codebase: 85% of sampled flags were real problems, and about 3–4% of commits would have failed CI with nothing wrong in the docs. [Details](ROADMAP.md#12-acceptance-bar).
+These rules were tuned by replaying 100 commits of a real production codebase: 85% of sampled flags were real problems, and about 3–4% of commits would have failed CI with nothing wrong in the docs. [How it was measured](documentation/accuracy.md).
 
 ## What you get
 
@@ -238,7 +239,7 @@ make grammars                              # rebuild tree-sitter grammars (Docke
 make vendor                                # refresh Prism and Mermaid
 ```
 
-[ARCHITECTURE.md](ARCHITECTURE.md) explains how the pieces fit, and [ROADMAP.md](ROADMAP.md) covers what's next and what indoc deliberately won't do.
+[ARCHITECTURE.md](ARCHITECTURE.md) explains how the pieces fit and why, [documentation/accuracy.md](documentation/accuracy.md) how each part is tested against the real tools, and [ROADMAP.md](ROADMAP.md) what's next and what indoc won't do.
 
 ## License
 
