@@ -1,7 +1,7 @@
 {
   "name": "indoc",
   "displayName": "indoc",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "description": "Documentation that fails CI when it stops matching the code. Your agent writes Markdown pages that cite code; indoc checks them against the code, extracts routes, environment variables, and commands, and builds a static site.",
   "author": {
     "name": "byabasaija",
