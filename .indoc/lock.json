@@ -13,19 +13,19 @@
         "internal/drift/drift.go::Ack": {
           "surface": "bdb11477c7c441cf",
           "body": "29138102e78d4f9c",
-          "raw": "626f4726e22b5ef7",
+          "raw": "f022796b08cb3cbc",
           "hasher": "go/2"
         },
         "internal/drift/drift.go::FileLock": {
           "surface": "670dc86edcd04c57",
           "body": "",
-          "raw": "626f4726e22b5ef7",
+          "raw": "f022796b08cb3cbc",
           "hasher": "go/2"
         },
         "internal/drift/drift.go::Stamp": {
           "surface": "8df7959ee83484b4",
           "body": "a9d4bcad15e37f8e",
-          "raw": "626f4726e22b5ef7",
+          "raw": "f022796b08cb3cbc",
           "hasher": "go/2"
         }
       },
@@ -61,7 +61,7 @@
           "hasher": "go/2"
         },
         "internal/drift/drift.go": {
-          "body": "8578178ebcfe7488",
+          "body": "3c1891ac5e9c49f7",
           "symbols": {
             "Ack": "bdb11477c7c441cf",
             "AckResult": "9848b62df55748a4",
@@ -103,11 +103,11 @@
             "surfaceChanges",
             "upgradable"
           ],
-          "raw": "626f4726e22b5ef7",
+          "raw": "f022796b08cb3cbc",
           "hasher": "go/2"
         },
         "internal/drift/drift_test.go": {
-          "body": "26ebf46abd726c07",
+          "body": "7fcf866d94f53233",
           "symbols": {
             "TestAckWithoutTargetsNeverSilencesUnchangedStalePage": "b69c1af2d399f822",
             "TestCitedBodyChangeIsDriftUnlessStrict": "a7b49e9e94fbb0b7",
@@ -115,6 +115,7 @@
             "TestEditedPageNeedsAck": "6dddb032ffa7eacd",
             "TestLockRoundTrip": "a0b24990fab53d39",
             "TestNewAndRemovedFilesAreStale": "b6344dfa25ae7e03",
+            "TestNewTestFilesAreDrift": "77e5c156856c1beb",
             "TestOlderLockHashes": "edb9f4e413d77970",
             "TestPrivateHelpersAreDrift": "52d4c671db4955ae",
             "TestRenamedCitationIsBroken": "c46c6a19c6c1075a",
@@ -141,7 +142,7 @@
             "fixture.write",
             "newFixture"
           ],
-          "raw": "fcc998308ba67fa7",
+          "raw": "17923641fc6a6de5",
           "hasher": "go/2"
         }
       }
@@ -256,19 +257,19 @@
         "internal/code/code.go::Analyze": {
           "surface": "498b2762e77d0628",
           "body": "999448245764a731",
-          "raw": "334982e50578ac89",
+          "raw": "37531f43588cdc7a",
           "hasher": "go/2"
         },
         "internal/drift/drift.go::Check": {
           "surface": "44441a0b4c307a7a",
           "body": "9dd5b37497a1ba3c",
-          "raw": "626f4726e22b5ef7",
+          "raw": "f022796b08cb3cbc",
           "hasher": "go/2"
         },
         "internal/drift/drift.go::Finding.Fails": {
           "surface": "7c6f4d383dc2bc4e",
           "body": "cbcb7de0f5756098",
-          "raw": "626f4726e22b5ef7",
+          "raw": "f022796b08cb3cbc",
           "hasher": "go/2"
         }
       },
@@ -285,7 +286,7 @@
           "hasher": "go/2"
         },
         "internal/drift/drift.go": {
-          "body": "8578178ebcfe7488",
+          "body": "3c1891ac5e9c49f7",
           "symbols": {
             "Ack": "bdb11477c7c441cf",
             "AckResult": "9848b62df55748a4",
@@ -327,11 +328,11 @@
             "surfaceChanges",
             "upgradable"
           ],
-          "raw": "626f4726e22b5ef7",
+          "raw": "f022796b08cb3cbc",
           "hasher": "go/2"
         },
         "internal/drift/drift_test.go": {
-          "body": "26ebf46abd726c07",
+          "body": "7fcf866d94f53233",
           "symbols": {
             "TestAckWithoutTargetsNeverSilencesUnchangedStalePage": "b69c1af2d399f822",
             "TestCitedBodyChangeIsDriftUnlessStrict": "a7b49e9e94fbb0b7",
@@ -339,6 +340,7 @@
             "TestEditedPageNeedsAck": "6dddb032ffa7eacd",
             "TestLockRoundTrip": "a0b24990fab53d39",
             "TestNewAndRemovedFilesAreStale": "b6344dfa25ae7e03",
+            "TestNewTestFilesAreDrift": "77e5c156856c1beb",
             "TestOlderLockHashes": "edb9f4e413d77970",
             "TestPrivateHelpersAreDrift": "52d4c671db4955ae",
             "TestRenamedCitationIsBroken": "c46c6a19c6c1075a",
@@ -365,24 +367,24 @@
             "fixture.write",
             "newFixture"
           ],
-          "raw": "fcc998308ba67fa7",
+          "raw": "17923641fc6a6de5",
           "hasher": "go/2"
         }
       }
     },
     "docs/reference.md": {
-      "page": "4f1e328815056146",
+      "page": "7f4f20febabeaa5f",
       "citations": {
         "internal/reference/reference.go::Coverage": {
           "surface": "a4c40678d4643931",
           "body": "",
-          "raw": "1d0a0a520224ddb6",
+          "raw": "c447b9a7e00d4fb5",
           "hasher": "go/2"
         },
         "internal/reference/reference.go::Extract": {
           "surface": "17595d9732df58da",
-          "body": "9330b2e907184ec3",
-          "raw": "1d0a0a520224ddb6",
+          "body": "65e39d530422d408",
+          "raw": "c447b9a7e00d4fb5",
           "hasher": "go/2"
         }
       },
@@ -514,6 +516,70 @@
           "raw": "de76273a4cd7d68c",
           "hasher": "go/2"
         },
+        "internal/reference/express.go": {
+          "body": "4d75067d8988f1d3",
+          "symbols": {
+            "express": "f488001829dfd7c1",
+            "express.classify": "0a1ed7ca8b19627c",
+            "express.note": "2e0dc89d1ed1c476",
+            "express.routerArg": "3527704985cf52d5",
+            "express.target": "2edd463e104914c3",
+            "extractExpress": "413fac6722b08685",
+            "flatten": "a1f37aa5ce008417",
+            "handlerName": "9d8438b9c517bb3f",
+            "isRequireOf": "16d8a8c1def87e67",
+            "joinRoute": "5bc12a59711fe350",
+            "jsProject": "6ae6a9940b6f3048",
+            "jsProject.export": "0ce0877bf47e021d",
+            "jsProject.load": "aea5b0b66f94ee82",
+            "jsProject.resolve": "85aa1109e73dafdd",
+            "jsProject.resolveModule": "0b662a6eb5119e4d",
+            "jsProject.value": "1cf9ce718d8acbbd",
+            "jsRef": "acc91e4a753864eb",
+            "mount": "07d895594c2a4146",
+            "nameOf": "17c8bdae0144624f",
+            "newJSProject": "78751dce76d222e0",
+            "pathValues": "3ce87f45b2898c4f",
+            "registration": "662ca7c931b84a48",
+            "routerKind": "9a7c6604dc705a16"
+          },
+          "private": [
+            "express",
+            "express.classify",
+            "express.note",
+            "express.routerArg",
+            "express.target",
+            "extractExpress",
+            "flatten",
+            "handlerName",
+            "isRequireOf",
+            "joinRoute",
+            "jsProject",
+            "jsProject.export",
+            "jsProject.load",
+            "jsProject.resolve",
+            "jsProject.resolveModule",
+            "jsProject.value",
+            "jsRef",
+            "mount",
+            "nameOf",
+            "newJSProject",
+            "pathValues",
+            "registration",
+            "routerKind"
+          ],
+          "raw": "7729113420a2ffd2",
+          "hasher": "go/2"
+        },
+        "internal/reference/express_test.go": {
+          "body": "39768074d3f87ebe",
+          "symbols": {
+            "TestExpressESMTypeScript": "1b0b38b799b9f9e5",
+            "TestExpressExtraction": "3117cbf3ed114849"
+          },
+          "raw": "b3ab57ac00e627a6",
+          "hasher": "go/2"
+        },
         "internal/reference/extract.go": {
           "body": "ee3d51c73d0294ad",
           "symbols": {
@@ -539,7 +605,7 @@
             "routesIn",
             "window"
           ],
-          "raw": "69741e891767c1fb",
+          "raw": "1f9abacfc171751e",
           "hasher": "go/2"
         },
         "internal/reference/extract_test.go": {
@@ -675,7 +741,7 @@
           "hasher": "go/2"
         },
         "internal/reference/reference.go": {
-          "body": "b4855aa789bdb7a0",
+          "body": "a6d661a12e600f8a",
           "symbols": {
             "Coverage": "a4c40678d4643931",
             "Extract": "17595d9732df58da",
@@ -687,7 +753,7 @@
             "appendNew",
             "nonTest"
           ],
-          "raw": "1d0a0a520224ddb6",
+          "raw": "c447b9a7e00d4fb5",
           "hasher": "go/2"
         },
         "internal/reference/sources.go": {
@@ -723,6 +789,23 @@
           "raw": "af7d9d4094f0cf0d",
           "hasher": "python/293fdc02038e/2"
         },
+        "internal/reference/testdata/express_routes.cjs": {
+          "body": "cec17aeb9d676469",
+          "symbols": {
+            "idOf": "e3b0c44298fc1c14",
+            "instrument": "e79c9b55d3b11ec2",
+            "join": "e3b0c44298fc1c14",
+            "walk": "e3b0c44298fc1c14"
+          },
+          "private": [
+            "idOf",
+            "instrument",
+            "join",
+            "walk"
+          ],
+          "raw": "316d99891eddd381",
+          "hasher": "javascript/44c892e0be05/2"
+        },
         "internal/reference/testdata/fastapi_routes.py": {
           "body": "02895eecafb365a9",
           "symbols": {
@@ -735,24 +818,24 @@
       }
     },
     "docs/writing-pages.md": {
-      "page": "cc1671a6c6b8943a",
+      "page": "88db63624d571c27",
       "citations": {
         "internal/code/code.go::Analyze": {
           "surface": "498b2762e77d0628",
           "body": "999448245764a731",
-          "raw": "334982e50578ac89",
+          "raw": "37531f43588cdc7a",
           "hasher": "go/2"
         },
         "internal/drift/drift.go::Finding.Fails": {
           "surface": "7c6f4d383dc2bc4e",
           "body": "cbcb7de0f5756098",
-          "raw": "626f4726e22b5ef7",
+          "raw": "f022796b08cb3cbc",
           "hasher": "go/2"
         },
         "internal/drift/drift.go::Stamp": {
           "surface": "8df7959ee83484b4",
           "body": "a9d4bcad15e37f8e",
-          "raw": "626f4726e22b5ef7",
+          "raw": "f022796b08cb3cbc",
           "hasher": "go/2"
         },
         "internal/pages/pages.go::Linkify": {
@@ -770,7 +853,7 @@
       },
       "sources": {
         "internal/code/code.go": {
-          "body": "5de89f2d41a9ec8a",
+          "body": "977252489edf546a",
           "symbols": {
             "Analyze": "498b2762e77d0628",
             "File": "dae3fc20928c2e14",
@@ -788,7 +871,7 @@
             "analyze",
             "isVirtualenv"
           ],
-          "raw": "334982e50578ac89",
+          "raw": "37531f43588cdc7a",
           "hasher": "go/2"
         },
         "internal/pages/pages.go": {

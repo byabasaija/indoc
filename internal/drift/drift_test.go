@@ -313,3 +313,12 @@ func TestOlderLockHashes(t *testing.T) {
 		t.Fatal("lock lost pages")
 	}
 }
+
+func TestNewTestFilesAreDrift(t *testing.T) {
+	f := newFixture(t)
+	f.write("app/checkout/test_new.py", "def test_x():\n    pass\n")
+	f.write("app/checkout/testdata/sample.json", "{}\n")
+	expect(t, f.check(),
+		"drift docs/routing.md app/checkout/test_new.py",
+		"drift docs/routing.md app/checkout/testdata/sample.json")
+}

@@ -192,12 +192,12 @@ func isVirtualenv(dir string) bool {
 	return err == nil
 }
 
-// IsTest reports whether a path is a test file by common conventions:
-// tests/test/__tests__ directories, test_*.py, *_test.py, conftest.py,
-// *_test.go, and *.test.* / *.spec.* files.
+// IsTest reports whether a path is a test file or test fixture by common
+// conventions: tests/test/__tests__/testdata directories, test_*.py,
+// *_test.py, conftest.py, *_test.go, and *.test.* / *.spec.* files.
 func IsTest(p string) bool {
 	for _, seg := range strings.Split(filepath.ToSlash(filepath.Dir(p)), "/") {
-		if seg == "tests" || seg == "test" || seg == "__tests__" {
+		if seg == "tests" || seg == "test" || seg == "__tests__" || seg == "testdata" {
 			return true
 		}
 	}

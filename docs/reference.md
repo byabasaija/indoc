@@ -29,6 +29,10 @@ The extractor is tested against Django's own URL resolver on real projects; see 
 
 For every `FastAPI()` application, indoc lists routes from `@app.get(...)`-style decorators, `api_route`, `add_api_route`, and websockets, follows `include_router` (with its `prefix`, nested routers, and each `APIRouter(prefix=...)`), lists sub-applications mounted with `mount` under their path, and adds the built-in `/openapi.json`, Swagger UI, and ReDoc routes, honoring `docs_url`, `redoc_url`, and `openapi_url`. A route an earlier route with the same path and method makes unreachable is reported.
 
+## Express
+
+indoc follows Express routers across files: `app.get(...)` and `router.post(...)`-style registrations, `router.route(path).get(...).post(...)` chains, `all()`, array paths, and `use()` mounts of routers and sub-applications, including routers imported with `require`, `import`, or `export default`, and TypeScript files imported as `.js`. A router that has routes but is never mounted, and route paths that are not literals, are reported. The extractor is checked against Express 4 and 5 at runtime.
+
 ## Cobra
 
 Go commands built with Cobra are listed by their full command path (`indoc check`), with their flags (`-o/--out`, global flags marked), arguments from `Use`, and `Short` description. Commands created but never attached with `AddCommand` are reported.

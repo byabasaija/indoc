@@ -117,12 +117,14 @@ In JavaScript and TypeScript, exported declarations are public and everything el
 |---|---|---|---|---|
 | Django + DRF | ✅ URLconf through `include()`, routers, `@action`; HTTP methods from views, viewsets, `@api_view`, `http_method_names` | ✅ django-environ, python-decouple, `os.environ` | ✅ management commands | Supported |
 | FastAPI | ✅ decorators, `APIRouter` prefixes, nested `include_router`, `add_api_route`, websockets, mounts, built-in docs routes | ✅ pydantic `BaseSettings` (`env_prefix`, aliases) | | Supported |
+| Express | ✅ routes across files, `route()` chains, `use()` mounts of routers and sub-apps | `process.env` | | Supported |
 | Cobra (Go) | | `os.Getenv` | ✅ command tree, flags, arguments | Supported |
 | Python (any) | | ✅ `os.environ`, `os.getenv`, pydantic settings | | Supported |
-| Express `app.get`, Go `HandleFunc`/`GET`, Flask-style decorators | best effort | `process.env` | | Best effort |
-| Flask blueprints, Next.js, NestJS, Rails, Laravel | | | | Planned |
+| Go `HandleFunc`/`GET`, Flask-style decorators | best effort | | | Best effort |
+| Next.js, Astro, NestJS | | | | Next |
+| Flask blueprints, Rails, Laravel | | | | Planned |
 
-Extraction is checked against each framework's own route table: Django's URL resolver on six real projects (523 routes), FastAPI's router on a real project and a fixture covering every supported construct, and Cobra's command tree on indoc's own CLI. All match route for route, including HTTP methods. Routes provided by installed packages (admin, allauth) are listed as external includes rather than guessed.
+Extraction is checked against each framework's own route table: Django's URL resolver on six real projects (524 routes), FastAPI's router on a real project and a fixture covering every supported construct, Express 4 and 5 by recording registrations at runtime, and Cobra's command tree on indoc's own CLI. All match route for route, including HTTP methods. Routes provided by installed packages (admin, allauth) are listed as external includes rather than guessed.
 
 Every extractor reports what it could not resolve, and `indoc scan` shows it. It also warns about things worth fixing: a route that can never be reached because an earlier pattern has the same path, and variables missing from `.env.example`. Default values that may be secrets (names containing `SECRET`, `PASSWORD`, `TOKEN`, `KEY`, ...) and credentials inside URLs are never published.
 

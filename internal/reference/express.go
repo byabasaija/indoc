@@ -147,7 +147,7 @@ const (
 
 type registration struct {
 	method, path, handler, file string
-	line                       int
+	line                        int
 }
 
 type mount struct {

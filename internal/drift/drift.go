@@ -287,7 +287,11 @@ func compareSources(r *Repo, p pages.Page, entry PageLock, covered []string) []F
 		now[path] = true
 		was, recorded := entry.Sources[path]
 		if !recorded {
-			out = append(out, Finding{Page: p.Path, Kind: Stale, Ref: path, Detail: "new file under sources"})
+			kind := Stale
+			if code.IsTest(path) {
+				kind = Drift // tests are not the documented interface
+			}
+			out = append(out, Finding{Page: p.Path, Kind: kind, Ref: path, Detail: "new file under sources"})
 			continue
 		}
 		f, ok := r.Analyze(path)
@@ -323,7 +327,11 @@ func compareSources(r *Repo, p pages.Page, entry PageLock, covered []string) []F
 	}
 	for path := range entry.Sources {
 		if !now[path] {
-			out = append(out, Finding{Page: p.Path, Kind: Stale, Ref: path, Detail: "file removed from sources"})
+			kind := Stale
+			if code.IsTest(path) {
+				kind = Drift
+			}
+			out = append(out, Finding{Page: p.Path, Kind: kind, Ref: path, Detail: "file removed from sources"})
 		}
 	}
 	return out

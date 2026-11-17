@@ -54,7 +54,7 @@ Cite the symbols a page actually explains. Citations inside fenced code blocks a
 
 ## Sources
 
-`sources:` covers more code than you cite. Under those globs, a page goes stale when a public signature is added, removed, or changed, or a file is added or removed. Body-only changes, changes to private helpers (`_name` in Python, lowercase names in Go), and changes to test files are reported as drift without failing CI.
+`sources:` covers more code than you cite. Under those globs, a page goes stale when a public signature is added, removed, or changed, or a file is added or removed. Body-only changes, changes to private helpers (`_name` in Python, lowercase names in Go), and changes to test files and fixtures (`tests/`, `testdata/`, `*_test.go`, `test_*.py`, `*.spec.ts`, ...), including new ones, are reported as drift without failing CI.
 
 Docstrings, comments, logging calls (`logger.info(...)`), and formatting, including trailing commas, are ignored everywhere.
 
