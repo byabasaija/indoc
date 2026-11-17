@@ -46,6 +46,12 @@ func Extract(root string, files []string) (*Report, error) {
 		report.Coverage = append(report.Coverage, *fastCov)
 	}
 
+	expressRoutes, expressCov := extractExpress(root, files)
+	if expressCov != nil {
+		routes = append(routes, expressRoutes...)
+		report.Coverage = append(report.Coverage, *expressCov)
+	}
+
 	cobraCommands, cobraCov := extractCobra(root, nonTest(files))
 	if cobraCov != nil {
 		commands = append(commands, cobraCommands...)
@@ -59,12 +65,18 @@ func Extract(root string, files []string) (*Report, error) {
 	}
 
 	genericSources := sources
-	if fastCov != nil || djangoCov != nil {
-		// A framework extractor owns Python routes; keep the regex fallback
-		// for other languages.
+	pythonOwned := fastCov != nil || djangoCov != nil
+	jsOwned := expressCov != nil
+	if pythonOwned || jsOwned {
+		// A framework extractor owns those routes; keep the regex fallback
+		// for the rest. Environment reads in JS still come from the fallback.
 		genericSources = nil
 		for _, src := range sources {
-			if src.Language != "Python" {
+			switch {
+			case src.Language == "Python" && pythonOwned:
+			case (src.Language == "JavaScript" || src.Language == "TypeScript") && jsOwned:
+				genericSources = append(genericSources, SourceFile{Path: src.Path, Language: src.Language + ":env"})
+			default:
 				genericSources = append(genericSources, src)
 			}
 		}

@@ -159,7 +159,7 @@ func routeMethod(language, line string) (string, bool) {
 		if match := pyRoute.FindStringSubmatch(line); match != nil {
 			return strings.ToUpper(match[1]), true
 		}
-	case "JavaScript", "TypeScript":
+	case "JavaScript", "TypeScript": // ":env" variants skip routes
 		if match := jsRoute.FindStringSubmatch(line); match != nil {
 			return strings.ToUpper(match[1]), true
 		}
