@@ -2,9 +2,7 @@ package reference
 
 import (
 	"fmt"
-	"os"
 	"path"
-	"path/filepath"
 	"strings"
 
 	"github.com/byabasaija/indoc/internal/doc"
@@ -21,7 +19,8 @@ func extractManagementCommands(root string, files []string, cov *Coverage) []doc
 		if !strings.HasSuffix(dir, "/management/commands/") || !strings.HasSuffix(base, ".py") || strings.HasPrefix(base, "_") {
 			continue
 		}
-		cls := py.load(f).Classes["Command"]
+		mod := py.load(f)
+		cls := mod.Classes["Command"]
 		if cls == nil {
 			continue
 		}
@@ -36,7 +35,7 @@ func extractManagementCommands(root string, files []string, cov *Coverage) []doc
 				e.Description = strings.Join(strings.Fields(s.Value), " ")
 			}
 		}
-		e.Detail = strings.Join(commandArguments(root, f), " ")
+		e.Detail = strings.Join(commandArguments(mod), " ")
 		out = append(out, e)
 		cov.Files++
 	}
@@ -44,19 +43,10 @@ func extractManagementCommands(root string, files []string, cov *Coverage) []doc
 }
 
 // commandArguments returns the names passed to parser.add_argument(...).
-func commandArguments(root, file string) []string {
-	src, err := os.ReadFile(filepath.Join(root, filepath.FromSlash(file)))
-	if err != nil {
-		return nil
-	}
-	toks := significant(python.Tokenize(string(src)))
+func commandArguments(m *python.Module) []string {
 	var args []string
-	for i := 0; i+2 < len(toks); i++ {
-		if toks[i].Text != "." || toks[i+1].Text != "add_argument" || toks[i+2].Text != "(" {
-			continue
-		}
-		c := callAt(toks, i+1)
-		if c == nil {
+	for _, c := range m.AllCalls {
+		if !strings.HasSuffix(c.FuncName(), ".add_argument") {
 			continue
 		}
 		var names []string

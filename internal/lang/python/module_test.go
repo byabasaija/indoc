@@ -150,22 +150,24 @@ func TestParseModule(t *testing.T) {
 	}
 }
 
-func TestDecodeString(t *testing.T) {
+func TestStrings(t *testing.T) {
 	cases := []struct {
-		tok, want string
+		src, want string
 		literal   bool
 	}{
 		{`"plain"`, "plain", true},
 		{`r"^users/(?P<pk>\d+)/$"`, `^users/(?P<pk>\d+)/$`, true},
 		{`'it\'s'`, "it's", true},
 		{`"""triple"""`, "triple", true},
-		{`f"{x}/"`, "{x}/", false},
+		{`f"{x}/"`, "", false},
 		{`b"bytes"`, "bytes", true},
+		{`"a" 'b'`, "ab", true},
 	}
 	for _, c := range cases {
-		got, lit := decodeString(c.tok)
-		if got != c.want || lit != c.literal {
-			t.Errorf("decodeString(%s) = %q %v, want %q %v", c.tok, got, lit, c.want, c.literal)
+		m := ParseModule("X = " + c.src + "\n")
+		s, ok := m.Assigns[0].Value.(*Str)
+		if !ok || s.Literal != c.literal || (c.literal && s.Value != c.want) {
+			t.Errorf("%s: got %#v", c.src, m.Assigns[0].Value)
 		}
 	}
 }

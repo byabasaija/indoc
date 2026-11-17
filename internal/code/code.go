@@ -16,6 +16,7 @@ import (
 	"github.com/byabasaija/indoc/internal/lang/golang"
 	"github.com/byabasaija/indoc/internal/lang/jsts"
 	"github.com/byabasaija/indoc/internal/lang/python"
+	"github.com/byabasaija/indoc/internal/treesitter"
 )
 
 // File is the analysis of one source file.
@@ -27,6 +28,30 @@ type File struct {
 	// Body hashes the whole file with comments and layout removed (or raw
 	// bytes when unparsed).
 	Body string
+	// Raw hashes the exact bytes. With Hasher it lets a lock written by a
+	// different indoc tell "unchanged" from "changed".
+	Raw string
+	// Hasher identifies how Symbols' and Body's hashes were computed.
+	Hasher string
+}
+
+// hashRules versions indoc's normalization rules (what hashing ignores).
+// Bump it whenever they change, so locks are compared like for like.
+const hashRules = "2"
+
+// HasherFor returns the hasher version for a file: the parser, its grammar
+// version, and the normalization rules.
+func HasherFor(path string) string {
+	switch strings.ToLower(filepath.Ext(path)) {
+	case ".py":
+		return "python/" + treesitter.GrammarVersion("python") + "/" + hashRules
+	case ".go":
+		return "go/" + hashRules
+	}
+	if g := jsts.Grammar(path); g != "" {
+		return g + "/" + treesitter.GrammarVersion(g) + "/" + hashRules
+	}
+	return "bytes"
 }
 
 // Parsable reports whether a parser exists for path.
@@ -41,10 +66,23 @@ func Parsable(path string) bool {
 // Analyze parses src according to path's extension. A file a parser cannot
 // handle is still tracked, by the hash of its bytes.
 func Analyze(path string, src []byte) File {
+	f := analyze(path, src)
+	sum := sha256.Sum256(src)
+	f.Raw = hex.EncodeToString(sum[:])[:16]
+	if f.Parsed {
+		f.Hasher = HasherFor(path)
+	} else {
+		f.Hasher = "bytes"
+	}
+	return f
+}
+
+func analyze(path string, src []byte) File {
 	switch strings.ToLower(filepath.Ext(path)) {
 	case ".py":
-		s := string(src)
-		return File{Parsed: true, Symbols: python.Parse(s), Body: python.FileHash(s)}
+		if f, err := python.ParseFile(src); err == nil {
+			return File{Parsed: true, Symbols: f.Symbols, Body: f.Hash}
+		}
 	case ".go":
 		return File{Parsed: true, Symbols: golang.Parse(src), Body: golang.FileHash(src)}
 	}

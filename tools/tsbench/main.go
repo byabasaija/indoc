@@ -14,13 +14,11 @@ import (
 	"sync/atomic"
 	"time"
 
-	"github.com/byabasaija/indoc/internal/lang/python"
 	"github.com/byabasaija/indoc/internal/treesitter"
 )
 
 func main() {
 	lang := flag.String("lang", "typescript", "grammar")
-	compare := flag.Bool("compare-python", false, "also time indoc's hand-written Python parser")
 	jobs := flag.Int("j", 1, "parallel parses")
 	flag.Parse()
 
@@ -73,15 +71,6 @@ func main() {
 		*lang, ms(load), len(files), float64(bytes)/1e6, parse.Seconds(), float64(len(files))/parse.Seconds(),
 		float64(bytes)/1e6/parse.Seconds(), nodes.Load(), errs.Load())
 
-	if *compare {
-		start = time.Now()
-		for _, src := range files {
-			python.Parse(string(src))
-		}
-		d := time.Since(start)
-		fmt.Printf("%-10s hand-written parser: %6.2f s = %6.0f files/s, %5.1f MB/s\n", "python", d.Seconds(),
-			float64(len(files))/d.Seconds(), float64(bytes)/1e6/d.Seconds())
-	}
 }
 
 func ms(d time.Duration) float64 { return float64(d.Microseconds()) / 1000 }

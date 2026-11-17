@@ -194,7 +194,7 @@ What staleness and extraction need from a parser is structural, not semantic: wh
 | Language | Parser | Why |
 | :--- | :--- | :--- |
 | Go | Standard library `go/parser` + `go/ast` | Exact, maintained by the Go team, zero dependencies. |
-| Python | Hand-written in Go: full tokenizer + structural parser | See below. |
+| Python | tree-sitter (originally hand-written; replaced in Phase 4b) | See below; the hand-written parser's CPython differential carried over as the gate. |
 | JS/TS (done), then others on demand | One shared path: tree-sitter grammars compiled to WebAssembly, run with a pure-Go runtime (wazero); symbol rules in Go | Hand-writing parsers does not scale past a few languages. With a shared runtime, a new language is a grammar plus a query file. Each language must pass a differential test against its own reference parser (e.g. `syn` for Rust) before it is marked supported. Requires a spike first: binary size (~0.5-3 MB per grammar) and speed. |
 
 **Python, in detail.** The tokenizer is exact and complete: strings (triple-quoted, raw, bytes, f-strings with nested quotes), comments, bracket nesting, line continuations, `INDENT`/`DEDENT`. The parser above it is deliberately partial: it recognises `def`, `async def`, `class`, decorators, and call expressions with literal arguments, and treats every other statement as opaque tokens. Because hashing runs over tokens, comment and whitespace changes are ignored without any extra work.
@@ -373,7 +373,9 @@ Each phase ends with a concrete check against a real repo, shop unless noted.
 | Reproducibility | `make grammars` output identical byte for byte | — |
 
   Getting to zero mismatches meant settling what a symbol is, mostly on the reference side: object-literal methods are not symbols (no stable name); `const A = class B {}` is one symbol named `A`; named class expressions count; `declare global` is not a namespace; computed names (`[Symbol.iterator]`) are skipped. Tree-sitter is about 7x slower than the hand-written Python parser per file (4 vs 29 MB/s); in absolute terms shop takes 0.35 s instead of 0.05 s.
-* **Next:** move Python onto tree-sitter, gated on the CPython differential, then port the Django, FastAPI, and env extractors onto syntax trees under their existing differentials, then delete the hand-written tokenizer and module reader. Go stays on `go/ast`. Then Express, Next.js, and NestJS route extraction on the JS/TS trees.
+* **Python moved to tree-sitter (done 2026-11-17).** The hand-written tokenizer, parser, and expression parser (~1,000 lines) are deleted; symbols, hashes, and the module view used by the Django, FastAPI, and env extractors now come from tree-sitter syntax trees. Gates, all passed: CPython differential 34,120 of 34,121 files (454,837 symbols) (the one miss is CPython's compiler stress test `test_compile.py`, whose dedented continuation inside brackets defeats the grammar's indentation scanner); the six Django differentials (524 routes) and FastAPI differentials unchanged; shop reference identical (67 routes, 31 variables, 3 commands); the 100-commit shop replay produced exactly the same failing findings commit for commit. Per-file parsing is ~7x slower than the hand-written parser, but `check` takes 0.14 s and `scan` 0.63 s on shop, so parallel analysis was not added.
+* **Lock compatibility.** Each lock entry records the file's exact bytes and the hasher (parser, grammar commit, normalization rules version). When a newer indoc hashes differently, unchanged files upgrade silently on the next `ack`/`bundle` and changed files are drift, so upgrading indoc never fails a check.
+* **Next:** Express, Next.js, and NestJS route extraction on the JS/TS trees. Go stays on `go/ast`.
 * Rust was dropped: no demand yet, and every grammar costs binary size and maintenance. The pipeline adds a language in a day when a user needs one.
 
 ### Phase 5: MCP + plugins

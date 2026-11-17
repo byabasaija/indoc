@@ -50,6 +50,8 @@ type PageLock struct {
 type SymbolLock struct {
 	Surface string `json:"surface"`
 	Body    string `json:"body"`
+	Raw     string `json:"raw,omitempty"`    // the file's exact bytes
+	Hasher  string `json:"hasher,omitempty"` // how Surface and Body were computed
 }
 
 // FileLock is a covered file's hashes. Symbols maps qualified names to
@@ -58,7 +60,14 @@ type FileLock struct {
 	Body    string            `json:"body"`
 	Symbols map[string]string `json:"symbols,omitempty"`
 	Private []string          `json:"private,omitempty"` // private symbol keys, so removed ones are classified too
+	Raw     string            `json:"raw,omitempty"`     // the file's exact bytes
+	Hasher  string            `json:"hasher,omitempty"`  // how Body and Symbols were computed
 }
+
+// Hashes from a different hasher (a newer grammar or different
+// normalization rules) cannot be compared. If the file's bytes are unchanged
+// nothing changed; otherwise the change is reported as drift, never stale.
+const olderLock = "changed; lock was written by a different indoc version, so signatures were not compared (run indoc ack after reviewing)"
 
 // NewLock returns an empty lock.
 func NewLock() *Lock { return &Lock{Version: LockVersion, Pages: map[string]PageLock{}} }
@@ -253,6 +262,12 @@ func compareCitations(r *Repo, p pages.Page, entry PageLock) []Finding {
 		if !found {
 			continue // reported as broken
 		}
+		if was.Hasher != f.Hasher {
+			if was.Raw != f.Raw {
+				out = append(out, Finding{Page: p.Path, Kind: Drift, Ref: c.Ref(), Detail: "file " + olderLock})
+			}
+			continue
+		}
 		switch {
 		case sym.Surface != was.Surface:
 			out = append(out, Finding{Page: p.Path, Kind: Stale, Ref: c.Ref(), Detail: "cited symbol's signature changed"})
@@ -276,7 +291,16 @@ func compareSources(r *Repo, p pages.Page, entry PageLock, covered []string) []F
 			continue
 		}
 		f, ok := r.Analyze(path)
-		if !ok || f.Body == was.Body {
+		if !ok {
+			continue
+		}
+		if was.Hasher != f.Hasher {
+			if was.Raw != f.Raw {
+				out = append(out, Finding{Page: p.Path, Kind: Drift, Ref: path, Detail: "file " + olderLock})
+			}
+			continue
+		}
+		if f.Body == was.Body {
 			continue
 		}
 		if !f.Parsed || was.Symbols == nil {
@@ -385,7 +409,7 @@ func Stamp(r *Repo, p pages.Page, pageSet map[string]bool) (PageLock, error) {
 		if entry.Citations == nil {
 			entry.Citations = map[string]SymbolLock{}
 		}
-		entry.Citations[c.Ref()] = SymbolLock{Surface: sym.Surface, Body: sym.Body}
+		entry.Citations[c.Ref()] = SymbolLock{Surface: sym.Surface, Body: sym.Body, Raw: f.Raw, Hasher: f.Hasher}
 	}
 	if len(broken) > 0 {
 		return PageLock{}, fmt.Errorf("%s has broken citations: %s", p.Path, strings.Join(broken, ", "))
@@ -395,7 +419,7 @@ func Stamp(r *Repo, p pages.Page, pageSet map[string]bool) (PageLock, error) {
 		if !ok {
 			continue
 		}
-		fl := FileLock{Body: f.Body}
+		fl := FileLock{Body: f.Body, Raw: f.Raw, Hasher: f.Hasher}
 		if f.Parsed {
 			fl.Symbols = f.Surfaces()
 			for q := range f.Private() {
@@ -450,7 +474,13 @@ func Ack(r *Repo, ps []pages.Page, lock *Lock, targets []string) (AckResult, err
 		}
 	} else {
 		for _, p := range ps {
-			if entry, ok := lock.Pages[p.Path]; !ok || entry.Page != hashBytes(p.Raw) {
+			entry, ok := lock.Pages[p.Path]
+			switch {
+			case !ok || entry.Page != hashBytes(p.Raw):
+				stamp(p)
+			case upgradable(r, entry):
+				// Written by another indoc version and nothing changed since:
+				// re-recording loses no information.
 				stamp(p)
 			}
 		}
@@ -466,6 +496,34 @@ func Ack(r *Repo, ps []pages.Page, lock *Lock, targets []string) (AckResult, err
 		return res, fmt.Errorf("%s", strings.Join(errs, "\n"))
 	}
 	return res, nil
+}
+
+// upgradable reports a lock entry with hashes from a different hasher whose
+// files are byte-for-byte unchanged.
+func upgradable(r *Repo, entry PageLock) bool {
+	outdated := false
+	check := func(path, raw, hasher string) bool {
+		f, ok := r.Analyze(path)
+		if !ok || f.Raw != raw {
+			return false
+		}
+		if f.Hasher != hasher {
+			outdated = true
+		}
+		return true
+	}
+	for ref, c := range entry.Citations {
+		path, _, _ := strings.Cut(ref, "::")
+		if !check(path, c.Raw, c.Hasher) {
+			return false
+		}
+	}
+	for path, fl := range entry.Sources {
+		if !check(path, fl.Raw, fl.Hasher) {
+			return false
+		}
+	}
+	return outdated
 }
 
 // PageSet returns the set of page paths.

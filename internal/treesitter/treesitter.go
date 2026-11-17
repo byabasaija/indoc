@@ -17,6 +17,7 @@ import (
 	"io"
 	"os"
 	"path/filepath"
+	"strings"
 	"sync"
 
 	"github.com/tetratelabs/wazero"
@@ -26,6 +27,22 @@ import (
 
 //go:embed wasm/*.wasm.gz
 var grammars embed.FS
+
+//go:embed build/grammars.txt
+var grammarSources string
+
+// GrammarVersion identifies the grammar a language is parsed with (its
+// pinned source commit, shortened). Syntax trees, and so symbol hashes, can
+// change when it does.
+func GrammarVersion(lang string) string {
+	for _, line := range strings.Split(grammarSources, "\n") {
+		f := strings.Fields(line)
+		if len(f) >= 3 && f[0] == lang {
+			return f[2][:12]
+		}
+	}
+	return ""
+}
 
 // Languages lists the embedded grammars.
 var Languages = []string{"javascript", "typescript", "tsx", "python"}

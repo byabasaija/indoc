@@ -1,16 +1,23 @@
 package python
 
-import "strings"
+import (
+	"strings"
+
+	"github.com/byabasaija/indoc/internal/treesitter"
+)
 
 // Module is the statically visible structure of a Python file: imports,
 // module- and class-level assignments, module-level call statements, classes,
-// and functions. Function bodies are not analyzed.
+// and functions. Function bodies are not walked for those; AllCalls and
+// Subscripts cover the whole file, bodies included.
 type Module struct {
-	Imports []Import
-	Assigns []Assign
-	Calls   []CallStmt
-	Classes map[string]*Class
-	Funcs   map[string]*Func
+	Imports    []Import
+	Assigns    []Assign
+	Calls      []CallStmt
+	Classes    map[string]*Class
+	Funcs      map[string]*Func
+	AllCalls   []*Call     // every call in the file
+	Subscripts []Subscript // every x[key] in the file
 }
 
 // Import is one imported binding.
@@ -60,314 +67,229 @@ type Func struct {
 	Line       int
 }
 
-type frame struct {
-	kind string // "class", "def", "cond", "block"
-	cls  *Class
+// Subscript is `value[key]`.
+type Subscript struct {
+	Value Expr
+	Key   Expr
+	Line  int
 }
 
-// ParseModule reads the structure of src. It never fails.
+// ParseModule reads the structure of src. It never fails: unparseable input
+// yields an empty module.
 func ParseModule(src string) *Module {
 	m := &Module{Classes: map[string]*Class{}, Funcs: map[string]*Func{}}
-	toks := Tokenize(src)
-	var (
-		stack      []frame
-		stmt       []Token
-		pending    *frame // frame to push if the next token is INDENT
-		decorators []Expr
-	)
-	inDef := func() bool {
-		for _, f := range stack {
-			if f.kind == "def" {
-				return true
-			}
-		}
-		return false
+	b := []byte(src)
+	root, err := treesitter.Parse("python", b)
+	if err != nil {
+		return m
 	}
-	cond := func() bool {
-		for _, f := range stack {
-			if f.kind == "cond" {
-				return true
-			}
+	mb := &moduleBuilder{m: m, src: b}
+	mb.statements(root, nil, false)
+	root.Walk(func(n *treesitter.Node) bool {
+		switch n.Type {
+		case "call":
+			m.AllCalls = append(m.AllCalls, call(n, b))
+		case "subscript":
+			m.Subscripts = append(m.Subscripts, Subscript{
+				Value: expr(n.Child("value"), b), Key: expr(n.Child("subscript"), b), Line: n.StartRow + 1,
+			})
 		}
-		return false
-	}
-	class := func() *Class { // innermost class, when directly in its body
-		for i := len(stack) - 1; i >= 0; i-- {
-			switch stack[i].kind {
-			case "class":
-				return stack[i].cls
-			case "def":
-				return nil
-			}
-		}
-		return nil
-	}
-
-	handle := func(s []Token) {
-		pending = nil
-		if len(s) == 0 || inDef() {
-			if len(s) > 0 && endsWithColon(s) {
-				pending = &frame{kind: "block"}
-			}
-			return
-		}
-		first := s[0]
-		line := first.Line
-		switch {
-		case first.Kind == Op && first.Text == "@":
-			decorators = append(decorators, ParseExpr(s[1:]))
-			return
-		case first.Text == "class" && first.Kind == Name:
-			c := &Class{Line: line, Methods: map[string]*Func{}}
-			if len(s) > 1 {
-				c.Name = s[1].Text
-			}
-			if len(s) > 3 && s[2].Text == "(" {
-				if call, ok := ParseExpr(s[1 : len(s)-1]).(*Call); ok {
-					c.Bases = call.Args
-				}
-			}
-			if outer := class(); outer == nil && len(stack) == countKind(stack, "cond", "block") {
-				m.Classes[c.Name] = c
-			}
-			decorators = nil
-			pending = &frame{kind: "class", cls: c}
-			return
-		case first.Kind == Name && (first.Text == "def" || first.Text == "async" && len(s) > 1 && s[1].Text == "def"):
-			nameAt := 1
-			if first.Text == "async" {
-				nameAt = 2
-			}
-			f := &Func{Decorators: decorators, Line: line}
-			if len(s) > nameAt {
-				f.Name = s[nameAt].Text
-			}
-			decorators = nil
-			if c := class(); c != nil {
-				c.Methods[f.Name] = f
-			} else if len(stack) == countKind(stack, "cond", "block") {
-				m.Funcs[f.Name] = f
-			}
-			pending = &frame{kind: "def"}
-			return
-		}
-		decorators = nil
-		if endsWithColon(s) {
-			kind := "block"
-			switch first.Text {
-			case "if", "elif", "else", "for", "while", "match", "case":
-				kind = "cond"
-			}
-			pending = &frame{kind: kind}
-			return
-		}
-		c := class()
-		if c == nil && len(stack) != countKind(stack, "cond", "block") {
-			return
-		}
-		if c == nil {
-			if imp, ok := parseImport(s); ok {
-				for i := range imp {
-					imp[i].Line = line
-				}
-				m.Imports = append(m.Imports, imp...)
-				return
-			}
-		}
-		if a, ok := parseAssign(s); ok {
-			a.Line = line
-			a.Cond = cond()
-			if c != nil {
-				c.Assigns = append(c.Assigns, a)
-			} else {
-				m.Assigns = append(m.Assigns, a)
-			}
-			return
-		}
-		if c == nil {
-			if call, ok := ParseExpr(s).(*Call); ok {
-				m.Calls = append(m.Calls, CallStmt{Call: call, Line: line, Cond: cond()})
-			}
-		}
-	}
-
-	for _, t := range toks {
-		switch t.Kind {
-		case Comment, NL:
-		case Newline:
-			handle(stmt)
-			stmt = stmt[:0]
-		case Indent:
-			if pending != nil {
-				stack = append(stack, *pending)
-			} else {
-				stack = append(stack, frame{kind: "block"})
-			}
-			pending = nil
-		case Dedent:
-			if len(stack) > 0 {
-				stack = stack[:len(stack)-1]
-			}
-		case EOF:
-			handle(stmt)
-		default:
-			stmt = append(stmt, t)
-		}
-	}
+		return true
+	})
 	return m
 }
 
-func countKind(stack []frame, kinds ...string) int {
-	n := 0
-	for _, f := range stack {
-		for _, k := range kinds {
-			if f.kind == k {
-				n++
-				break
+type moduleBuilder struct {
+	m   *Module
+	src []byte
+}
+
+// statements reads the statements of a module, class body, or nested block.
+// cls is the enclosing class, if any; cond is true inside if/for/while/match.
+func (mb *moduleBuilder) statements(n *treesitter.Node, cls *Class, cond bool) {
+	for _, c := range named(n) {
+		switch c.Type {
+		case "import_statement", "import_from_statement":
+			if cls == nil {
+				mb.m.Imports = append(mb.m.Imports, mb.imports(c)...)
+			}
+		case "expression_statement":
+			mb.expressionStatement(c, cls, cond)
+		case "class_definition":
+			mb.class(c, cls)
+		case "function_definition":
+			mb.function(c, nil, cls)
+		case "decorated_definition":
+			var decorators []Expr
+			for _, d := range c.Children {
+				if d.Type == "decorator" {
+					if inner := named(d); len(inner) == 1 {
+						decorators = append(decorators, expr(inner[0], mb.src))
+					}
+				}
+			}
+			def := c.Child("definition")
+			switch {
+			case def == nil:
+			case def.Type == "class_definition":
+				mb.class(def, cls)
+			case def.Type == "function_definition":
+				mb.function(def, decorators, cls)
+			}
+		case "if_statement", "for_statement", "while_statement", "match_statement":
+			mb.nested(c, cls, true)
+		case "try_statement", "with_statement":
+			mb.nested(c, cls, cond)
+		}
+	}
+}
+
+// nested reads the blocks of a compound statement (including elif, else,
+// except, finally, and case clauses).
+func (mb *moduleBuilder) nested(n *treesitter.Node, cls *Class, cond bool) {
+	for _, c := range named(n) {
+		switch c.Type {
+		case "block":
+			mb.statements(c, cls, cond)
+		case "elif_clause", "else_clause", "except_clause", "except_group_clause", "finally_clause", "case_clause", "block_body":
+			mb.nested(c, cls, cond)
+		}
+	}
+}
+
+func (mb *moduleBuilder) expressionStatement(n *treesitter.Node, cls *Class, cond bool) {
+	parts := named(n)
+	if len(parts) != 1 {
+		return
+	}
+	e := parts[0]
+	line := n.StartRow + 1
+	switch e.Type {
+	case "assignment", "augmented_assignment":
+		left := e.Child("left")
+		if left == nil || left.Type != "identifier" {
+			return
+		}
+		a := Assign{Target: left.Text(mb.src), Line: line, Cond: cond}
+		if e.Type == "augmented_assignment" {
+			op := e.Child("operator")
+			if op == nil || op.Text(mb.src) != "+=" {
+				return
+			}
+			a.Op = "+="
+			a.Value = expr(e.Child("right"), mb.src)
+		} else {
+			if t := e.Child("type"); t != nil {
+				a.Annotation = expr(firstNamed(t), mb.src)
+			}
+			if right := e.Child("right"); right != nil {
+				a.Op, a.Value = "=", expr(right, mb.src)
+			} else {
+				a.Op = ":"
 			}
 		}
+		if cls != nil {
+			cls.Assigns = append(cls.Assigns, a)
+		} else {
+			mb.m.Assigns = append(mb.m.Assigns, a)
+		}
+	case "call":
+		if cls == nil {
+			mb.m.Calls = append(mb.m.Calls, CallStmt{Call: call(e, mb.src), Line: line, Cond: cond})
+		}
+	}
+}
+
+func firstNamed(n *treesitter.Node) *treesitter.Node {
+	if parts := named(n); len(parts) > 0 {
+		return parts[0]
 	}
 	return n
 }
 
-func endsWithColon(s []Token) bool {
-	last := s[len(s)-1]
-	return last.Kind == Op && last.Text == ":"
+func (mb *moduleBuilder) class(n *treesitter.Node, outer *Class) {
+	name := n.Child("name")
+	if name == nil {
+		return
+	}
+	c := &Class{Name: name.Text(mb.src), Line: keywordRow(n) + 1, Methods: map[string]*Func{}}
+	if sup := n.Child("superclasses"); sup != nil {
+		for _, b := range named(sup) {
+			if b.Type != "keyword_argument" {
+				c.Bases = append(c.Bases, expr(b, mb.src))
+			}
+		}
+	}
+	if outer == nil {
+		mb.m.Classes[c.Name] = c
+	}
+	if body := n.Child("body"); body != nil {
+		mb.statements(body, c, false)
+	}
 }
 
-func parseImport(s []Token) ([]Import, bool) {
-	switch s[0].Text {
-	case "import":
-		var out []Import
-		for _, part := range splitTop(s[1:], ",") {
-			mod, alias := dotted(part)
-			if mod == "" {
+func (mb *moduleBuilder) function(n *treesitter.Node, decorators []Expr, cls *Class) {
+	name := n.Child("name")
+	if name == nil {
+		return
+	}
+	f := &Func{Name: name.Text(mb.src), Decorators: decorators, Line: keywordRow(n) + 1}
+	if cls != nil {
+		cls.Methods[f.Name] = f
+	} else {
+		mb.m.Funcs[f.Name] = f
+	}
+}
+
+func (mb *moduleBuilder) imports(n *treesitter.Node) []Import {
+	line := n.StartRow + 1
+	var out []Import
+	if n.Type == "import_statement" {
+		for _, c := range n.Children {
+			if c.Field != "name" {
 				continue
 			}
-			local := alias
-			target := mod
-			if local == "" {
-				local, _, _ = strings.Cut(mod, ".")
-				target = local
-			}
-			out = append(out, Import{Local: local, Module: target})
-		}
-		return out, true
-	case "from":
-		i := 1
-		level := 0
-		for i < len(s) && (s[i].Text == "." || s[i].Text == "...") {
-			level += len(s[i].Text)
-			i++
-		}
-		var mod []string
-		for i < len(s) && s[i].Text != "import" {
-			if s[i].Kind == Name {
-				mod = append(mod, s[i].Text)
-			}
-			i++
-		}
-		if i >= len(s) {
-			return nil, false
-		}
-		names := s[i+1:]
-		if len(names) > 0 && names[0].Text == "(" {
-			names = names[1:]
-			if n := len(names); n > 0 && names[n-1].Text == ")" {
-				names = names[:n-1]
+			switch c.Type {
+			case "dotted_name":
+				mod := c.Text(mb.src)
+				first, _, _ := strings.Cut(mod, ".")
+				out = append(out, Import{Local: first, Module: first, Line: line})
+			case "aliased_import":
+				if nm, alias := c.Child("name"), c.Child("alias"); nm != nil && alias != nil {
+					out = append(out, Import{Local: alias.Text(mb.src), Module: nm.Text(mb.src), Line: line})
+				}
 			}
 		}
-		var out []Import
-		for _, part := range splitTop(names, ",") {
-			name, alias := dotted(part)
-			if name == "" || name == "*" {
-				continue
-			}
-			local := name
-			if alias != "" {
-				local = alias
-			}
-			out = append(out, Import{Local: local, Module: strings.Join(mod, "."), Name: name, Level: level})
-		}
-		return out, true
+		return out
 	}
-	return nil, false
-}
-
-// dotted reads `a.b.c [as d]`.
-func dotted(toks []Token) (name, alias string) {
-	var parts []string
-	for i := 0; i < len(toks); i++ {
-		t := toks[i]
-		if t.Kind == Name && t.Text == "as" && i+1 < len(toks) {
-			return strings.Join(parts, ""), toks[i+1].Text
+	module, level := "", 0
+	if mn := n.Child("module_name"); mn != nil {
+		if mn.Type == "relative_import" {
+			for _, c := range mn.Children {
+				switch c.Type {
+				case "import_prefix":
+					level = strings.Count(c.Text(mb.src), ".")
+				case "dotted_name":
+					module = c.Text(mb.src)
+				}
+			}
+		} else {
+			module = mn.Text(mb.src)
 		}
-		parts = append(parts, t.Text)
 	}
-	return strings.Join(parts, ""), ""
-}
-
-// splitTop splits tokens on sep at bracket depth 0.
-func splitTop(toks []Token, sep string) [][]Token {
-	var out [][]Token
-	depth, start := 0, 0
-	for i, t := range toks {
-		if t.Kind != Op {
+	for _, c := range n.Children {
+		if c.Field != "name" {
 			continue
 		}
-		switch t.Text {
-		case "(", "[", "{":
-			depth++
-		case ")", "]", "}":
-			depth--
-		case sep:
-			if depth == 0 {
-				out = append(out, toks[start:i])
-				start = i + 1
+		switch c.Type {
+		case "dotted_name":
+			nm := c.Text(mb.src)
+			out = append(out, Import{Local: nm, Module: module, Name: nm, Level: level, Line: line})
+		case "aliased_import":
+			if nm, alias := c.Child("name"), c.Child("alias"); nm != nil && alias != nil {
+				out = append(out, Import{Local: alias.Text(mb.src), Module: module, Name: nm.Text(mb.src), Level: level, Line: line})
 			}
 		}
-	}
-	if start < len(toks) {
-		out = append(out, toks[start:])
 	}
 	return out
-}
-
-// parseAssign recognizes `name = value`, `name += value`, `name: T = value`,
-// and `name: T`.
-func parseAssign(s []Token) (Assign, bool) {
-	if len(s) < 3 || s[0].Kind != Name || isKeyword(s[0].Text) {
-		return Assign{}, false
-	}
-	annotated := s[1].Kind == Op && s[1].Text == ":"
-	depth := 0
-	for i := 1; i < len(s); i++ {
-		t := s[i]
-		if t.Kind != Op {
-			continue
-		}
-		switch t.Text {
-		case "(", "[", "{":
-			depth++
-		case ")", "]", "}":
-			depth--
-		case "=", "+=":
-			if depth != 0 {
-				continue
-			}
-			// Only a plain name (optionally annotated) may precede the operator.
-			if i != 1 && !(annotated && t.Text == "=") {
-				return Assign{}, false
-			}
-			a := Assign{Target: s[0].Text, Op: t.Text, Value: ParseExpr(s[i+1:])}
-			if annotated {
-				a.Annotation = ParseExpr(s[2:i])
-			}
-			return a, true
-		}
-	}
-	if annotated {
-		return Assign{Target: s[0].Text, Op: ":", Annotation: ParseExpr(s[2:])}, true
-	}
-	return Assign{}, false
 }

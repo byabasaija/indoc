@@ -55,3 +55,12 @@ Lines marked `✗` fail the check. With `--strict`, drift, unanchored pages, and
 - `indoc ack docs/page.md` records that page even if unchanged: "I reviewed it against the new code and it is still correct."
 
 `indoc bundle` performs the first form automatically after building. A page with a broken citation can never be recorded (`internal/drift/drift.go::Stamp`).
+
+## Upgrading indoc
+
+A new indoc release can parse code differently, for example after a grammar update, which changes the hashes it computes. The lock records which version wrote each entry and the exact bytes of each file (`internal/drift/drift.go::FileLock`):
+
+- **File unchanged since it was recorded:** nothing to report. The next `indoc ack` or `indoc bundle` re-records it with the new hashes.
+- **File changed:** indoc cannot compare signatures across versions, so the change is reported as drift, which does not fail the check. Review the page and run `indoc ack <page>`.
+
+Upgrading indoc never turns a passing check into a failing one.

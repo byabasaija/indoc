@@ -65,6 +65,6 @@ Precise staleness and symbol citations need a parser for the language. `internal
 | Language | Status |
 |---|---|
 | JavaScript, TypeScript, JSX, TSX | Supported through tree-sitter. Agrees with the TypeScript compiler on 56,396 symbols across 9,436 files. Exported declarations are public. |
-| Python | Supported. Agrees with CPython's own parser on 409,406 symbols across 29,536 files. `_name` is private. |
+| Python | Supported through tree-sitter. Agrees with CPython's own parser on 454,837 symbols across 34,120 of 34,121 files. `_name` is private. |
 | Go | Supported, via the Go standard library parser. Lowercase names are private. |
 | Others | Files are still tracked, but any change is reported as drift, and `path::Symbol` citations cannot be verified. |

@@ -103,7 +103,7 @@ Precise staleness and `path::Symbol` citations need a parser for the language. E
 | Language | Parser | Checked against |
 |---|---|---|
 | JavaScript, TypeScript, JSX, TSX | tree-sitter | The TypeScript compiler: 9,436 files, 56,396 symbols, all matching |
-| Python | indoc's own (moving to tree-sitter) | CPython: 29,536 files, 409,406 symbols, all matching |
+| Python | tree-sitter | CPython's own parser: 34,120 of 34,121 files, 454,837 symbols |
 | Go | Go standard library | — |
 | Others | — | Files are tracked, but any change is reported as drift and citations cannot be verified |
 

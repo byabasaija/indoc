@@ -2,19 +2,31 @@
   "version": 1,
   "pages": {
     "docs/ci.md": {
-      "page": "1297501e6b35f61c",
+      "page": "cb8ead3179dabef9",
       "citations": {
         "internal/cli/check.go::runCheck": {
           "surface": "4d82fe88e3e7a473",
-          "body": "751f17f353f66bc0"
+          "body": "751f17f353f66bc0",
+          "raw": "c48c7c94d1243cd4",
+          "hasher": "go/2"
         },
         "internal/drift/drift.go::Ack": {
           "surface": "bdb11477c7c441cf",
-          "body": "aee67ffa433e2c2d"
+          "body": "29138102e78d4f9c",
+          "raw": "626f4726e22b5ef7",
+          "hasher": "go/2"
+        },
+        "internal/drift/drift.go::FileLock": {
+          "surface": "670dc86edcd04c57",
+          "body": "",
+          "raw": "626f4726e22b5ef7",
+          "hasher": "go/2"
         },
         "internal/drift/drift.go::Stamp": {
           "surface": "8df7959ee83484b4",
-          "body": "e41312428930fb82"
+          "body": "a9d4bcad15e37f8e",
+          "raw": "626f4726e22b5ef7",
+          "hasher": "go/2"
         }
       },
       "sources": {
@@ -27,7 +39,9 @@
           "private": [
             "init",
             "runAck"
-          ]
+          ],
+          "raw": "1542e4101d23e6d4",
+          "hasher": "go/2"
         },
         "internal/cli/check.go": {
           "body": "d6f983ccbdfc9a33",
@@ -42,15 +56,17 @@
             "nonNil",
             "printFindings",
             "runCheck"
-          ]
+          ],
+          "raw": "c48c7c94d1243cd4",
+          "hasher": "go/2"
         },
         "internal/drift/drift.go": {
-          "body": "4ccc61c8164b8d4b",
+          "body": "8578178ebcfe7488",
           "symbols": {
             "Ack": "bdb11477c7c441cf",
             "AckResult": "9848b62df55748a4",
             "Check": "44441a0b4c307a7a",
-            "FileLock": "dce2a0c1be7170a2",
+            "FileLock": "670dc86edcd04c57",
             "Finding": "5732b8238ac08f38",
             "Finding.Fails": "7c6f4d383dc2bc4e",
             "LoadLock": "c194e5c08d9c855d",
@@ -64,7 +80,7 @@
             "Repo.Analyze": "02cf115fc0979c59",
             "Repo.covered": "6744a19ba34c9040",
             "Stamp": "8df7959ee83484b4",
-            "SymbolLock": "99d8b668799d1e13",
+            "SymbolLock": "cc3c8454bb7c98eb",
             "analysis": "63f5a2e6d87ed764",
             "checkCitations": "604b2c850b0dfbd2",
             "compareCitations": "9714340f130cc1ae",
@@ -72,7 +88,8 @@
             "describe": "a44bb99c5d92c380",
             "hashBytes": "60fe68dca6b8818d",
             "pathSet": "7c4b5bc9f1fc6c51",
-            "surfaceChanges": "8c2b2db2df65687a"
+            "surfaceChanges": "8c2b2db2df65687a",
+            "upgradable": "7a51ab81571e6b4b"
           },
           "private": [
             "Repo.covered",
@@ -83,11 +100,14 @@
             "describe",
             "hashBytes",
             "pathSet",
-            "surfaceChanges"
-          ]
+            "surfaceChanges",
+            "upgradable"
+          ],
+          "raw": "626f4726e22b5ef7",
+          "hasher": "go/2"
         },
         "internal/drift/drift_test.go": {
-          "body": "c7f9fc72aca5e501",
+          "body": "26ebf46abd726c07",
           "symbols": {
             "TestAckWithoutTargetsNeverSilencesUnchangedStalePage": "b69c1af2d399f822",
             "TestCitedBodyChangeIsDriftUnlessStrict": "a7b49e9e94fbb0b7",
@@ -95,6 +115,7 @@
             "TestEditedPageNeedsAck": "6dddb032ffa7eacd",
             "TestLockRoundTrip": "a0b24990fab53d39",
             "TestNewAndRemovedFilesAreStale": "b6344dfa25ae7e03",
+            "TestOlderLockHashes": "edb9f4e413d77970",
             "TestPrivateHelpersAreDrift": "52d4c671db4955ae",
             "TestRenamedCitationIsBroken": "c46c6a19c6c1075a",
             "TestSignatureChangeIsStale": "1ecb8b51cfffb49a",
@@ -119,7 +140,9 @@
             "fixture.load",
             "fixture.write",
             "newFixture"
-          ]
+          ],
+          "raw": "fcc998308ba67fa7",
+          "hasher": "go/2"
         }
       }
     },
@@ -128,15 +151,21 @@
       "citations": {
         "internal/cli/bundle.go::runBundle": {
           "surface": "afbcb60d55daccfa",
-          "body": "4c33e356e3345660"
+          "body": "4c33e356e3345660",
+          "raw": "c943a3a51b21a5b0",
+          "hasher": "go/2"
         },
         "internal/cli/init.go::runInit": {
           "surface": "08c0804721543100",
-          "body": "7458fa34dd1c59ff"
+          "body": "7458fa34dd1c59ff",
+          "raw": "39f31bd127924bb2",
+          "hasher": "go/2"
         },
         "internal/config/config.go::InferProjectName": {
           "surface": "665df7f08f982cfb",
-          "body": "7b074de3acb70fe3"
+          "body": "7b074de3acb70fe3",
+          "raw": "1aff1c3d19e30162",
+          "hasher": "go/2"
         }
       },
       "sources": {
@@ -151,7 +180,19 @@
             "overviewIndex": "d5fe107b30abd0b5",
             "runBundle": "afbcb60d55daccfa",
             "splitSource": "ebcb91591de95bdb"
-          }
+          },
+          "private": [
+            "assemble",
+            "buildSite",
+            "citationLink",
+            "init",
+            "linkSources",
+            "overviewIndex",
+            "runBundle",
+            "splitSource"
+          ],
+          "raw": "c943a3a51b21a5b0",
+          "hasher": "go/2"
         },
         "internal/cli/init.go": {
           "body": "81d42e71a5beec20",
@@ -159,7 +200,14 @@
             "hasAny": "b6d1a7c0ec76e5ea",
             "init": "c78f10468427bc77",
             "runInit": "08c0804721543100"
-          }
+          },
+          "private": [
+            "hasAny",
+            "init",
+            "runInit"
+          ],
+          "raw": "39f31bd127924bb2",
+          "hasher": "go/2"
         },
         "internal/config/config.go": {
           "body": "8709f2b3864914e6",
@@ -177,7 +225,15 @@
             "packageJSONName": "32172c9075e6be3a",
             "pyprojectName": "44d439eb4064fd49",
             "sourceTemplate": "16f7771317498873"
-          }
+          },
+          "private": [
+            "goModuleName",
+            "packageJSONName",
+            "pyprojectName",
+            "sourceTemplate"
+          ],
+          "raw": "1aff1c3d19e30162",
+          "hasher": "go/2"
         },
         "internal/config/config_test.go": {
           "body": "296db378a3830332",
@@ -188,7 +244,9 @@
             "TestResolve": "1e0c2aa40c46b1ab",
             "TestSaveLoadRoundTrip": "59775ecd4338fc38",
             "TestSourceURL": "292d1d4604b5f38c"
-          }
+          },
+          "raw": "42168b5f137ea017",
+          "hasher": "go/2"
         }
       }
     },
@@ -197,15 +255,21 @@
       "citations": {
         "internal/code/code.go::Analyze": {
           "surface": "498b2762e77d0628",
-          "body": "3b43e1327db60280"
+          "body": "999448245764a731",
+          "raw": "334982e50578ac89",
+          "hasher": "go/2"
         },
         "internal/drift/drift.go::Check": {
           "surface": "44441a0b4c307a7a",
-          "body": "9dd5b37497a1ba3c"
+          "body": "9dd5b37497a1ba3c",
+          "raw": "626f4726e22b5ef7",
+          "hasher": "go/2"
         },
         "internal/drift/drift.go::Finding.Fails": {
           "surface": "7c6f4d383dc2bc4e",
-          "body": "cbcb7de0f5756098"
+          "body": "cbcb7de0f5756098",
+          "raw": "626f4726e22b5ef7",
+          "hasher": "go/2"
         }
       },
       "sources": {
@@ -216,15 +280,17 @@
           },
           "private": [
             "main"
-          ]
+          ],
+          "raw": "e69265b020553194",
+          "hasher": "go/2"
         },
         "internal/drift/drift.go": {
-          "body": "4ccc61c8164b8d4b",
+          "body": "8578178ebcfe7488",
           "symbols": {
             "Ack": "bdb11477c7c441cf",
             "AckResult": "9848b62df55748a4",
             "Check": "44441a0b4c307a7a",
-            "FileLock": "dce2a0c1be7170a2",
+            "FileLock": "670dc86edcd04c57",
             "Finding": "5732b8238ac08f38",
             "Finding.Fails": "7c6f4d383dc2bc4e",
             "LoadLock": "c194e5c08d9c855d",
@@ -238,7 +304,7 @@
             "Repo.Analyze": "02cf115fc0979c59",
             "Repo.covered": "6744a19ba34c9040",
             "Stamp": "8df7959ee83484b4",
-            "SymbolLock": "99d8b668799d1e13",
+            "SymbolLock": "cc3c8454bb7c98eb",
             "analysis": "63f5a2e6d87ed764",
             "checkCitations": "604b2c850b0dfbd2",
             "compareCitations": "9714340f130cc1ae",
@@ -246,7 +312,8 @@
             "describe": "a44bb99c5d92c380",
             "hashBytes": "60fe68dca6b8818d",
             "pathSet": "7c4b5bc9f1fc6c51",
-            "surfaceChanges": "8c2b2db2df65687a"
+            "surfaceChanges": "8c2b2db2df65687a",
+            "upgradable": "7a51ab81571e6b4b"
           },
           "private": [
             "Repo.covered",
@@ -257,11 +324,14 @@
             "describe",
             "hashBytes",
             "pathSet",
-            "surfaceChanges"
-          ]
+            "surfaceChanges",
+            "upgradable"
+          ],
+          "raw": "626f4726e22b5ef7",
+          "hasher": "go/2"
         },
         "internal/drift/drift_test.go": {
-          "body": "c7f9fc72aca5e501",
+          "body": "26ebf46abd726c07",
           "symbols": {
             "TestAckWithoutTargetsNeverSilencesUnchangedStalePage": "b69c1af2d399f822",
             "TestCitedBodyChangeIsDriftUnlessStrict": "a7b49e9e94fbb0b7",
@@ -269,6 +339,7 @@
             "TestEditedPageNeedsAck": "6dddb032ffa7eacd",
             "TestLockRoundTrip": "a0b24990fab53d39",
             "TestNewAndRemovedFilesAreStale": "b6344dfa25ae7e03",
+            "TestOlderLockHashes": "edb9f4e413d77970",
             "TestPrivateHelpersAreDrift": "52d4c671db4955ae",
             "TestRenamedCitationIsBroken": "c46c6a19c6c1075a",
             "TestSignatureChangeIsStale": "1ecb8b51cfffb49a",
@@ -293,7 +364,9 @@
             "fixture.load",
             "fixture.write",
             "newFixture"
-          ]
+          ],
+          "raw": "fcc998308ba67fa7",
+          "hasher": "go/2"
         }
       }
     },
@@ -302,11 +375,15 @@
       "citations": {
         "internal/reference/reference.go::Coverage": {
           "surface": "a4c40678d4643931",
-          "body": ""
+          "body": "",
+          "raw": "1d0a0a520224ddb6",
+          "hasher": "go/2"
         },
         "internal/reference/reference.go::Extract": {
           "surface": "17595d9732df58da",
-          "body": "9330b2e907184ec3"
+          "body": "9330b2e907184ec3",
+          "raw": "1d0a0a520224ddb6",
+          "hasher": "go/2"
         }
       },
       "sources": {
@@ -320,14 +397,31 @@
             "firstWord": "03be2f65e40c2312",
             "flagDefinition": "95c886d20445ddda",
             "stringValue": "05b4bb0b6430817d"
-          }
+          },
+          "private": [
+            "cobraCommand",
+            "commandLiteral",
+            "commandPath",
+            "extractCobra",
+            "firstWord",
+            "flagDefinition",
+            "stringValue"
+          ],
+          "raw": "ce35917dc28789bc",
+          "hasher": "go/2"
         },
         "internal/reference/commands.go": {
-          "body": "9a1d6681de0588dc",
+          "body": "6b32cb3076b3a926",
           "symbols": {
-            "commandArguments": "d835cd1666d32e57",
+            "commandArguments": "ce5519c40cdb1444",
             "extractManagementCommands": "8b62c1da13d1975e"
-          }
+          },
+          "private": [
+            "commandArguments",
+            "extractManagementCommands"
+          ],
+          "raw": "926fbc10cbb0eb4a",
+          "hasher": "go/2"
         },
         "internal/reference/django.go": {
           "body": "19deacc9c718a450",
@@ -356,7 +450,35 @@
             "ordered": "8b56f310e529afeb",
             "short": "a6cd2c360b178dae",
             "upperStrings": "60a70566482bf82e"
-          }
+          },
+          "private": [
+            "actionDecorator",
+            "django",
+            "django.add",
+            "django.allowedMethods",
+            "django.classMethods",
+            "django.collectActions",
+            "django.collectMethods",
+            "django.element",
+            "django.expand",
+            "django.external",
+            "django.include",
+            "django.note",
+            "django.router",
+            "django.setting",
+            "django.shadowed",
+            "django.viewMethods",
+            "django.viewset",
+            "django.walkFile",
+            "element",
+            "extractDjango",
+            "lastSeg",
+            "ordered",
+            "short",
+            "upperStrings"
+          ],
+          "raw": "c50a7b56bfd577d0",
+          "hasher": "go/2"
         },
         "internal/reference/django_differential_test.go": {
           "body": "5564104946b75e19",
@@ -366,7 +488,15 @@
             "indexOf": "7700a087417b5297",
             "normalizeDjangoPath": "d03978a2a4d336e4",
             "orderedList": "5cff58ff5f1086e8"
-          }
+          },
+          "private": [
+            "expandHome",
+            "indexOf",
+            "normalizeDjangoPath",
+            "orderedList"
+          ],
+          "raw": "1251d51da2241118",
+          "hasher": "go/2"
         },
         "internal/reference/django_test.go": {
           "body": "574b26acbd6f1794",
@@ -376,7 +506,13 @@
             "TestRedactDefault": "53a2d759c2ffe092",
             "section": "f99b29194b6cfe91",
             "writeFixture": "72e59015914ba5c3"
-          }
+          },
+          "private": [
+            "section",
+            "writeFixture"
+          ],
+          "raw": "de76273a4cd7d68c",
+          "hasher": "go/2"
         },
         "internal/reference/extract.go": {
           "body": "ee3d51c73d0294ad",
@@ -391,7 +527,20 @@
             "routeMethod": "b3f57e6a59c8cc9d",
             "routesIn": "e2355ae8e1e2a3e8",
             "window": "665652a7482ff585"
-          }
+          },
+          "private": [
+            "bytesContainNUL",
+            "canonicalGoMethod",
+            "configIn",
+            "firstPath",
+            "generic",
+            "readSource",
+            "routeMethod",
+            "routesIn",
+            "window"
+          ],
+          "raw": "69741e891767c1fb",
+          "hasher": "go/2"
         },
         "internal/reference/extract_test.go": {
           "body": "a5d1dd29d3a105b9",
@@ -399,7 +548,13 @@
             "TestExtractRoutesAndConfig": "0ac4f86f8958cc69",
             "stringsJoin": "528469df168e4948",
             "writeFile": "0a9163586fc6f3ea"
-          }
+          },
+          "private": [
+            "stringsJoin",
+            "writeFile"
+          ],
+          "raw": "237d4d2f6546b02d",
+          "hasher": "go/2"
         },
         "internal/reference/fastapi.go": {
           "body": "11b48be533ef2d79",
@@ -418,7 +573,25 @@
             "methodList": "3023e7ee82e94c66",
             "readFile": "463ce554b30fc414",
             "shadowWarnings": "ae544a80f131d9b1"
-          }
+          },
+          "private": [
+            "argText",
+            "builtinDocs",
+            "builtinRoute",
+            "extractFastAPI",
+            "fastapi",
+            "fastapi.add",
+            "fastapi.app",
+            "fastapi.fastapiCtor",
+            "fastapi.note",
+            "fastapi.router",
+            "literalPath",
+            "methodList",
+            "readFile",
+            "shadowWarnings"
+          ],
+          "raw": "7aa152b91958d57a",
+          "hasher": "go/2"
         },
         "internal/reference/fastapi_test.go": {
           "body": "d635b665b8acca88",
@@ -427,25 +600,44 @@
             "TestFastAPIExtraction": "8ee828ae91dda99f",
             "compareFastAPI": "36a5157f630bfd7a",
             "orderedOrAll": "0154f7429ed026f6"
-          }
+          },
+          "private": [
+            "compareFastAPI",
+            "orderedOrAll"
+          ],
+          "raw": "920ac34e2ae8c16f",
+          "hasher": "go/2"
         },
         "internal/reference/pyenv.go": {
-          "body": "65cc3c7f290d400f",
+          "body": "fcc372b0fe4a3d22",
           "symbols": {
-            "callAt": "c07a10ab4da6b180",
             "contains": "ff1822e7196e7478",
-            "envCall": "b2f42c0a311ddc63",
+            "envCall": "b50254727252b2ff",
+            "envFromCall": "261265cfc4521986",
+            "envFromSubscript": "483b4818d052d456",
             "envRead": "781e95f786145fd4",
-            "envReadAt": "e7a66370243de42c",
             "extractPythonEnv": "f75f1fc75d426ef2",
             "isSettingsClass": "25f80a73d8762893",
-            "optionalCall": "b9d2d5c229aa70d9",
+            "optionalCall": "af61633125e18b15",
             "readEnvExample": "75e0352ec3a3ea10",
             "redactDefault": "4068a865f17a2730",
-            "settingsFields": "8b62218f48a2185f",
-            "significant": "dfb827be5b577967",
-            "subscriptName": "a4ebaab710038d71"
-          }
+            "settingsFields": "8b62218f48a2185f"
+          },
+          "private": [
+            "contains",
+            "envCall",
+            "envFromCall",
+            "envFromSubscript",
+            "envRead",
+            "extractPythonEnv",
+            "isSettingsClass",
+            "optionalCall",
+            "readEnvExample",
+            "redactDefault",
+            "settingsFields"
+          ],
+          "raw": "fc71a06fc4d6f19b",
+          "hasher": "go/2"
         },
         "internal/reference/pyproject.go": {
           "body": "ee2bc503263ff275",
@@ -463,7 +655,24 @@
             "pyProject.moduleName": "9715a610c62f4176",
             "pyProject.resolveAbsolute": "ef32031d239acca1",
             "ref": "16f5b8afb206d21b"
-          }
+          },
+          "private": [
+            "dirOf",
+            "join",
+            "newPyProject",
+            "nonEmpty",
+            "pyProject",
+            "pyProject.importTarget",
+            "pyProject.load",
+            "pyProject.lookup",
+            "pyProject.lookupDepth",
+            "pyProject.moduleFile",
+            "pyProject.moduleName",
+            "pyProject.resolveAbsolute",
+            "ref"
+          ],
+          "raw": "4d8cd5ce01069575",
+          "hasher": "go/2"
         },
         "internal/reference/reference.go": {
           "body": "b4855aa789bdb7a0",
@@ -473,23 +682,36 @@
             "Report": "70504ac63e96eb8e",
             "appendNew": "b08d8f22235162b4",
             "nonTest": "2a254ab8c4186979"
-          }
+          },
+          "private": [
+            "appendNew",
+            "nonTest"
+          ],
+          "raw": "1d0a0a520224ddb6",
+          "hasher": "go/2"
         },
         "internal/reference/sources.go": {
           "body": "a9c989c2226f1e54",
           "symbols": {
             "Sources": "09d2aa099f04de28",
             "isTest": "0d6d36f97904bc0e"
-          }
+          },
+          "private": [
+            "isTest"
+          ],
+          "raw": "5666b4e9d7612fb2",
+          "hasher": "go/2"
         },
         "internal/reference/sources_test.go": {
           "body": "3b3e5b7d528ea511",
           "symbols": {
             "TestSources": "d4393cefcf847a37"
-          }
+          },
+          "raw": "886919c49b0b3263",
+          "hasher": "go/2"
         },
         "internal/reference/testdata/django_urls.py": {
-          "body": "5d5983c00d512dbc",
+          "body": "e86a1861c4548803",
           "symbols": {
             "all_outside": "3c207ac4d3cc5ce7",
             "leaves": "716a2f9e8ddd7252",
@@ -497,58 +719,77 @@
             "module_outside": "b5428a0e4ddeb7fc",
             "outside": "f881b6009cbb7353",
             "walk": "066b258472351972"
-          }
+          },
+          "raw": "af7d9d4094f0cf0d",
+          "hasher": "python/293fdc02038e/2"
         },
         "internal/reference/testdata/fastapi_routes.py": {
-          "body": "b38fdbbaf2083a52",
+          "body": "02895eecafb365a9",
           "symbols": {
             "row": "66a02dbb956cc27c",
             "walk": "43a0842ee20f3de2"
-          }
+          },
+          "raw": "1d05ab8562e60fca",
+          "hasher": "python/293fdc02038e/2"
         }
       }
     },
     "docs/writing-pages.md": {
-      "page": "6d37fbc7fff6a4d5",
+      "page": "cc1671a6c6b8943a",
       "citations": {
         "internal/code/code.go::Analyze": {
           "surface": "498b2762e77d0628",
-          "body": "3b43e1327db60280"
+          "body": "999448245764a731",
+          "raw": "334982e50578ac89",
+          "hasher": "go/2"
         },
         "internal/drift/drift.go::Finding.Fails": {
           "surface": "7c6f4d383dc2bc4e",
-          "body": "cbcb7de0f5756098"
+          "body": "cbcb7de0f5756098",
+          "raw": "626f4726e22b5ef7",
+          "hasher": "go/2"
         },
         "internal/drift/drift.go::Stamp": {
           "surface": "8df7959ee83484b4",
-          "body": "e41312428930fb82"
+          "body": "a9d4bcad15e37f8e",
+          "raw": "626f4726e22b5ef7",
+          "hasher": "go/2"
         },
         "internal/pages/pages.go::Linkify": {
           "surface": "b31743bf804e9b22",
-          "body": "ff79ab1e5f006210"
+          "body": "ff79ab1e5f006210",
+          "raw": "aad7733c037ca72c",
+          "hasher": "go/2"
         },
         "internal/pages/pages.go::Parse": {
           "surface": "21d7718c70908c49",
-          "body": "b7199f790d64bb50"
+          "body": "b7199f790d64bb50",
+          "raw": "aad7733c037ca72c",
+          "hasher": "go/2"
         }
       },
       "sources": {
         "internal/code/code.go": {
-          "body": "94b45c3cf75476f4",
+          "body": "5de89f2d41a9ec8a",
           "symbols": {
             "Analyze": "498b2762e77d0628",
-            "File": "dd4efa2226a2e880",
+            "File": "dae3fc20928c2e14",
             "File.Lookup": "548418227fcfb633",
             "File.Private": "cd5018fa1ea28f10",
             "File.Surfaces": "7c6e4c8a2651c3e0",
+            "HasherFor": "02041b0f90a28590",
             "IsTest": "ac381bf5d8c73c92",
             "ListFiles": "4ae8ae2ed76bdf67",
             "Parsable": "ad7f83aeb7fc246d",
+            "analyze": "9263e64a0262bd09",
             "isVirtualenv": "1f9359d24de35af2"
           },
           "private": [
+            "analyze",
             "isVirtualenv"
-          ]
+          ],
+          "raw": "334982e50578ac89",
+          "hasher": "go/2"
         },
         "internal/pages/pages.go": {
           "body": "e7850256720a835d",
@@ -579,7 +820,9 @@
             "linkifyLine",
             "splitFrontmatter",
             "titleFromPath"
-          ]
+          ],
+          "raw": "aad7733c037ca72c",
+          "hasher": "go/2"
         },
         "internal/pages/pages_test.go": {
           "body": "a4ffb56386b75fbc",
@@ -589,7 +832,9 @@
             "TestParseDocusaurusKeysAndFallbackTitles": "469c2144a116974d",
             "TestParseFrontmatterAndCitations": "d463991d1ab22c96",
             "TestParseRejectsBadFrontmatter": "7213cdfdef0417c9"
-          }
+          },
+          "raw": "652688294ec62d53",
+          "hasher": "go/2"
         }
       }
     }

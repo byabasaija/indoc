@@ -98,10 +98,6 @@ func extractPythonEnv(root string, files []SourceFile, all []string) ([]doc.RefE
 	var order []string
 	for i, m := range mods {
 		file := paths[i]
-		src, err := os.ReadFile(filepath.Join(root, filepath.FromSlash(file)))
-		if err != nil || len(src) > maxFileBytes {
-			continue
-		}
 		decouple, osEnviron, osGetenv := "", "", ""
 		for _, imp := range m.Imports {
 			switch {
@@ -117,20 +113,32 @@ func extractPythonEnv(root string, files []SourceFile, all []string) ([]doc.RefE
 			cov.Evidence = append(cov.Evidence, "python-decouple")
 		}
 		cov.Files++
-		toks := significant(python.Tokenize(string(src)))
-		for j := 0; j < len(toks); j++ {
-			name, detail, line, ok := envReadAt(toks, j, envObjects, decouple, osEnviron, osGetenv)
-			if !ok {
-				continue
+
+		type found struct {
+			name, detail string
+			line         int
+		}
+		var hits []found
+		for _, c := range m.AllCalls {
+			if name, detail, ok := envFromCall(c, envObjects, decouple, osEnviron, osGetenv); ok {
+				hits = append(hits, found{name, detail, c.Line})
 			}
-			if r, seen := reads[name]; seen {
-				if r.entry.Detail == "" && detail != "" {
-					r.entry.Detail = detail
+		}
+		for _, sub := range m.Subscripts {
+			if name, ok := envFromSubscript(sub, osEnviron); ok {
+				hits = append(hits, found{name, "required", sub.Line})
+			}
+		}
+		sort.SliceStable(hits, func(a, b int) bool { return hits[a].line < hits[b].line })
+		for _, h := range hits {
+			if r, seen := reads[h.name]; seen {
+				if r.entry.Detail == "" && h.detail != "" {
+					r.entry.Detail = h.detail
 				}
 				continue
 			}
-			reads[name] = &envRead{entry: doc.RefEntry{Name: name, Detail: detail, Source: fmt.Sprintf("%s:%d", file, line)}, file: file}
-			order = append(order, name)
+			reads[h.name] = &envRead{entry: doc.RefEntry{Name: h.name, Detail: h.detail, Source: fmt.Sprintf("%s:%d", file, h.line)}, file: file}
+			order = append(order, h.name)
 		}
 	}
 
@@ -184,108 +192,64 @@ func contains(list []string, s string) bool {
 	return false
 }
 
-func significant(toks []python.Token) []python.Token {
-	out := toks[:0:0]
-	for _, t := range toks {
-		switch t.Kind {
-		case python.Comment, python.NL, python.Newline, python.Indent, python.Dedent:
-			continue
-		}
-		out = append(out, t)
+// envFromCall recognizes an environment read in a call.
+func envFromCall(c *python.Call, envObjects map[string]bool, decouple, osEnviron, osGetenv string) (name, detail string, ok bool) {
+	fn := c.FuncName()
+	if fn == "" {
+		return "", "", false
 	}
-	return out
-}
-
-// envReadAt recognizes an environment read starting at toks[i].
-func envReadAt(toks []python.Token, i int, envObjects map[string]bool, decouple, osEnviron, osGetenv string) (name, detail string, line int, ok bool) {
-	t := toks[i]
-	if t.Kind != python.Name || (i > 0 && toks[i-1].Text == ".") {
-		return
-	}
-	at := func(k int, text string) bool { return i+k < len(toks) && toks[i+k].Text == text }
-	line = t.Line
-
+	obj, method, hasMethod := strings.Cut(fn, ".")
 	switch {
-	case envObjects[t.Text] && at(1, "("):
-		c := callAt(toks, i)
-		return envCall(c, "", false, line)
-	case envObjects[t.Text] && at(1, ".") && i+3 < len(toks) && toks[i+3].Text == "(":
-		method := toks[i+2].Text
+	case envObjects[fn]:
+		return envCall(c, "", false)
+	case hasMethod && envObjects[obj] && !strings.Contains(method, "."):
 		kind, known := envMethods[method]
 		if !known {
-			return
-		}
-		c := callAt(toks, i)
-		if c == nil {
-			return
+			return "", "", false
 		}
 		if c.Arg(0, "var") == nil {
-			if name, ok := envDefaults[method]; ok {
-				if def := c.Kw("default"); def != nil {
-					return name, kind + ", default " + short(redactDefault(name, def.Text())), line, true
+			if def, ok := envDefaults[method]; ok {
+				if d := c.Kw("default"); d != nil {
+					return def, kind + ", default " + short(redactDefault(def, d.Text())), true
 				}
-				return name, kind + ", required", line, true
+				return def, kind + ", required", true
 			}
 		}
-		return envCall(c, kind, true, line)
-	case decouple != "" && t.Text == decouple && at(1, "("):
-		return envCall(callAt(toks, i), "", true, line)
-	case t.Text == "os" && at(1, ".") && at(2, "environ"):
-		if at(3, "[") {
-			return subscriptName(toks, i+4, line)
-		}
-		if at(3, ".") && at(4, "get") && at(5, "(") {
-			return optionalCall(callAt(toks, i), line)
-		}
-	case t.Text == "os" && at(1, ".") && at(2, "getenv") && at(3, "("):
-		return optionalCall(callAt(toks, i), line)
-	case osEnviron != "" && t.Text == osEnviron:
-		if at(1, "[") {
-			return subscriptName(toks, i+2, line)
-		}
-		if at(1, ".") && at(2, "get") && at(3, "(") {
-			return optionalCall(callAt(toks, i), line)
-		}
-	case osGetenv != "" && t.Text == osGetenv && at(1, "("):
-		return optionalCall(callAt(toks, i), line)
+		return envCall(c, kind, true)
+	case decouple != "" && fn == decouple:
+		return envCall(c, "", true)
+	case fn == "os.environ.get", fn == "os.getenv",
+		osEnviron != "" && fn == osEnviron+".get", osGetenv != "" && fn == osGetenv:
+		return optionalCall(c)
 	}
-	return
+	return "", "", false
 }
 
-// callAt parses the call whose callee starts at toks[i].
-func callAt(toks []python.Token, i int) *python.Call {
-	j := i
-	for j < len(toks) && toks[j].Text != "(" {
-		j++
+// envFromSubscript recognizes os.environ["X"].
+func envFromSubscript(sub python.Subscript, osEnviron string) (string, bool) {
+	d, ok := sub.Value.(*python.Dotted)
+	if !ok || !(d.Path == "os.environ" || osEnviron != "" && d.Path == osEnviron) {
+		return "", false
 	}
-	depth := 0
-	for k := j; k < len(toks); k++ {
-		switch toks[k].Text {
-		case "(", "[", "{":
-			depth++
-		case ")", "]", "}":
-			depth--
-			if depth == 0 {
-				c, _ := python.ParseExpr(toks[i : k+1]).(*python.Call)
-				return c
-			}
-		}
+	s, ok := sub.Key.(*python.Str)
+	if !ok || !s.Literal || !envName.MatchString(s.Value) {
+		return "", false
 	}
-	return nil
+	return s.Value, true
 }
 
 // envCall reads `env("X", default=...)`-style calls. When positionalDefault
 // is set, the second positional argument is the default (env.str, config).
-func envCall(c *python.Call, kind string, positionalDefault bool, line int) (string, string, int, bool) {
+func envCall(c *python.Call, kind string, positionalDefault bool) (string, string, bool) {
 	if c == nil {
-		return "", "", 0, false
+		return "", "", false
 	}
 	s, ok := c.Arg(0, "var").(*python.Str)
 	if !ok || !s.Literal || !envName.MatchString(s.Value) {
 		if s2, ok2 := c.Arg(0, "option").(*python.Str); ok2 && s2.Literal && envName.MatchString(s2.Value) {
 			s = s2
 		} else {
-			return "", "", 0, false
+			return "", "", false
 		}
 	}
 	def := c.Kw("default")
@@ -301,32 +265,21 @@ func envCall(c *python.Call, kind string, positionalDefault bool, line int) (str
 	} else {
 		parts = append(parts, "default "+short(redactDefault(s.Value, def.Text())))
 	}
-	return s.Value, strings.Join(parts, ", "), line, true
+	return s.Value, strings.Join(parts, ", "), true
 }
 
-func optionalCall(c *python.Call, line int) (string, string, int, bool) {
+func optionalCall(c *python.Call) (string, string, bool) {
 	if c == nil || len(c.Args) == 0 {
-		return "", "", 0, false
+		return "", "", false
 	}
 	s, ok := c.Args[0].(*python.Str)
 	if !ok || !s.Literal || !envName.MatchString(s.Value) {
-		return "", "", 0, false
+		return "", "", false
 	}
 	if len(c.Args) > 1 {
-		return s.Value, "default " + short(redactDefault(s.Value, c.Args[1].Text())), line, true
+		return s.Value, "default " + short(redactDefault(s.Value, c.Args[1].Text())), true
 	}
-	return s.Value, "optional", line, true
-}
-
-func subscriptName(toks []python.Token, i, line int) (string, string, int, bool) {
-	if i >= len(toks) || toks[i].Kind != python.String {
-		return "", "", 0, false
-	}
-	s, ok := python.ParseExpr(toks[i : i+1]).(*python.Str)
-	if !ok || !envName.MatchString(s.Value) {
-		return "", "", 0, false
-	}
-	return s.Value, "required", line, true
+	return s.Value, "optional", true
 }
 
 // readEnvExample returns the keys of the first committed example env file.

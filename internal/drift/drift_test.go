@@ -272,3 +272,44 @@ func TestTestFileChangesAreDrift(t *testing.T) {
 		t.Errorf("detail = %q", got[0].Detail)
 	}
 }
+
+func TestOlderLockHashes(t *testing.T) {
+	f := newFixture(t)
+	// Simulate a lock written by another indoc: same bytes, different hasher.
+	for path, entry := range f.lock.Pages {
+		for k, fl := range entry.Sources {
+			fl.Hasher, fl.Symbols = "python/old/1", map[string]string{"Dispatcher": "different"}
+			entry.Sources[k] = fl
+		}
+		for k, c := range entry.Citations {
+			c.Hasher, c.Surface = "python/old/1", "different"
+			entry.Citations[k] = c
+		}
+		f.lock.Pages[path] = entry
+	}
+	expect(t, f.check()) // bytes unchanged: nothing to report
+
+	if res := f.ack(); strings.Join(res.Stamped, ",") != "docs/routing.md,docs/setup.md" {
+		t.Fatalf("ack should upgrade both unchanged entries, stamped %v", res.Stamped)
+	}
+	for k, fl := range f.lock.Pages["docs/routing.md"].Sources {
+		if fl.Hasher == "python/old/1" {
+			t.Fatalf("%s not upgraded", k)
+		}
+	}
+
+	// Changed bytes under an old hasher: drift, never stale.
+	for path, entry := range f.lock.Pages {
+		for k, fl := range entry.Sources {
+			fl.Hasher = "python/old/1"
+			entry.Sources[k] = fl
+		}
+		f.lock.Pages[path] = entry
+	}
+	f.write("app/checkout/dispatcher.py", strings.Replace(dispatcher, "def route(self, session)", "def route(self, session, provider)", 1))
+	got := f.check()
+	expect(t, got, "drift docs/routing.md app/checkout/dispatcher.py")
+	if f.ack(); len(f.lock.Pages) == 0 {
+		t.Fatal("lock lost pages")
+	}
+}

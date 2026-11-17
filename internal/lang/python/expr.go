@@ -1,14 +1,18 @@
 package python
 
-import "strings"
+import (
+	"strings"
 
-// Expr is a parsed Python expression. Only the forms needed for static
-// configuration (URL tables, routers, settings reads) are modeled; everything
-// else is Opaque with its source text.
+	"github.com/byabasaija/indoc/internal/treesitter"
+)
+
+// Expr is a Python expression in the forms static configuration uses (URL
+// tables, routers, settings reads). Everything else is Opaque with its source
+// text.
 type Expr interface{ Text() string }
 
 // Str is a string literal (adjacent literals concatenated). Literal is false
-// for f-strings, whose value is not known statically.
+// for f-strings and t-strings, whose value is not known statically.
 type Str struct {
 	Value   string
 	Literal bool
@@ -26,7 +30,7 @@ type Attr struct {
 
 // Call is a call expression.
 type Call struct {
-	Line   int // line of the opening parenthesis
+	Line   int // 1-based line of the opening parenthesis
 	Func   Expr
 	Args   []Expr
 	Kwargs []Kwarg
@@ -125,338 +129,118 @@ func (c *Call) FuncName() string {
 	return ""
 }
 
-// ParseExpr parses tokens (no NEWLINE) as one expression. It never fails;
-// unrecognized input becomes Opaque.
-func ParseExpr(toks []Token) Expr {
-	p := &exprParser{toks: significantOnly(toks)}
-	e := p.expr()
-	if p.i < len(p.toks) {
-		return &Opaque{Src: joinText(p.toks)}
+// expr converts a syntax tree node.
+func expr(n *treesitter.Node, src []byte) Expr {
+	if n == nil {
+		return &Opaque{}
 	}
-	return e
+	switch n.Type {
+	case "identifier":
+		return &Dotted{Path: n.Text(src)}
+	case "true", "false", "none":
+		return &Dotted{Path: map[string]string{"true": "True", "false": "False", "none": "None"}[n.Type]}
+	case "attribute":
+		obj := expr(n.Child("object"), src)
+		attr := ""
+		if a := n.Child("attribute"); a != nil {
+			attr = a.Text(src)
+		}
+		if d, ok := obj.(*Dotted); ok {
+			return &Dotted{Path: d.Path + "." + attr}
+		}
+		return &Attr{X: obj, Attr: attr}
+	case "call":
+		return call(n, src)
+	case "string":
+		return str(n, src)
+	case "concatenated_string":
+		s := &Str{Literal: true, Src: oneLine(n.Text(src))}
+		var b strings.Builder
+		for _, c := range named(n) {
+			part := str(c, src)
+			b.WriteString(part.Value)
+			s.Literal = s.Literal && part.Literal
+		}
+		s.Value = b.String()
+		return s
+	case "list", "tuple", "expression_list":
+		seq := &Seq{Tuple: n.Type != "list"}
+		for _, c := range named(n) {
+			seq.Elems = append(seq.Elems, expr(c, src))
+		}
+		return seq
+	case "parenthesized_expression":
+		if inner := named(n); len(inner) == 1 {
+			return expr(inner[0], src)
+		}
+	case "list_splat", "dictionary_splat":
+		if inner := named(n); len(inner) == 1 {
+			return &Starred{X: expr(inner[0], src), Double: n.Type == "dictionary_splat"}
+		}
+	case "binary_operator":
+		op := ""
+		if o := n.Child("operator"); o != nil {
+			op = o.Text(src)
+		}
+		return &BinOp{Op: op, L: expr(n.Child("left"), src), R: expr(n.Child("right"), src)}
+	case "conditional_expression":
+		if parts := named(n); len(parts) == 3 {
+			return &Cond{Then: expr(parts[0], src), Test: expr(parts[1], src), Else: expr(parts[2], src)}
+		}
+	}
+	return &Opaque{Src: oneLine(n.Text(src))}
 }
 
-func significantOnly(toks []Token) []Token {
-	out := make([]Token, 0, len(toks))
-	for _, t := range toks {
-		switch t.Kind {
-		case Comment, NL, Newline, Indent, Dedent, EOF:
+func call(n *treesitter.Node, src []byte) *Call {
+	c := &Call{Func: expr(n.Child("function"), src), Line: n.StartRow + 1}
+	args := n.Child("arguments")
+	if args == nil {
+		return c
+	}
+	c.Line = args.StartRow + 1
+	for _, a := range named(args) {
+		if a.Type == "keyword_argument" {
+			name := ""
+			if nm := a.Child("name"); nm != nil {
+				name = nm.Text(src)
+			}
+			c.Kwargs = append(c.Kwargs, Kwarg{Name: name, Value: expr(a.Child("value"), src)})
 			continue
 		}
-		out = append(out, t)
+		c.Args = append(c.Args, expr(a, src))
 	}
-	return out
-}
-
-type exprParser struct {
-	toks []Token
-	i    int
-}
-
-func (p *exprParser) peek() Token {
-	if p.i < len(p.toks) {
-		return p.toks[p.i]
-	}
-	return Token{Kind: EOF}
-}
-
-func (p *exprParser) is(text string) bool {
-	t := p.peek()
-	return (t.Kind == Op || t.Kind == Name) && t.Text == text
-}
-
-func (p *exprParser) expr() Expr {
-	start := p.i
-	x := p.binary()
-	if p.is("if") {
-		p.i++
-		test := p.binary()
-		if !p.is("else") {
-			return p.opaqueFrom(start)
-		}
-		p.i++
-		return &Cond{Then: x, Test: test, Else: p.expr()}
-	}
-	if p.is("for") || p.is("lambda") || p.is(":=") {
-		return p.opaqueFrom(start)
-	}
-	return x
-}
-
-var binaryOps = map[string]bool{
-	"+": true, "-": true, "*": true, "/": true, "//": true, "%": true, "|": true, "&": true, "^": true,
-	"or": true, "and": true, "==": true, "!=": true, "<": true, ">": true, "<=": true, ">=": true,
-	"in": true, "is": true, "@": true, "**": true, "<<": true, ">>": true,
-}
-
-func (p *exprParser) binary() Expr {
-	x := p.unary()
-	for {
-		t := p.peek()
-		if !(t.Kind == Op || t.Kind == Name) || !binaryOps[t.Text] {
-			return x
-		}
-		if t.Text == "is" || t.Text == "in" || t.Text == "not" {
-			p.i++
-			if p.is("not") {
-				p.i++
-			}
-		} else {
-			p.i++
-		}
-		x = &BinOp{Op: t.Text, L: x, R: p.unary()}
-	}
-}
-
-func (p *exprParser) unary() Expr {
-	switch {
-	case p.is("*"), p.is("**"):
-		double := p.peek().Text == "**"
-		p.i++
-		return &Starred{X: p.unary(), Double: double}
-	case p.is("not"), p.is("-"), p.is("+"), p.is("~"), p.is("await"):
-		start := p.i
-		p.i++
-		p.unary()
-		return p.opaqueFrom(start)
-	}
-	return p.postfix(p.atom())
-}
-
-func (p *exprParser) postfix(x Expr) Expr {
-	for {
-		switch {
-		case p.is("."):
-			p.i++
-			t := p.peek()
-			if t.Kind != Name {
-				return x
-			}
-			p.i++
-			if n, ok := x.(*Dotted); ok {
-				x = &Dotted{Path: n.Path + "." + t.Text}
-			} else {
-				x = &Attr{X: x, Attr: t.Text}
-			}
-		case p.is("("):
-			line := p.peek().Line
-			p.i++
-			x = p.callArgs(x)
-			x.(*Call).Line = line
-		case p.is("["):
-			start := p.i
-			p.skipBalanced()
-			x = &Opaque{Src: x.Text() + joinText(p.toks[start:p.i])}
-		default:
-			return x
-		}
-	}
-}
-
-func (p *exprParser) callArgs(fn Expr) Expr {
-	c := &Call{Func: fn}
-	for !p.is(")") && p.peek().Kind != EOF {
-		t := p.peek()
-		if t.Kind == Name && p.i+1 < len(p.toks) && p.toks[p.i+1].Kind == Op && p.toks[p.i+1].Text == "=" {
-			p.i += 2
-			c.Kwargs = append(c.Kwargs, Kwarg{Name: t.Text, Value: p.expr()})
-		} else {
-			c.Args = append(c.Args, p.expr())
-		}
-		if !p.is(",") {
-			break
-		}
-		p.i++
-	}
-	if !p.is(")") {
-		p.skipToClose(")")
-	}
-	p.i++
 	return c
 }
 
-func (p *exprParser) atom() Expr {
-	t := p.peek()
-	switch {
-	case t.Kind == String:
-		var raw, value []string
-		literal := true
-		for p.peek().Kind == String {
-			s := p.peek().Text
-			v, ok := decodeString(s)
-			literal = literal && ok
-			raw = append(raw, s)
-			value = append(value, v)
-			p.i++
-		}
-		return &Str{Value: strings.Join(value, ""), Literal: literal, Src: strings.Join(raw, " ")}
-	case t.Kind == Name && !isKeyword(t.Text):
-		p.i++
-		return &Dotted{Path: t.Text}
-	case t.Kind == Name && (t.Text == "True" || t.Text == "False" || t.Text == "None"):
-		p.i++
-		return &Dotted{Path: t.Text}
-	case t.Kind == Number:
-		p.i++
-		return &Opaque{Src: t.Text}
-	case p.is("("), p.is("["):
-		closer := map[string]string{"(": ")", "[": "]"}[t.Text]
-		start := p.i
-		p.i++
-		seq := &Seq{Tuple: t.Text == "("}
-		trailingComma := false
-		for !p.is(closer) && p.peek().Kind != EOF {
-			e := p.expr()
-			if p.is("for") || p.is("async") { // comprehension
-				p.i = start
-				p.skipBalanced()
-				return &Opaque{Src: joinText(p.toks[start:p.i])}
-			}
-			seq.Elems = append(seq.Elems, e)
-			trailingComma = false
-			if !p.is(",") {
-				break
-			}
-			p.i++
-			trailingComma = true
-		}
-		if !p.is(closer) {
-			p.i = start
-			p.skipBalanced()
-			return &Opaque{Src: joinText(p.toks[start:p.i])}
-		}
-		p.i++
-		if seq.Tuple && len(seq.Elems) == 1 && !trailingComma {
-			return seq.Elems[0] // parenthesized expression
-		}
-		return seq
-	case p.is("{"):
-		start := p.i
-		p.skipBalanced()
-		return &Opaque{Src: joinText(p.toks[start:p.i])}
-	}
-	// Unknown: consume one token so callers always make progress.
-	p.i++
-	return &Opaque{Src: t.Text}
-}
-
-// skipBalanced consumes a bracketed group starting at the cursor.
-func (p *exprParser) skipBalanced() {
-	depth := 0
-	for p.i < len(p.toks) {
-		t := p.toks[p.i]
-		p.i++
-		if t.Kind != Op {
-			continue
-		}
-		switch t.Text {
-		case "(", "[", "{":
-			depth++
-		case ")", "]", "}":
-			depth--
-			if depth <= 0 {
-				return
-			}
+// str decodes a string node. f-strings and t-strings are not literal.
+func str(n *treesitter.Node, src []byte) *Str {
+	s := &Str{Src: oneLine(n.Text(src)), Literal: true}
+	var start, end *treesitter.Node
+	for _, c := range n.Children {
+		switch c.Type {
+		case "string_start":
+			start = c
+		case "string_end":
+			end = c
+		case "interpolation":
+			s.Literal = false
 		}
 	}
-}
-
-func (p *exprParser) skipToClose(closer string) {
-	depth := 0
-	for p.i < len(p.toks) {
-		t := p.toks[p.i]
-		if t.Kind == Op {
-			switch t.Text {
-			case "(", "[", "{":
-				depth++
-			case ")", "]", "}":
-				if depth == 0 && t.Text == closer {
-					return
-				}
-				depth--
-			}
-		}
-		p.i++
+	if start == nil || end == nil {
+		s.Literal = false
+		return s
 	}
-}
-
-func (p *exprParser) opaqueFrom(start int) Expr {
-	depth := 0
-	for p.i < len(p.toks) {
-		t := p.toks[p.i]
-		if t.Kind == Op {
-			switch t.Text {
-			case "(", "[", "{":
-				depth++
-			case ")", "]", "}":
-				if depth == 0 {
-					return &Opaque{Src: joinText(p.toks[start:p.i])}
-				}
-				depth--
-			case ",":
-				if depth == 0 {
-					return &Opaque{Src: joinText(p.toks[start:p.i])}
-				}
-			}
-		}
-		p.i++
-	}
-	return &Opaque{Src: joinText(p.toks[start:p.i])}
-}
-
-var keywords = map[string]bool{
-	"and": true, "as": true, "assert": true, "async": true, "await": true, "break": true,
-	"class": true, "continue": true, "def": true, "del": true, "elif": true, "else": true,
-	"except": true, "finally": true, "for": true, "from": true, "global": true, "if": true,
-	"import": true, "in": true, "is": true, "lambda": true, "nonlocal": true, "not": true,
-	"or": true, "pass": true, "raise": true, "return": true, "try": true, "while": true,
-	"with": true, "yield": true, "True": true, "False": true, "None": true,
-}
-
-func isKeyword(s string) bool { return keywords[s] }
-
-func joinText(toks []Token) string {
-	var b strings.Builder
-	for i, t := range toks {
-		if i > 0 && needsSpace(toks[i-1], t) {
-			b.WriteByte(' ')
-		}
-		b.WriteString(t.Text)
-	}
-	return b.String()
-}
-
-func needsSpace(prev, cur Token) bool {
-	if prev.Kind == Op || cur.Kind == Op {
-		return prev.Text == ","
-	}
-	return true
-}
-
-// decodeString returns a string token's value. ok is false for f-strings and
-// t-strings, whose value depends on runtime data.
-func decodeString(tok string) (string, bool) {
-	i := 0
-	for i < len(tok) && tok[i] != '"' && tok[i] != '\'' {
-		i++
-	}
-	prefix := strings.ToLower(tok[:i])
-	body := tok[i:]
-	q := 1
-	if len(body) >= 6 && (strings.HasPrefix(body, `"""`) || strings.HasPrefix(body, `'''`)) {
-		q = 3
-	}
-	if len(body) < 2*q {
-		return "", false
-	}
-	body = body[q : len(body)-q]
+	prefix := strings.ToLower(strings.TrimRight(start.Text(src), `"'`))
 	if strings.ContainsAny(prefix, "ft") {
-		return body, false
+		s.Literal = false
 	}
+	body := string(src[start.End:end.Start])
 	if strings.Contains(prefix, "r") || !strings.Contains(body, `\`) {
-		return body, true
+		s.Value = body
+	} else {
+		s.Value = unescape(body)
 	}
-	return unescape(body), true
+	return s
 }
 
 // unescape handles the common escapes; anything else is kept verbatim.
@@ -483,3 +267,15 @@ func unescape(s string) string {
 	}
 	return b.String()
 }
+
+func named(n *treesitter.Node) []*treesitter.Node {
+	var out []*treesitter.Node
+	for _, c := range n.Children {
+		if c.Named && !c.Extra {
+			out = append(out, c)
+		}
+	}
+	return out
+}
+
+func oneLine(s string) string { return strings.Join(strings.Fields(s), " ") }
