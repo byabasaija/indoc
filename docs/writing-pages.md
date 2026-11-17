@@ -31,6 +31,7 @@ Every request lands in
 | `order` | Sort position. Pages without one sort after, by path. |
 | `audience` | Optional reader group, such as `partner` or `dev`. |
 | `sources` | Globs of code this page describes. `**` matches any depth. |
+| `strict` | `true` makes body changes to cited symbols fail the check. |
 
 Docusaurus keys `sidebar_label` and `sidebar_position` are read too, so an existing Docusaurus docs folder works unchanged.
 
@@ -43,13 +44,17 @@ Write `path::Symbol` anywhere in the text, usually in backticks: `internal/drift
 A citation does two things:
 
 1. **It is checked.** If the file or symbol does not exist, `indoc check` reports it as broken and `indoc bundle` refuses to build.
-2. **It is an anchor.** Any change to the cited symbol, including its body, makes the page stale.
+2. **It is an anchor.** A signature change makes the page stale. A body change is reported as drift, because most implementation changes do not affect what a page says.
+
+For pages whose readers depend on exact behavior, such as a partner API or a CLI's output, add `strict: true` to the frontmatter. On those pages any change to a cited symbol, including its body, fails the check.
 
 Cite the symbols a page actually explains. Citations inside fenced code blocks are ignored.
 
 ## Sources
 
-`sources:` covers more code than you cite. Under those globs, a page goes stale when a signature is added, removed, or changed, or a file is added or removed. Body-only changes are reported as drift without failing CI.
+`sources:` covers more code than you cite. Under those globs, a page goes stale when a public signature is added, removed, or changed, or a file is added or removed. Body-only changes and changes to private helpers (`_name` in Python, lowercase names in Go) are reported as drift without failing CI.
+
+Docstrings, comments, logging calls (`logger.info(...)`), and formatting, including trailing commas, are ignored everywhere.
 
 ## Language support
 

@@ -1,12 +1,13 @@
 // Package drift records what each documentation page was last verified
 // against (the lock) and reports pages whose code has changed since.
 //
-// Rules (ROADMAP section 11):
+// Rules (ROADMAP section 11), measured on real history (section 12):
 //
-//	cited symbol changed (signature or body)   stale  (check fails)
+//	cited symbol's signature changed           stale  (check fails)
 //	surface changed under sources globs        stale  (check fails)
-//	body-only change under sources globs       drift  (reported; fails with --strict)
-//	whitespace / comments                      ignored
+//	cited symbol's body changed                drift  (fails on strict pages, or with --strict)
+//	body-only change under sources globs       drift  (fails with --strict)
+//	comments, docstrings, logging, formatting  ignored
 //
 // A page is compared only while its content matches the lock. Editing a page
 // makes it "edited" until re-stamped, and nothing re-stamps an unchanged page
@@ -253,8 +254,10 @@ func compareCitations(r *Repo, p pages.Page, entry PageLock) []Finding {
 		switch {
 		case sym.Surface != was.Surface:
 			out = append(out, Finding{Page: p.Path, Kind: Stale, Ref: c.Ref(), Detail: "cited symbol's signature changed"})
+		case sym.Body != was.Body && p.Strict:
+			out = append(out, Finding{Page: p.Path, Kind: Stale, Ref: c.Ref(), Detail: "cited symbol's implementation changed (strict page)"})
 		case sym.Body != was.Body:
-			out = append(out, Finding{Page: p.Path, Kind: Stale, Ref: c.Ref(), Detail: "cited symbol's implementation changed"})
+			out = append(out, Finding{Page: p.Path, Kind: Drift, Ref: c.Ref(), Detail: "cited symbol's implementation changed; check the page still describes it"})
 		}
 	}
 	return out
@@ -278,9 +281,13 @@ func compareSources(r *Repo, p pages.Page, entry PageLock, covered []string) []F
 			out = append(out, Finding{Page: p.Path, Kind: Drift, Ref: path, Detail: "file changed"})
 			continue
 		}
-		if changes := surfaceChanges(was.Symbols, f.Surfaces()); changes != "" {
-			out = append(out, Finding{Page: p.Path, Kind: Stale, Ref: path, Detail: changes})
-		} else {
+		public, private := surfaceChanges(was.Symbols, f.Surfaces(), path)
+		switch {
+		case public != "":
+			out = append(out, Finding{Page: p.Path, Kind: Stale, Ref: path, Detail: public})
+		case private != "":
+			out = append(out, Finding{Page: p.Path, Kind: Drift, Ref: path, Detail: "private helpers changed: " + private})
+		default:
 			out = append(out, Finding{Page: p.Path, Kind: Drift, Ref: path, Detail: "implementation changed; signatures unchanged"})
 		}
 	}
@@ -292,23 +299,38 @@ func compareSources(r *Repo, p pages.Page, entry PageLock, covered []string) []F
 	return out
 }
 
-// surfaceChanges describes added, removed, and re-signed symbols, or "".
-func surfaceChanges(was, now map[string]string) string {
-	var added, removed, changed []string
+// surfaceChanges describes added, removed, and re-signed symbols, split into
+// public ones (stale) and private ones (drift). Either may be "".
+func surfaceChanges(was, now map[string]string, file string) (public, private string) {
+	type group struct{ changed, added, removed []string }
+	var pub, priv group
+	pick := func(q string) *group {
+		if isPrivate(q, file) {
+			return &priv
+		}
+		return &pub
+	}
 	for q, s := range now {
 		old, ok := was[q]
 		switch {
 		case !ok:
-			added = append(added, q)
+			g := pick(q)
+			g.added = append(g.added, q)
 		case old != s:
-			changed = append(changed, q)
+			g := pick(q)
+			g.changed = append(g.changed, q)
 		}
 	}
 	for q := range was {
 		if _, ok := now[q]; !ok {
-			removed = append(removed, q)
+			g := pick(q)
+			g.removed = append(g.removed, q)
 		}
 	}
+	return describe(pub.changed, pub.added, pub.removed), describe(priv.changed, priv.added, priv.removed)
+}
+
+func describe(changed, added, removed []string) string {
 	var parts []string
 	for _, group := range []struct {
 		label string
@@ -327,6 +349,29 @@ func surfaceChanges(was, now map[string]string) string {
 		parts = append(parts, group.label+": "+strings.Join(names, ", ")+suffix)
 	}
 	return strings.Join(parts, "; ")
+}
+
+// isPrivate reports whether any segment of a qualified name is private by the
+// language's convention: a leading underscore in Python (dunder methods are
+// public), a lowercase initial in Go. A "#2" duplicate suffix is ignored.
+func isPrivate(qual, file string) bool {
+	qual, _, _ = strings.Cut(qual, "#")
+	for _, seg := range strings.Split(qual, ".") {
+		if seg == "" {
+			continue
+		}
+		switch strings.ToLower(filepath.Ext(file)) {
+		case ".py":
+			if strings.HasPrefix(seg, "_") && !(strings.HasPrefix(seg, "__") && strings.HasSuffix(seg, "__")) {
+				return true
+			}
+		case ".go":
+			if r := seg[0]; r >= 'a' && r <= 'z' || r == '_' {
+				return true
+			}
+		}
+	}
+	return false
 }
 
 // Stamp records a page's current state. It fails if any citation does not

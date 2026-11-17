@@ -33,7 +33,7 @@ Dependencies point down. Language parsers know nothing about pages; pages know n
 - **Surface:** decorators, name, parameters, return annotation, bases. What callers and readers depend on.
 - **Body:** the implementation.
 
-Comments and layout are excluded from both, so reformatting changes nothing. Each parser also produces a whole-file hash so module-level code (settings, URL tables) is tracked.
+Comments, layout, trailing commas, docstrings and other bare string statements, and single logging calls (`logger.info(...)`) are excluded from both, so reformatting and log edits change nothing. A class's body hash covers its interface (attributes and member signatures), not its methods' bodies, which each method hashes itself. Each parser also produces a whole-file hash so module-level code (settings, URL tables) is tracked.
 
 - **Python** (`internal/lang/python`): a complete tokenizer (all string forms including PEP 701 f-strings, indentation, continuations) and a deliberately partial parser that understands only `def`, `async def`, `class`, and decorators. Pure Go; Python is never needed at runtime. An opt-in differential test compares it with CPython's `ast` module; see ROADMAP section 6 for results.
 - **Go** (`internal/lang/golang`): the standard library's `go/parser`.
@@ -50,8 +50,10 @@ Pages are Markdown files selected by `pages:` globs in `.indoc/config.yaml`. Pub
 
 | Condition | Kind | Fails `check` |
 |---|---|---|
-| Cited symbol's surface or body changed | stale | yes |
-| Surface added/removed/changed, or file added/removed, under `sources` | stale | yes |
+| Cited symbol's surface changed | stale | yes |
+| Cited symbol's body changed | drift (stale on `strict: true` pages) | `--strict` (yes on strict pages) |
+| Public surface added/removed/changed, or file added/removed, under `sources` | stale | yes |
+| Private surface changed under `sources` (`_name` in Python, lowercase in Go) | drift | `--strict` |
 | Covered file changed with no surface change (or unparsed file changed) | drift | `--strict` |
 | Citation or `sources` glob does not resolve | broken | yes |
 | Page edited, new, or deleted since recorded | edited / unstamped / removed | yes |

@@ -400,10 +400,13 @@ Rules:
 
 | Change | Result |
 | :--- | :--- |
-| Cited symbol changed (signature or body) | **Stale**: `check` fails |
-| Surface changed under `sources` globs | **Stale**: `check` fails |
-| Body-only change under `sources` globs | **Drift**: reported by `scan`, fails only with `check --strict` |
-| Whitespace/comments | Ignored |
+| Cited symbol's signature changed, or symbol gone | **Stale** / **Broken**: `check` fails |
+| Public surface changed under `sources` globs | **Stale**: `check` fails |
+| Cited symbol's body changed | **Drift**; **Stale** on pages with `strict: true` |
+| Body-only or private-helper change under `sources` globs | **Drift**: reported by `scan`, fails only with `check --strict` |
+| Comments, docstrings, logging calls, formatting (incl. trailing commas) | Ignored |
+
+These rules are the result of the replay measurement in section 12. The first version made every cited body change stale; on real history that was right only about 40% of the time.
 
 * Citations name symbols, not lines: `path::Symbol` or `path::Class.method`. The viewer resolves the current line when linking. Line numbers rot on every edit above them; a symbol only breaks on rename, which is exactly when the doc should be flagged.
 * Cited symbols are anchors automatically. `sources:` globs are for broader coverage.
@@ -425,3 +428,19 @@ Every phase is measured against real repositories before the next starts. Stalen
 * **Replay test:** fixed page set for shop, replay the last 100 commits, run `check` at each.
 * **Targets:** under 15% of commits fail `check`; at least 80% of 20 hand-reviewed flags are judged real.
 * Miss either target → tune detection before Phase 2. Results are recorded in this file.
+
+### Result: shop replay (2026-11-17)
+
+Setup: 7 pages written as an agent would (3 partner pages marked `strict: true`), anchored at `54ecd5f` (2025-11-21); replay of the next 100 first-parent commits. In that window the documented directories gained 5,394 lines and lost 3,579, including a provider-abstraction restructure. Each failing commit simulates the developer re-recording the flagged pages. Tool: `go run ./tools/replay`.
+
+| Iteration | Change | Commits failing | Sampled precision |
+| :--- | :--- | :--- | :--- |
+| 1 | Initial rules | 43% | not sampled |
+| 2 | Ignore docstrings and logging calls; class citation = interface | 30% | 10/20 (50%) |
+| 3 | Ignore trailing commas; cited body change → drift unless `strict: true` | 20% | **17/20 (85%)**, fresh sample |
+| 4 | Private-helper changes → drift | **17%** | ≥ 85% (only false flags removed) |
+
+Judging rule: a flag is real if the change alters behavior or interface that the page describes or that its reader relies on. Real catches included webhook signature verification being removed (the partner page still described it), OTPs becoming amount-bound, new partner endpoints and error responses, and files moved by a restructure.
+
+**Precision target met (85% ≥ 80%). Failure-rate target missed (17% > 15%).** About 3–4 of the 17 failing commits had no real finding, so roughly 3–4% of commits would block CI wrongly; the rest failed because the docs were actually wrong. A raw failure-rate target penalizes catching real staleness in actively developed code. **Open decision:** keep 15%, or replace it with a false-block target (commits failing with no real finding ≤ 5%).
+

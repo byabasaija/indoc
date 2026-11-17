@@ -128,9 +128,20 @@ func TestSignatureChangeIsStale(t *testing.T) {
 	}
 }
 
-func TestCitedBodyChangeIsStale(t *testing.T) {
+func TestCitedBodyChangeIsDriftUnlessStrict(t *testing.T) {
 	f := newFixture(t)
 	f.write("app/checkout/dispatcher.py", strings.Replace(dispatcher, "return self.route(session)", "return None", 1))
+	got := f.check()
+	expect(t, got,
+		"drift docs/routing.md app/checkout/dispatcher.py",
+		"drift docs/routing.md app/checkout/dispatcher.py::Dispatcher.dispatch")
+	if got[1].Fails(false) {
+		t.Error("cited body change on a normal page must not fail check")
+	}
+
+	f.write("docs/routing.md", strings.Replace(routingPage, "title: Routing", "title: Routing\nstrict: true", 1))
+	f.ack()
+	f.write("app/checkout/dispatcher.py", strings.Replace(dispatcher, "return self.route(session)", "return False", 1))
 	expect(t, f.check(),
 		"drift docs/routing.md app/checkout/dispatcher.py",
 		"stale docs/routing.md app/checkout/dispatcher.py::Dispatcher.dispatch")
@@ -229,5 +240,38 @@ func TestLockRoundTrip(t *testing.T) {
 	missing, err := LoadLock(filepath.Join(f.root, "nope.json"))
 	if err != nil || len(missing.Pages) != 0 {
 		t.Fatalf("missing lock should be empty, got %v %v", missing, err)
+	}
+}
+
+func TestPrivateHelpersAreDrift(t *testing.T) {
+	f := newFixture(t)
+	f.write("app/checkout/dispatcher.py", dispatcher+"\n    def _hash(self, x):\n        return x\n\n    def __repr__(self):\n        return 'd'\n")
+	got := f.check()
+	expect(t, got, "stale docs/routing.md app/checkout/dispatcher.py")
+	if got[0].Detail != "added: Dispatcher.__repr__" {
+		t.Errorf("dunder methods are public; detail = %q", got[0].Detail)
+	}
+
+	f.ack("docs/routing.md")
+	f.write("app/checkout/dispatcher.py", dispatcher+"\n    def _hash(self, x, salt):\n        return x\n\n    def __repr__(self):\n        return 'd'\n")
+	got = f.check()
+	expect(t, got, "drift docs/routing.md app/checkout/dispatcher.py")
+	if got[0].Detail != "private helpers changed: signature changed: Dispatcher._hash" {
+		t.Errorf("detail = %q", got[0].Detail)
+	}
+}
+
+func TestIsPrivate(t *testing.T) {
+	cases := map[string]bool{
+		"a.py|Handler._step": true, "a.py|_helper": true, "a.py|Handler.__init__": false,
+		"a.py|Handler.step": false, "a.py|_Internal.run": true, "a.py|f#2": false,
+		"a.go|Scanner.scan": true, "a.go|Scanner.Scan": false, "a.go|helper": true,
+		"a.rs|_x": false,
+	}
+	for in, want := range cases {
+		file, qual, _ := strings.Cut(in, "|")
+		if got := isPrivate(qual, file); got != want {
+			t.Errorf("isPrivate(%q, %q) = %v", qual, file, got)
+		}
 	}
 }

@@ -1,6 +1,7 @@
 package python
 
 import (
+	"strings"
 	"testing"
 
 	"github.com/byabasaija/indoc/internal/lang"
@@ -102,7 +103,7 @@ func TestParseFStringNestedQuotes(t *testing.T) { // PEP 701
 
 func TestHashesIgnoreFormattingAndComments(t *testing.T) {
 	a := find(t, Parse("def f(a, b):\n    return a + b\n"), "f")
-	b := find(t, Parse("def f(a,\n      b):  # sum\n    # add them\n    return a+b\n"), "f")
+	b := find(t, Parse("def f(\n    a,\n    b,\n):  # sum\n    # add them\n    return a+b\n"), "f")
 	if a.Surface != b.Surface || a.Body != b.Body {
 		t.Fatalf("formatting changed hashes: %+v vs %+v", a, b)
 	}
@@ -139,5 +140,68 @@ func TestParseNeverPanicsOnMalformedInput(t *testing.T) {
 		"s = '''unterminated", "f'{", "x = (\n", "\tdef f(): pass\n",
 	} {
 		Parse(src)
+	}
+}
+
+func TestDocstringsAndLoggingAreIgnored(t *testing.T) {
+	base := find(t, Parse("def f(x):\n    \"\"\"Old docs.\"\"\"\n    logger.info(f\"x={x}\")\n    return x\n"), "f")
+	same := find(t, Parse("def f(x):\n    \"\"\"New, longer\n    docs.\"\"\"\n    self.log.debug(\"changed\", extra={\"a\": 1})\n    return x\n"), "f")
+	if base.Body != same.Body {
+		t.Error("docstring or logging edits changed the body hash")
+	}
+	for name, src := range map[string]string{
+		"logging result used": "def f(x):\n    y = logger.info(x)\n    return x\n",
+		"logging plus call":   "def f(x):\n    logger.info(x) or g()\n    return x\n",
+		"string in call":      "def f(x):\n    g(\"\"\"text\"\"\")\n    return x\n",
+		"behavior change":     "def f(x):\n    return x + 1\n",
+	} {
+		if find(t, Parse(src), "f").Body == base.Body {
+			t.Errorf("%s: must change the body hash", name)
+		}
+	}
+	if FileHash("\"\"\"Module docs.\"\"\"\nX = 1\n") != FileHash("\"\"\"Rewritten.\"\"\"\nX = 1\n") {
+		t.Error("module docstring changed the file hash")
+	}
+}
+
+func TestClassBodyIsItsInterface(t *testing.T) {
+	src := `class Adapter(Base):
+    timeout = 30
+
+    def send(self, payload):
+        return post(payload)
+
+    class Error(Exception):
+        def describe(self):
+            return "a"
+`
+	base := find(t, Parse(src), "Adapter")
+	cases := map[string]struct {
+		edit    string
+		changes bool
+	}{
+		"method body":       {strings.Replace(src, "return post(payload)", "return put(payload)", 1), false},
+		"nested class body": {strings.Replace(src, `return "a"`, `return "b"`, 1), false},
+		"method signature":  {strings.Replace(src, "def send(self, payload)", "def send(self, payload, retry)", 1), true},
+		"class attribute":   {strings.Replace(src, "timeout = 30", "timeout = 60", 1), true},
+		"new method":        {src + "\n    def close(self):\n        pass\n", true},
+	}
+	for name, c := range cases {
+		got := find(t, Parse(c.edit), "Adapter")
+		if (got.Body != base.Body) != c.changes {
+			t.Errorf("%s: body changed = %v, want %v", name, got.Body != base.Body, c.changes)
+		}
+	}
+	// The method's own hash still sees its body.
+	if find(t, Parse(cases["method body"].edit), "Adapter.send").Body == find(t, Parse(src), "Adapter.send").Body {
+		t.Error("method body edit must change the method's body hash")
+	}
+}
+
+func TestTrailingCommasAreFormatting(t *testing.T) {
+	a := find(t, Parse("@schema(description=\"x\")\ndef f():\n    return {'a': 1, 'b': [1, 2]}\n"), "f")
+	b := find(t, Parse("@schema(\n    description=\"x\",\n)\ndef f():\n    return {\n        'a': 1,\n        'b': [1, 2,],\n    }\n"), "f")
+	if a.Surface != b.Surface || a.Body != b.Body {
+		t.Fatal("trailing commas changed hashes")
 	}
 }

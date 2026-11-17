@@ -44,6 +44,7 @@ sources:
 
 - **Cite the code you describe** as `path::Symbol` (`app/checkout/dispatcher.py::Dispatcher.dispatch`; methods and nested names use dots). Every specific claim about behavior should cite the symbol that implements it. Citations are verified and anchor the page.
 - Set `sources:` to the directories or files the page explains, as narrowly as accurate.
+- Add `strict: true` to pages whose readers depend on exact behavior: a partner or public API, webhooks, a CLI's output. On those pages any change to cited code fails the check, not only signature changes.
 - Use real commands from the project's task runner (`justfile`, `Makefile`, `package.json` scripts) and real request/response or CLI examples.
 - Do not write route or environment-variable tables. indoc generates them from source.
 - No page per source file. Write the pages a reader needs.

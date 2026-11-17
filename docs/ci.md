@@ -39,12 +39,12 @@ Lines marked `✗` fail the check. With `--strict`, drift, unanchored pages, and
 
 | Kind | Meaning | Fix |
 |---|---|---|
-| stale | Code the page cites or covers changed | Update the page, or `indoc ack <page>` if it is still correct |
+| stale | A cited signature, or a public signature under `sources`, changed (or any cited change on a `strict` page) | Update the page, or `indoc ack <page>` if it is still correct |
 | broken | A citation or `sources` glob does not resolve | Fix the citation |
 | edited | The page changed since it was recorded | `indoc ack` |
 | unstamped | A new page | `indoc ack` |
 | removed | A recorded page was deleted | `indoc ack` |
-| drift | Implementation changed, signatures did not | Review; fails only with `--strict` |
+| drift | Implementation or private helpers changed; signatures did not | Review; fails only with `--strict` |
 | unanchored | No `sources` and no citations | Add them; fails only with `--strict` |
 
 ## Recording pages

@@ -2,7 +2,7 @@
   "version": 1,
   "pages": {
     "docs/ci.md": {
-      "page": "4a61cfa7b79a34f3",
+      "page": "a6a3a28660d5e247",
       "citations": {
         "internal/cli/check.go::runCheck": {
           "surface": "4d82fe88e3e7a473",
@@ -35,7 +35,7 @@
           }
         },
         "internal/drift/drift.go": {
-          "body": "4d05c12deea26296",
+          "body": "f62926542a2b540a",
           "symbols": {
             "Ack": "bdb11477c7c441cf",
             "AckResult": "9848b62df55748a4",
@@ -59,20 +59,24 @@
             "checkCitations": "604b2c850b0dfbd2",
             "compareCitations": "9714340f130cc1ae",
             "compareSources": "f4ee5ca9a53c24e7",
+            "describe": "a44bb99c5d92c380",
             "hashBytes": "60fe68dca6b8818d",
+            "isPrivate": "3737ed6a34adaac4",
             "pathSet": "7c4b5bc9f1fc6c51",
-            "surfaceChanges": "4343603d0a650103"
+            "surfaceChanges": "14f658006d1acefa"
           }
         },
         "internal/drift/drift_test.go": {
-          "body": "65acecfa7626c300",
+          "body": "0dc7c92c1543fc9e",
           "symbols": {
             "TestAckWithoutTargetsNeverSilencesUnchangedStalePage": "b69c1af2d399f822",
-            "TestCitedBodyChangeIsStale": "eb5075765082fe56",
+            "TestCitedBodyChangeIsDriftUnlessStrict": "a7b49e9e94fbb0b7",
             "TestCommentsAndFormattingAreIgnored": "077ac7ce3e281816",
             "TestEditedPageNeedsAck": "6dddb032ffa7eacd",
+            "TestIsPrivate": "8756beba8372dbd1",
             "TestLockRoundTrip": "a0b24990fab53d39",
             "TestNewAndRemovedFilesAreStale": "b6344dfa25ae7e03",
+            "TestPrivateHelpersAreDrift": "52d4c671db4955ae",
             "TestRenamedCitationIsBroken": "c46c6a19c6c1075a",
             "TestSignatureChangeIsStale": "1ecb8b51cfffb49a",
             "TestSourcesMatchingNothingIsBroken": "027389132e5095b6",
@@ -153,7 +157,7 @@
       }
     },
     "docs/index.md": {
-      "page": "96ab9a7029958071",
+      "page": "71abd8aa0555a25b",
       "citations": {
         "internal/code/code.go::Analyze": {
           "surface": "498b2762e77d0628",
@@ -176,7 +180,7 @@
           }
         },
         "internal/drift/drift.go": {
-          "body": "4d05c12deea26296",
+          "body": "f62926542a2b540a",
           "symbols": {
             "Ack": "bdb11477c7c441cf",
             "AckResult": "9848b62df55748a4",
@@ -200,20 +204,24 @@
             "checkCitations": "604b2c850b0dfbd2",
             "compareCitations": "9714340f130cc1ae",
             "compareSources": "f4ee5ca9a53c24e7",
+            "describe": "a44bb99c5d92c380",
             "hashBytes": "60fe68dca6b8818d",
+            "isPrivate": "3737ed6a34adaac4",
             "pathSet": "7c4b5bc9f1fc6c51",
-            "surfaceChanges": "4343603d0a650103"
+            "surfaceChanges": "14f658006d1acefa"
           }
         },
         "internal/drift/drift_test.go": {
-          "body": "65acecfa7626c300",
+          "body": "0dc7c92c1543fc9e",
           "symbols": {
             "TestAckWithoutTargetsNeverSilencesUnchangedStalePage": "b69c1af2d399f822",
-            "TestCitedBodyChangeIsStale": "eb5075765082fe56",
+            "TestCitedBodyChangeIsDriftUnlessStrict": "a7b49e9e94fbb0b7",
             "TestCommentsAndFormattingAreIgnored": "077ac7ce3e281816",
             "TestEditedPageNeedsAck": "6dddb032ffa7eacd",
+            "TestIsPrivate": "8756beba8372dbd1",
             "TestLockRoundTrip": "a0b24990fab53d39",
             "TestNewAndRemovedFilesAreStale": "b6344dfa25ae7e03",
+            "TestPrivateHelpersAreDrift": "52d4c671db4955ae",
             "TestRenamedCitationIsBroken": "c46c6a19c6c1075a",
             "TestSignatureChangeIsStale": "1ecb8b51cfffb49a",
             "TestSourcesMatchingNothingIsBroken": "027389132e5095b6",
@@ -232,7 +240,7 @@
       }
     },
     "docs/writing-pages.md": {
-      "page": "b39063a28f1c442c",
+      "page": "315a89f9f21d6617",
       "citations": {
         "internal/code/code.go::Analyze": {
           "surface": "498b2762e77d0628",
@@ -248,7 +256,7 @@
         },
         "internal/pages/pages.go::Parse": {
           "surface": "21d7718c70908c49",
-          "body": "1f6a8d3730f5c3da"
+          "body": "b7199f790d64bb50"
         }
       },
       "sources": {
@@ -265,20 +273,20 @@
           }
         },
         "internal/pages/pages.go": {
-          "body": "e16fbbcc9cac9309",
+          "body": "f0ffc11c97238c71",
           "symbols": {
             "Citation": "4ff1d172532f8877",
             "Citation.Ref": "d428f6f2d2b262be",
             "Load": "92343c81f51a3dd1",
             "Match": "b6ece7cdf64077ba",
-            "Page": "59f9319db9df51d5",
+            "Page": "88cf0c7a66dda464",
             "Page.Anchored": "91797e9211489847",
             "Parse": "21d7718c70908c49",
             "fenceMarker": "da58d0423dfd6529",
             "findCitations": "a7fd3bcc744cf263",
             "firstHeading": "a09462356d2e5c85",
             "firstNonEmpty": "a4fc998c56dbd5b9",
-            "frontmatter": "b94b106391271173",
+            "frontmatter": "a3e46e688c5f9c60",
             "splitFrontmatter": "392c5658a5874645",
             "titleFromPath": "0ccab65379cf0320"
           }

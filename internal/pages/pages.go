@@ -25,6 +25,9 @@ type Page struct {
 	Audience  string
 	Layout    string
 	Sources   []string // globs of code this page describes
+	// Strict makes any change to a cited symbol, including its body, fail
+	// check. For pages describing externally visible behavior.
+	Strict    bool
 	Body      string   // Markdown without frontmatter
 	Raw       []byte   // whole file, for hashing
 	Citations []Citation
@@ -49,6 +52,7 @@ type frontmatter struct {
 	Audience        string   `yaml:"audience"`
 	Layout          string   `yaml:"layout"`
 	Sources         []string `yaml:"sources"`
+	Strict          bool     `yaml:"strict"`
 	SidebarLabel    string   `yaml:"sidebar_label"`    // Docusaurus
 	SidebarPosition *int     `yaml:"sidebar_position"` // Docusaurus
 }
@@ -111,6 +115,7 @@ func Parse(pagePath string, raw []byte) (Page, error) {
 		p.Title = firstNonEmpty(fm.Title, fm.SidebarLabel)
 		p.Audience = fm.Audience
 		p.Layout = fm.Layout
+		p.Strict = fm.Strict
 		for _, s := range fm.Sources {
 			s = strings.TrimSpace(s)
 			if s == "" {
