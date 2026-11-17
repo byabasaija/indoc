@@ -7,14 +7,14 @@
 
 ## 1. Problem
 
-The first real test (a Django codebase, shop) produced docs nobody would keep:
+The first real test (a private production Django API, "the pilot repo" below) produced docs nobody would keep:
 
 | Symptom | Cause |
 | :--- | :--- |
 | Reference section empty | Extractor missed 53 Django `path()` routes and ~25 `env("X")` reads. Scan stayed silent about it. |
 | Overview ~400 chars, guides ~600 chars | Agent guide asks for "a small number of guides" and sets no quality bar or audience. |
 | Existing `docs/*.md` (20 KB of real partner docs) ignored | indoc only knows `.indoc/site.json`. |
-| `project_name: Shop API Documentation` | `init` default, never inferred. |
+| `project_name: <Name> API Documentation` | `init` default, never inferred. |
 
 The tool tells the agent to be brief, then hands it no facts. Generic output is the predictable result.
 
@@ -73,7 +73,7 @@ order: 2
 audience: partner          # optional; groups pages in the viewer
 sources:                   # globs this page describes
   - shop/api/partner/**
-  - shop/core/services/payments.py
+  - shop/payments/gateway.py
 ---
 
 Partners authenticate with ... (`shop/api/partner/auth.py::PartnerAuthentication`)
@@ -207,12 +207,12 @@ Alternatives rejected:
 * **Existing pure-Go Python parsers.** The ones available target old grammar versions and fail on modern syntax (f-string nesting, `match`, type parameter syntax).
 * **tree-sitter via cgo.** Breaks the single static binary and cross-compilation.
 
-**Correctness is measured, not assumed.** A test-only harness (never a runtime dependency) runs CPython's `ast` module over a corpus (shop, the other Django and FastAPI repos available locally, plus Django and DRF source) and compares, per file: every symbol's name, qualified path, and start/end line. **Target: 100% agreement.** Every disagreement becomes a fixture.
+**Correctness is measured, not assumed.** A test-only harness (never a runtime dependency) runs CPython's `ast` module over a corpus (the pilot repo, the other Django and FastAPI repos available locally, plus Django and DRF source) and compares, per file: every symbol's name, qualified path, and start/end line. **Target: 100% agreement.** Every disagreement becomes a fixture.
 
 **Result (2026-11-17):** 29,536 files, 409,406 symbols, **100% agreement** with CPython 3.13 `ast` (name, qualified path, start and end line). Corpus: 11 local Django/FastAPI projects including their virtualenvs (Django, DRF, Pillow, pygments, and more) plus the CPython 3.13 standard library. 6 files skipped because CPython itself rejects them. The first run agreed on 84% of files; two tokenizer bugs (indentation measured after a bracket closed mid-line; backslash before `{` in f-strings) accounted for every mismatch and are now regression tests. Reproduce:
 
 ```
-INDOC_PY_CORPUS=~/projects/shop INDOC_PYTHON=python3.13 \
+INDOC_PY_CORPUS=~/projects/your-django-app INDOC_PYTHON=python3.13 \
   go test ./internal/lang/python -run Differential -v
 ```
 
@@ -247,7 +247,7 @@ Deterministic checks the tool owns:
 Agent workflow (skill / MCP prompt):
 
 1. Run scan; read the project map and existing docs.
-2. **Propose an audience and outline to the user before writing.** Example for shop: *partner integrators* (auth, endpoints, callbacks, errors) and *team developers* (setup, checkout routing, provider adapters).
+2. **Propose an audience and outline to the user before writing.** Example for a payments API: *partner integrators* (auth, endpoints, callbacks, errors) and *team developers* (setup, checkout flow, provider adapters).
 3. Write pages with `sources:` and citations. Every guide has real commands, real paths, and a real request/response or CLI example where one applies.
 4. Run `check` and `bundle`; fix errors.
 
@@ -299,7 +299,7 @@ Every page is pre-rendered to its own HTML file. No JavaScript is required to re
 .indoc/site/                     (default; output_dir overrides)
 ├── index.html                  landing page
 ├── partner/authentication/index.html
-├── dev/checkout-routing/index.html
+├── dev/checkout/index.html
 ├── reference/routes/index.html     generated
 ├── reference/config/index.html     generated
 ├── 404.html
@@ -320,7 +320,7 @@ Every page is pre-rendered to its own HTML file. No JavaScript is required to re
 
 ## 9. Phases
 
-Each phase ends with a concrete check against a real repo, shop unless noted.
+Each phase ends with a concrete check against a real repo, the pilot repo unless noted.
 
 ### Phase 1: Markdown pages + `check`
 * `pages:` globs, frontmatter parsing (incl. Docusaurus keys), overview detection.
@@ -331,20 +331,20 @@ Each phase ends with a concrete check against a real repo, shop unless noted.
 * Move config to `.indoc/config.yaml`; default output `.indoc/site/`; `init` writes `.indoc/.gitignore`.
 * `init` infers project name, lists existing docs for opt-in, proposes a pages location, and asks how the site will be published.
 * `check` works on any Markdown docs folder (check-only adoption), including Docusaurus.
-* **Exit:** shop's `partner-integration.md` bundles with `code-review-gaps-*.md` excluded; replay test meets the section 12 targets.
+* **Exit:** the pilot repo's partner guide bundles with its internal review notes excluded; replay test meets the section 12 targets.
 
 ### Phase 2: Extractor interface + Django/DRF (done 2026-11-17)
 * Coverage reporting per extractor, zero-result warnings.
 * Django URLconf resolution, DRF routers, settings, management commands.
-* **Exit:** shop reference shows all 53 URL patterns (resolved full paths) and every env var, or names exactly which could not be resolved.
-* **Result:** a differential test runs Django's own URL resolver in each project's environment and compares route by route. Six private Django projects: **522 routes, 0 missing, 0 extra, 0 wrong HTTP methods.** Third-party URL trees (admin, allauth, wagtail, debug toolbar) are reported as external includes. Env vars on shop: 31 found, a superset of what `grep` finds (25; it misses multi-line calls). Found along the way: an unreachable DRF API root in app-e (now a warning) and secret defaults that would have been published (now redacted).
+* **Exit:** the pilot repo's reference shows all 53 URL patterns (resolved full paths) and every env var, or names exactly which could not be resolved.
+* **Result:** a differential test runs Django's own URL resolver in each project's environment and compares route by route. Six private Django projects: **522 routes, 0 missing, 0 extra, 0 wrong HTTP methods.** Third-party URL trees (admin, allauth, wagtail, debug toolbar) are reported as external includes. Env vars on the pilot repo: 31 found, a superset of what `grep` finds (25; it misses multi-line calls). Found along the way: an unreachable DRF API root in one project (now a warning) and secret defaults that would have been published (now redacted).
 
 ### Phase 3: Citations + project map (done 2026-11-17)
 * Citation validation in `check`/`bundle` (Phase 1); "view source" links via a `source_url` template inferred from the git remote.
 * Scan returns the project map: frameworks, entry points, most-imported modules, git hot files, existing docs, task runner targets.
 * Rewrite the skill around outline-first authoring.
-* **Exit:** regenerating shop docs produces partner and developer pages where every guide cites code; side-by-side review against the first run.
-* **Result:** following the skill on shop (in a copy; the repository was not modified):
+* **Exit:** regenerating the pilot repo's docs produces partner and developer pages where every guide cites code; side-by-side review against the first run.
+* **Result:** following the skill on the pilot repo (in a copy; the repository was not modified):
 
 | | First run (old workflow) | Phase 3 workflow |
 | :--- | :--- | :--- |
@@ -353,13 +353,13 @@ Each phase ends with a concrete check against a real repo, shop unless noted.
 | Citations | 0 | 38, all verified, all linked to the exact line |
 | Commands | none | from the `justfile` and CI workflow |
 | Reference | empty | 67 routes, 31 environment variables, 3 management commands |
-| Drift detection | none | changing `verify_withdrawal_otp`'s signature fails `check` on exactly the two pages that describe it |
+| Drift detection | none | changing a cited function's signature fails `check` on exactly the two pages that describe it |
 
-  The existing partner guide was wrong on three points the code made visible: the API key is required only for partner sessions (not on every call), a wrong or amount-mismatched code returns `400 invalid_code`, and an code is valid only for the amount it was issued for. Partner pages are `strict: true`. Setup is the only page without citations; it cites the `justfile` via `sources:`.
+  The existing partner guide was wrong on three points the code made visible: when authentication applies, an error response, and a validation rule. Partner pages are `strict: true`. Setup is the only page without citations; it cites the `justfile` via `sources:`.
 
 ### Phase 4: FastAPI + Cobra (done 2026-11-17)
-* **Exit:** lexai (or another FastAPI project) and indoc itself produce complete reference pages.
-* **Result:** FastAPI extraction matches FastAPI's own route table (expanded through included routers) on fastapi-app (6/6) and on a fixture covering decorators, `api_route`, `add_api_route`, nested `include_router` with prefixes, websockets, mounted sub-apps, static mounts, custom docs URLs, and duplicate paths (14/14). lexai and another-fastapi-app cannot be imported safely (lexai creates a database at import), so they were checked by reading the source: all routes and environment variables found. Pydantic `BaseSettings` fields are extracted as environment variables. Cobra extraction matches indoc's runtime command tree exactly (8 commands, all flags). The six Django projects still match after the changes.
+* **Exit:** a FastAPI project and indoc itself produce complete reference pages.
+* **Result:** FastAPI extraction matches FastAPI's own route table (expanded through included routers) on a private FastAPI project (6/6) and on a fixture covering decorators, `api_route`, `add_api_route`, nested `include_router` with prefixes, websockets, mounted sub-apps, static mounts, custom docs URLs, and duplicate paths (14/14). Two other private FastAPI projects cannot be imported safely (one creates a database at import), so they were checked by reading the source: all routes and environment variables found. Pydantic `BaseSettings` fields are extracted as environment variables. Cobra extraction matches indoc's runtime command tree exactly (8 commands, all flags). The six Django projects still match after the changes.
 
 ### Phase 4b: tree-sitter parsing layer (JS/TS done 2026-11-17)
 * wazero + tree-sitter WebAssembly; full syntax trees to Go, symbol rules in Go (no `tags.scm`).
@@ -368,16 +368,16 @@ Each phase ends with a concrete check against a real repo, shop unless noted.
 
 | Measure | Result | Target |
 | :--- | :--- | :--- |
-| Correctness | 9,436 JS/TS/TSX files, 56,396 symbols, **0 mismatches** vs the TypeScript compiler (a production web app and a frontend `node_modules`). 57 minified bundles reported, not compared. | ≥ 99.5% |
+| Correctness | 9,436 JS/TS/TSX files, 56,396 symbols, **0 mismatches** vs the TypeScript compiler (a private Astro/React project and a frontend `node_modules`). 57 minified bundles reported, not compared. | ≥ 99.5% |
 | Binary size | +4.3 MB (12.9 → 17.2 MB): ~0.5 MB gzipped grammars, the rest wazero | ≤ +6 MB |
 | Startup | 70 ms cold (compile), 3-4 ms with the on-disk cache | ≤ 300 ms |
 | Speed | ~5 MB/s per core; 4,684 JS files (41 MB) in 3.2 s on 8 workers | 5,000 files < 10 s |
 | Reproducibility | `make grammars` output identical byte for byte | — |
 
-  Getting to zero mismatches meant settling what a symbol is, mostly on the reference side: object-literal methods are not symbols (no stable name); `const A = class B {}` is one symbol named `A`; named class expressions count; `declare global` is not a namespace; computed names (`[Symbol.iterator]`) are skipped. Tree-sitter is about 7x slower than the hand-written Python parser per file (4 vs 29 MB/s); in absolute terms shop takes 0.35 s instead of 0.05 s.
-* **Python moved to tree-sitter (done 2026-11-17).** The hand-written tokenizer, parser, and expression parser (~1,000 lines) are deleted; symbols, hashes, and the module view used by the Django, FastAPI, and env extractors now come from tree-sitter syntax trees. Gates, all passed: CPython differential 34,120 of 34,121 files (454,837 symbols) (the one miss is CPython's compiler stress test `test_compile.py`, whose dedented continuation inside brackets defeats the grammar's indentation scanner); the six Django differentials (524 routes) and FastAPI differentials unchanged; shop reference identical (67 routes, 31 variables, 3 commands); the 100-commit shop replay produced exactly the same failing findings commit for commit. Per-file parsing is ~7x slower than the hand-written parser, but `check` takes 0.14 s and `scan` 0.63 s on shop, so parallel analysis was not added.
+  Getting to zero mismatches meant settling what a symbol is, mostly on the reference side: object-literal methods are not symbols (no stable name); `const A = class B {}` is one symbol named `A`; named class expressions count; `declare global` is not a namespace; computed names (`[Symbol.iterator]`) are skipped. Tree-sitter is about 7x slower than the hand-written Python parser per file (4 vs 29 MB/s); in absolute terms the pilot repo takes 0.35 s instead of 0.05 s.
+* **Python moved to tree-sitter (done 2026-11-17).** The hand-written tokenizer, parser, and expression parser (~1,000 lines) are deleted; symbols, hashes, and the module view used by the Django, FastAPI, and env extractors now come from tree-sitter syntax trees. Gates, all passed: CPython differential 34,120 of 34,121 files (454,837 symbols) (the one miss is CPython's compiler stress test `test_compile.py`, whose dedented continuation inside brackets defeats the grammar's indentation scanner); the six Django differentials (524 routes) and FastAPI differentials unchanged; the pilot repo's reference identical (67 routes, 31 variables, 3 commands); the 100-commit pilot repo replay produced exactly the same failing findings commit for commit. Per-file parsing is ~7x slower than the hand-written parser, but `check` takes 0.14 s and `scan` 0.63 s on the pilot repo, so parallel analysis was not added.
 * **Lock compatibility.** Each lock entry records the file's exact bytes and the hasher (parser, grammar commit, normalization rules version). When a newer indoc hashes differently, unchanged files upgrade silently on the next `ack`/`bundle` and changed files are drift, so upgrading indoc never fails a check.
-* **JavaScript framework routes (done 2026-11-17).** Express, Next.js, NestJS, and Astro, each checked against the framework itself where it can run: Express 4.22 and 5.3 via a runtime tracer (14/14 routes), Next.js 15.5 via `next build` route manifests (10/10), NestJS 11.2 via the routes it registers (8/8), and Astro on a production web app (70 page files, every endpoint's methods matching its exports). Go stays on `go/ast`.
+* **JavaScript framework routes (done 2026-11-17).** Express, Next.js, NestJS, and Astro, each checked against the framework itself where it can run: Express 4.22 and 5.3 via a runtime tracer (14/14 routes), Next.js 15.5 via `next build` route manifests (10/10), NestJS 11.2 via the routes it registers (8/8), and Astro on a private Astro project (70 page files, every endpoint's methods matching its exports). Go stays on `go/ast`.
 * **Phase 4b complete.** Next: Phase 5.
 * Rust was dropped: no demand yet, and every grammar costs binary size and maintenance. The pipeline adds a language in a day when a user needs one.
 
@@ -423,7 +423,7 @@ Saying no keeps indoc small enough to be excellent at one thing. Each item lists
 
 ### Staleness is symbol-level, tiered
 
-Measured on shop (411 commits, 1,072 non-test source-file changes):
+Measured on the pilot repo (411 commits, 1,072 non-test source-file changes):
 
 | Change kind | Share |
 | :--- | :--- |
@@ -451,7 +451,7 @@ These rules are the result of the replay measurement in section 12. The first ve
 
 ### Publishing is opt-in
 
-shop's `docs/` contains partner docs next to `code-review-gaps-*.md` and agent planning files. Bundling `docs/` by default would publish a list of security gaps.
+The pilot repo's `docs/` holds partner docs next to internal code-review notes and agent planning files. Bundling `docs/` by default would have published the internal notes.
 
 * Only files matched by `pages:` globs in `.indoc/config.yaml` are bundled.
 * `init` lists existing Markdown; the agent asks the user which to include.
@@ -462,13 +462,13 @@ shop's `docs/` contains partner docs next to `code-review-gaps-*.md` and agent p
 
 Every phase is measured against real repositories before the next starts. Staleness specifically:
 
-* **Replay test:** fixed page set for shop, replay the last 100 commits, run `check` at each.
+* **Replay test:** fixed page set for the pilot repo, replay the last 100 commits, run `check` at each.
 * **Targets:** at most 5% of commits fail `check` with no real finding (false blocks); at least 80% of 20 hand-reviewed flags are judged real. (The original target, under 15% of commits failing for any reason, was replaced on 2026-11-17: it penalized catching real staleness in actively developed code.)
 * Miss either target → tune detection before Phase 2. Results are recorded in this file.
 
-### Result: shop replay (2026-11-17)
+### Result: pilot repo replay (2026-11-17)
 
-Setup: 7 pages written as an agent would (3 partner pages marked `strict: true`), anchored at `54ecd5f` (2025-11-21); replay of the next 100 first-parent commits. In that window the documented directories gained 5,394 lines and lost 3,579, including a provider-abstraction restructure. Each failing commit simulates the developer re-recording the flagged pages. Tool: `go run ./tools/replay`.
+Setup: 7 pages written as an agent would (3 partner pages marked `strict: true`), anchored at a commit from 2025-11; replay of the next 100 first-parent commits. In that window the documented directories gained 5,394 lines and lost 3,579, including a provider-abstraction restructure. Each failing commit simulates the developer re-recording the flagged pages. Tool: `go run ./tools/replay`.
 
 | Iteration | Change | Commits failing | Sampled precision |
 | :--- | :--- | :--- | :--- |
@@ -477,7 +477,7 @@ Setup: 7 pages written as an agent would (3 partner pages marked `strict: true`)
 | 3 | Ignore trailing commas; cited body change → drift unless `strict: true` | 20% | **17/20 (85%)**, fresh sample |
 | 4 | Private-helper changes → drift | **17%** | ≥ 85% (only false flags removed) |
 
-Judging rule: a flag is real if the change alters behavior or interface that the page describes or that its reader relies on. Real catches included webhook signature verification being removed (the partner page still described it), OTPs becoming amount-bound, new partner endpoints and error responses, and files moved by a restructure.
+Judging rule: a flag is real if the change alters behavior or interface that the page describes or that its reader relies on. Real catches included a security check removed while a partner page still described it, a changed validation rule, new partner endpoints and error responses, and files moved by a restructure.
 
 **Precision target met (85% ≥ 80%). Failure-rate target missed (17% > 15%).** About 3–4 of the 17 failing commits had no real finding, so roughly 3–4% of commits would block CI wrongly; the rest failed because the docs were actually wrong. A raw failure-rate target penalizes catching real staleness in actively developed code, so the target was replaced with false blocks ≤ 5%. **Phase 1 gate: passed** (≈3–4% false blocks, 85% precision).
 

@@ -108,14 +108,14 @@
           "hasher": "bytes"
         },
         "plugin/skills/indoc/SKILL.md": {
-          "body": "07193cbedb0ace1f",
-          "raw": "07193cbedb0ace1f",
+          "body": "642f016d425dc3d7",
+          "raw": "642f016d425dc3d7",
           "hasher": "bytes"
         }
       }
     },
     "documentation/ci.md": {
-      "page": "fac8ae35c1f61986",
+      "page": "21a59666872ccdc1",
       "citations": {
         "internal/cli/check.go::runCheck": {
           "surface": "4d82fe88e3e7a473",
@@ -220,7 +220,7 @@
           "hasher": "go/2"
         },
         "internal/drift/drift_test.go": {
-          "body": "7fcf866d94f53233",
+          "body": "ded2d51834b85269",
           "symbols": {
             "TestAckWithoutTargetsNeverSilencesUnchangedStalePage": "b69c1af2d399f822",
             "TestCitedBodyChangeIsDriftUnlessStrict": "a7b49e9e94fbb0b7",
@@ -255,7 +255,7 @@
             "fixture.write",
             "newFixture"
           ],
-          "raw": "17923641fc6a6de5",
+          "raw": "8b21f526cf53a26f",
           "hasher": "go/2"
         }
       }
@@ -357,7 +357,7 @@
           "hasher": "go/2"
         },
         "internal/config/config_test.go": {
-          "body": "296db378a3830332",
+          "body": "c4d81899cad64e1b",
           "symbols": {
             "TestInferProjectName": "4a4371ac59b9b6c3",
             "TestLoadDefaultsOutputDir": "21eb196bb3e3702d",
@@ -366,7 +366,7 @@
             "TestSaveLoadRoundTrip": "59775ecd4338fc38",
             "TestSourceURL": "292d1d4604b5f38c"
           },
-          "raw": "42168b5f137ea017",
+          "raw": "6a7504c701928bbe",
           "hasher": "go/2"
         }
       }
@@ -452,7 +452,7 @@
           "hasher": "go/2"
         },
         "internal/drift/drift_test.go": {
-          "body": "7fcf866d94f53233",
+          "body": "ded2d51834b85269",
           "symbols": {
             "TestAckWithoutTargetsNeverSilencesUnchangedStalePage": "b69c1af2d399f822",
             "TestCitedBodyChangeIsDriftUnlessStrict": "a7b49e9e94fbb0b7",
@@ -487,13 +487,13 @@
             "fixture.write",
             "newFixture"
           ],
-          "raw": "17923641fc6a6de5",
+          "raw": "8b21f526cf53a26f",
           "hasher": "go/2"
         }
       }
     },
     "documentation/reference.md": {
-      "page": "16b92482426b3bc7",
+      "page": "27003eb7b1a08e91",
       "citations": {
         "internal/reference/reference.go::Coverage": {
           "surface": "a4c40678d4643931",
@@ -617,7 +617,7 @@
             "normalizeDjangoPath",
             "orderedList"
           ],
-          "raw": "1251d51da2241118",
+          "raw": "9aa85e90747dde5a",
           "hasher": "go/2"
         },
         "internal/reference/django_test.go": {
@@ -791,7 +791,7 @@
             "compareFastAPI",
             "orderedOrAll"
           ],
-          "raw": "920ac34e2ae8c16f",
+          "raw": "6db0fb9bb0fd2535",
           "hasher": "go/2"
         },
         "internal/reference/fsroutes.go": {
@@ -1270,7 +1270,7 @@
       }
     },
     "documentation/writing-pages.md": {
-      "page": "cdb47823e6d3e57d",
+      "page": "a4c172812c72e439",
       "citations": {
         "internal/code/code.go::Analyze": {
           "surface": "498b2762e77d0628",
@@ -1363,7 +1363,7 @@
           "hasher": "go/2"
         },
         "internal/pages/pages_test.go": {
-          "body": "a4ffb56386b75fbc",
+          "body": "b768bfa9676d7254",
           "symbols": {
             "TestLinkify": "1573063d76c9937b",
             "TestMatch": "ace37652a65aedac",
@@ -1371,7 +1371,7 @@
             "TestParseFrontmatterAndCitations": "d463991d1ab22c96",
             "TestParseRejectsBadFrontmatter": "7213cdfdef0417c9"
           },
-          "raw": "652688294ec62d53",
+          "raw": "264a8578d291eba0",
           "hasher": "go/2"
         }
       }

@@ -7,35 +7,35 @@ import (
 
 func TestParseFrontmatterAndCitations(t *testing.T) {
 	raw := []byte(`---
-title: How checkout sessions are routed
+title: How checkout charges a card
 order: 3
 audience: dev
 sources:
-  - shop/core/services/checkout/**
+  - shop/checkout/**
 ---
 
 # Ignored heading
 
-Requests land in ` + "`shop/core/services/checkout/dispatcher.py::CheckoutDispatcher.dispatch`" + `,
-which calls shop/core/services/checkout/cardpay/handler.py::CardPaymentHandler.
+Requests land in ` + "`shop/checkout/dispatcher.py::CheckoutService.dispatch`" + `,
+which calls shop/checkout/wallet/handler.py::WalletHandler.
 
 ` + "```rust\nuse std::io::Read; // not.rs::a citation\n```" + `
 
-Again: ` + "`shop/core/services/checkout/dispatcher.py::CheckoutDispatcher.dispatch`" + `
+Again: ` + "`shop/checkout/dispatcher.py::CheckoutService.dispatch`" + `
 `)
 	p, err := Parse("docs/dev/checkout.md", raw)
 	if err != nil {
 		t.Fatal(err)
 	}
-	if p.Title != "How checkout sessions are routed" || !p.HasOrder || p.Order != 3 || p.Audience != "dev" {
+	if p.Title != "How checkout charges a card" || !p.HasOrder || p.Order != 3 || p.Audience != "dev" {
 		t.Errorf("frontmatter not applied: %+v", p)
 	}
-	if !reflect.DeepEqual(p.Sources, []string{"shop/core/services/checkout/**"}) {
+	if !reflect.DeepEqual(p.Sources, []string{"shop/checkout/**"}) {
 		t.Errorf("sources = %v", p.Sources)
 	}
 	want := []Citation{
-		{Path: "shop/core/services/checkout/dispatcher.py", Symbol: "CheckoutDispatcher.dispatch", Line: 11},
-		{Path: "shop/core/services/checkout/cardpay/handler.py", Symbol: "CardPaymentHandler", Line: 12},
+		{Path: "shop/checkout/dispatcher.py", Symbol: "CheckoutService.dispatch", Line: 11},
+		{Path: "shop/checkout/wallet/handler.py", Symbol: "WalletHandler", Line: 12},
 	}
 	if !reflect.DeepEqual(p.Citations, want) {
 		t.Errorf("citations = %+v\nwant %+v", p.Citations, want)
@@ -78,7 +78,7 @@ func TestParseRejectsBadFrontmatter(t *testing.T) {
 }
 
 func TestMatch(t *testing.T) {
-	files := []string{"README.md", "docs/a.md", "docs/code-review-gaps.md", "docs/partner/b.md", "docs/x.pdf"}
+	files := []string{"README.md", "docs/a.md", "docs/internal-review-notes.md", "docs/partner/b.md", "docs/x.pdf"}
 	got := Match(files, []string{"docs/partner/**/*.md", "docs/a.md"})
 	if !reflect.DeepEqual(got, []string{"docs/a.md", "docs/partner/b.md"}) {
 		t.Errorf("Match = %v", got)

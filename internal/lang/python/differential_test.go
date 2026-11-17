@@ -16,7 +16,7 @@ import (
 // TestDifferentialCPython compares Parse against CPython's ast module over a
 // corpus of real code. It is opt-in because it needs Python and a corpus:
 //
-//	INDOC_PY_CORPUS=~/projects/shop:~/other INDOC_PYTHON=python3.13 \
+//	INDOC_PY_CORPUS=~/projects/your-django-app:~/other INDOC_PYTHON=python3.13 \
 //	  go test ./internal/lang/python -run Differential -v
 //
 // Every symbol's qualified name, start line, and end line must agree.

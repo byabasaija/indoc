@@ -212,7 +212,7 @@ func TestBundleRefusesBrokenCitations(t *testing.T) {
 func TestInitWithExistingDocsPublishesNothing(t *testing.T) {
 	r := newRepo(t)
 	r.write("documentation/partner-integration.md", "# Partners\n")
-	r.write("documentation/code-review-gaps.md", "# Security gaps\n")
+	r.write("documentation/internal-review-notes.md", "# Internal review notes\n")
 	var out bytes.Buffer
 	if err := runInit(r.cfg, &out, nil, "", false); err != nil {
 		t.Fatal(err)
@@ -224,7 +224,7 @@ func TestInitWithExistingDocsPublishesNothing(t *testing.T) {
 	if len(cfg.Pages) != 0 {
 		t.Fatalf("existing docs were published by default: %v", cfg.Pages)
 	}
-	if !strings.Contains(out.String(), "documentation/code-review-gaps.md") {
+	if !strings.Contains(out.String(), "documentation/internal-review-notes.md") {
 		t.Fatalf("init did not list existing docs:\n%s", out.String())
 	}
 	if err := runCheck(r.cfg, &out, false, false, false); err == nil || !strings.Contains(err.Error(), "no pages configured") {
@@ -237,7 +237,7 @@ func TestInitWithExistingDocsPublishesNothing(t *testing.T) {
 	if err := runBundle(r.cfg, "", &bytes.Buffer{}); err != nil {
 		t.Fatal(err)
 	}
-	if strings.Contains(r.site(), "Security gaps") {
+	if strings.Contains(r.site(), "Internal review notes") {
 		t.Fatal("unselected page was published")
 	}
 }

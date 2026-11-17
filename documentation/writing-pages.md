@@ -12,15 +12,15 @@ A page is a Markdown file with optional YAML frontmatter, parsed by `internal/pa
 
 ```markdown
 ---
-title: How checkout sessions are routed
+title: How checkout charges a card
 order: 2
 audience: dev
 sources:
-  - shop/core/services/checkout/**
+  - shop/checkout/**
 ---
 
-Every request lands in
-`shop/core/services/checkout/dispatcher.py::CheckoutDispatcher.dispatch`.
+Every order is charged by
+`shop/checkout/service.py::CheckoutService.charge`.
 ```
 
 ## Frontmatter

@@ -34,9 +34,9 @@ Use `mode: warn` while trying it out. Without the action, install indoc any way 
 ## Reading the report
 
 ```
-documentation/dev/checkout-routing.md
-  ✗ STALE      shop/core/services/checkout/dispatcher.py::CheckoutDispatcher.dispatch  cited symbol's signature changed
-    DRIFT      shop/core/services/checkout/session.py  implementation changed; signatures unchanged
+documentation/dev/checkout.md
+  ✗ STALE      shop/checkout/service.py::CheckoutService.charge  cited symbol's signature changed
+    DRIFT      shop/checkout/session.py  implementation changed; signatures unchanged
 ```
 
 Lines marked `✗` fail the check. With `--strict`, drift, unanchored pages, and unverifiable citations fail too.

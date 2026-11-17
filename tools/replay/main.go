@@ -5,8 +5,8 @@
 // simulates a developer responding (re-recording the flagged pages) so one
 // change is not counted again on every later commit.
 //
-//	go run ./tools/replay run -repo ~/projects/shop -pages ./pages -base <sha> -n 100
-//	go run ./tools/replay symbols -repo ~/projects/shop -rev <sha> path/to/file.py
+//	go run ./tools/replay run -repo ~/projects/your-django-app -pages ./pages -base <sha> -n 100
+//	go run ./tools/replay symbols -repo ~/projects/your-django-app -rev <sha> path/to/file.py
 //
 // Development tool only; not part of the indoc binary.
 package main

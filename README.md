@@ -38,9 +38,9 @@ Docs rot quietly. A function gets a new parameter, a route moves, and the guide 
 
 ```console
 $ indoc check
-documentation/dev/checkout-routing.md
-  ✗ STALE      shop/core/services/checkout/dispatcher.py::CheckoutDispatcher.dispatch  cited symbol's signature changed
-    DRIFT      shop/core/services/checkout/session.py  implementation changed; signatures unchanged
+documentation/dev/checkout.md
+  ✗ STALE      shop/checkout/service.py::CheckoutService.charge  cited symbol's signature changed
+    DRIFT      shop/checkout/session.py  implementation changed; signatures unchanged
 
 6 pages checked: 1 stale, 1 drift
 Error: docs do not match the code
@@ -111,13 +111,13 @@ A page says which code it covers and cites the symbols it explains:
 
 ```markdown
 ---
-title: How checkout sessions are routed
+title: How checkout charges a card
 sources:
-  - shop/core/services/checkout/**
+  - shop/checkout/**
 ---
 
-Every request lands in `shop/core/services/checkout/dispatcher.py::CheckoutDispatcher.dispatch`,
-which picks a handler from the merchant's payment provider.
+Every order is charged by `shop/checkout/service.py::CheckoutService.charge`,
+which picks a payment provider for the customer's country.
 ```
 
 `.indoc/lock.json` (committed) records what each page was verified against. `indoc check` compares the code with that record:

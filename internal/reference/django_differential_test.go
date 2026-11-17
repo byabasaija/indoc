@@ -17,8 +17,8 @@ import (
 // TestDjangoDifferential compares the static Django extractor with Django's
 // own URL resolver running in the project's environment. Opt-in:
 //
-//	INDOC_DJANGO_REPO=~/projects/shop \
-//	INDOC_DJANGO_PYTHON=~/projects/shop/.venv/bin/python \
+//	INDOC_DJANGO_REPO=~/projects/your-django-app \
+//	INDOC_DJANGO_PYTHON=~/projects/your-django-app/.venv/bin/python \
 //	INDOC_DJANGO_ENV='DJANGO_SETTINGS_MODULE=config.settings.test DATABASE_URL=sqlite:///dummy.db' \
 //	  go test ./internal/reference -run DjangoDifferential -v
 //

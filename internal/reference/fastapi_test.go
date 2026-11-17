@@ -190,8 +190,8 @@ func TestFastAPIExtraction(t *testing.T) {
 
 // TestFastAPIDifferential compares against a real project's route table:
 //
-//	INDOC_FASTAPI_REPO=~/projects/fastapi-app INDOC_FASTAPI_APP=app.main:app \
-//	INDOC_FASTAPI_PYTHON=~/projects/fastapi-app/.venv/bin/python go test ./internal/reference -run FastAPIDifferential -v
+//	INDOC_FASTAPI_REPO=~/projects/your-fastapi-app INDOC_FASTAPI_APP=app.main:app \
+//	INDOC_FASTAPI_PYTHON=~/projects/your-fastapi-app/.venv/bin/python go test ./internal/reference -run FastAPIDifferential -v
 func TestFastAPIDifferential(t *testing.T) {
 	repo, app, py := expandHome(os.Getenv("INDOC_FASTAPI_REPO")), os.Getenv("INDOC_FASTAPI_APP"), expandHome(os.Getenv("INDOC_FASTAPI_PYTHON"))
 	if repo == "" || app == "" || py == "" {

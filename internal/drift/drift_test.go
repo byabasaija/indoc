@@ -14,15 +14,15 @@ const dispatcher = `class Dispatcher:
         return self.route(session)
 
     def route(self, session):
-        return "banktransfer"
+        return "card"
 `
 
 const routingPage = `---
 title: Routing
 sources:
-  - app/checkout/**
+  - shop/checkout/**
 ---
-Sessions enter ` + "`app/checkout/dispatcher.py::Dispatcher.dispatch`" + `.
+Sessions enter ` + "`shop/checkout/dispatcher.py::Dispatcher.dispatch`" + `.
 `
 
 const setupPage = `---
@@ -41,7 +41,7 @@ type fixture struct {
 
 func newFixture(t *testing.T) *fixture {
 	f := &fixture{t: t, root: t.TempDir(), lock: NewLock()}
-	f.write("app/checkout/dispatcher.py", dispatcher)
+	f.write("shop/checkout/dispatcher.py", dispatcher)
 	f.write("app/settings.cfg", "timeout=30\n")
 	f.write("docs/routing.md", routingPage)
 	f.write("docs/setup.md", setupPage)
@@ -104,15 +104,15 @@ func expect(t *testing.T, got []Finding, want ...string) {
 
 func TestCommentsAndFormattingAreIgnored(t *testing.T) {
 	f := newFixture(t)
-	f.write("app/checkout/dispatcher.py", "# routing\n"+strings.Replace(dispatcher, "(self, session):", "(self,  session):  # note", 1))
+	f.write("shop/checkout/dispatcher.py", "# routing\n"+strings.Replace(dispatcher, "(self, session):", "(self,  session):  # note", 1))
 	expect(t, f.check())
 }
 
 func TestUncitedBodyChangeIsDrift(t *testing.T) {
 	f := newFixture(t)
-	f.write("app/checkout/dispatcher.py", strings.Replace(dispatcher, `"banktransfer"`, `"cardpay"`, 1))
+	f.write("shop/checkout/dispatcher.py", strings.Replace(dispatcher, `"card"`, `"wallet"`, 1))
 	got := f.check()
-	expect(t, got, "drift docs/routing.md app/checkout/dispatcher.py")
+	expect(t, got, "drift docs/routing.md shop/checkout/dispatcher.py")
 	if got[0].Fails(false) || !got[0].Fails(true) {
 		t.Error("drift must fail only in strict mode")
 	}
@@ -120,9 +120,9 @@ func TestUncitedBodyChangeIsDrift(t *testing.T) {
 
 func TestSignatureChangeIsStale(t *testing.T) {
 	f := newFixture(t)
-	f.write("app/checkout/dispatcher.py", strings.Replace(dispatcher, "def route(self, session)", "def route(self, session, provider)", 1))
+	f.write("shop/checkout/dispatcher.py", strings.Replace(dispatcher, "def route(self, session)", "def route(self, session, provider)", 1))
 	got := f.check()
-	expect(t, got, "stale docs/routing.md app/checkout/dispatcher.py")
+	expect(t, got, "stale docs/routing.md shop/checkout/dispatcher.py")
 	if got[0].Detail != "signature changed: Dispatcher.route" {
 		t.Errorf("detail = %q", got[0].Detail)
 	}
@@ -130,29 +130,29 @@ func TestSignatureChangeIsStale(t *testing.T) {
 
 func TestCitedBodyChangeIsDriftUnlessStrict(t *testing.T) {
 	f := newFixture(t)
-	f.write("app/checkout/dispatcher.py", strings.Replace(dispatcher, "return self.route(session)", "return None", 1))
+	f.write("shop/checkout/dispatcher.py", strings.Replace(dispatcher, "return self.route(session)", "return None", 1))
 	got := f.check()
 	expect(t, got,
-		"drift docs/routing.md app/checkout/dispatcher.py",
-		"drift docs/routing.md app/checkout/dispatcher.py::Dispatcher.dispatch")
+		"drift docs/routing.md shop/checkout/dispatcher.py",
+		"drift docs/routing.md shop/checkout/dispatcher.py::Dispatcher.dispatch")
 	if got[1].Fails(false) {
 		t.Error("cited body change on a normal page must not fail check")
 	}
 
 	f.write("docs/routing.md", strings.Replace(routingPage, "title: Routing", "title: Routing\nstrict: true", 1))
 	f.ack()
-	f.write("app/checkout/dispatcher.py", strings.Replace(dispatcher, "return self.route(session)", "return False", 1))
+	f.write("shop/checkout/dispatcher.py", strings.Replace(dispatcher, "return self.route(session)", "return False", 1))
 	expect(t, f.check(),
-		"drift docs/routing.md app/checkout/dispatcher.py",
-		"stale docs/routing.md app/checkout/dispatcher.py::Dispatcher.dispatch")
+		"drift docs/routing.md shop/checkout/dispatcher.py",
+		"stale docs/routing.md shop/checkout/dispatcher.py::Dispatcher.dispatch")
 }
 
 func TestRenamedCitationIsBroken(t *testing.T) {
 	f := newFixture(t)
-	f.write("app/checkout/dispatcher.py", strings.Replace(dispatcher, "def dispatch", "def handle", 1))
+	f.write("shop/checkout/dispatcher.py", strings.Replace(dispatcher, "def dispatch", "def handle", 1))
 	expect(t, f.check(),
-		"stale docs/routing.md app/checkout/dispatcher.py",
-		"broken docs/routing.md app/checkout/dispatcher.py::Dispatcher.dispatch")
+		"stale docs/routing.md shop/checkout/dispatcher.py",
+		"broken docs/routing.md shop/checkout/dispatcher.py::Dispatcher.dispatch")
 	r, ps := f.load()
 	if _, err := Ack(r, ps, f.lock, []string{"docs/routing.md"}); err == nil {
 		t.Error("ack must refuse a page with broken citations")
@@ -161,12 +161,12 @@ func TestRenamedCitationIsBroken(t *testing.T) {
 
 func TestNewAndRemovedFilesAreStale(t *testing.T) {
 	f := newFixture(t)
-	f.write("app/checkout/cardpay.py", "def handle():\n    pass\n")
-	expect(t, f.check(), "stale docs/routing.md app/checkout/cardpay.py")
+	f.write("shop/checkout/wallet.py", "def handle():\n    pass\n")
+	expect(t, f.check(), "stale docs/routing.md shop/checkout/wallet.py")
 
 	f.ack("docs/routing.md")
-	os.Remove(filepath.Join(f.root, "app/checkout/cardpay.py"))
-	expect(t, f.check(), "stale docs/routing.md app/checkout/cardpay.py")
+	os.Remove(filepath.Join(f.root, "shop/checkout/wallet.py"))
+	expect(t, f.check(), "stale docs/routing.md shop/checkout/wallet.py")
 }
 
 func TestUnparsedFileChangeIsDrift(t *testing.T) {
@@ -177,7 +177,7 @@ func TestUnparsedFileChangeIsDrift(t *testing.T) {
 
 func TestEditedPageNeedsAck(t *testing.T) {
 	f := newFixture(t)
-	f.write("app/checkout/dispatcher.py", strings.Replace(dispatcher, "def route(self, session)", "def route(self, session, provider)", 1))
+	f.write("shop/checkout/dispatcher.py", strings.Replace(dispatcher, "def route(self, session)", "def route(self, session, provider)", 1))
 	f.write("docs/routing.md", routingPage+"\nRoutes take a provider now.\n")
 	expect(t, f.check(), "edited docs/routing.md ")
 
@@ -190,11 +190,11 @@ func TestEditedPageNeedsAck(t *testing.T) {
 
 func TestAckWithoutTargetsNeverSilencesUnchangedStalePage(t *testing.T) {
 	f := newFixture(t)
-	f.write("app/checkout/dispatcher.py", strings.Replace(dispatcher, "def route(self, session)", "def route(self, session, provider)", 1))
+	f.write("shop/checkout/dispatcher.py", strings.Replace(dispatcher, "def route(self, session)", "def route(self, session, provider)", 1))
 	if res := f.ack(); len(res.Stamped) != 0 {
 		t.Fatalf("ack with no targets stamped unchanged pages: %v", res.Stamped)
 	}
-	expect(t, f.check(), "stale docs/routing.md app/checkout/dispatcher.py")
+	expect(t, f.check(), "stale docs/routing.md shop/checkout/dispatcher.py")
 
 	f.ack("docs/routing.md") // reviewed: still correct
 	expect(t, f.check())
@@ -245,17 +245,17 @@ func TestLockRoundTrip(t *testing.T) {
 
 func TestPrivateHelpersAreDrift(t *testing.T) {
 	f := newFixture(t)
-	f.write("app/checkout/dispatcher.py", dispatcher+"\n    def _hash(self, x):\n        return x\n\n    def __repr__(self):\n        return 'd'\n")
+	f.write("shop/checkout/dispatcher.py", dispatcher+"\n    def _hash(self, x):\n        return x\n\n    def __repr__(self):\n        return 'd'\n")
 	got := f.check()
-	expect(t, got, "stale docs/routing.md app/checkout/dispatcher.py")
+	expect(t, got, "stale docs/routing.md shop/checkout/dispatcher.py")
 	if got[0].Detail != "added: Dispatcher.__repr__" {
 		t.Errorf("dunder methods are public; detail = %q", got[0].Detail)
 	}
 
 	f.ack("docs/routing.md")
-	f.write("app/checkout/dispatcher.py", dispatcher+"\n    def _hash(self, x, salt):\n        return x\n\n    def __repr__(self):\n        return 'd'\n")
+	f.write("shop/checkout/dispatcher.py", dispatcher+"\n    def _hash(self, x, salt):\n        return x\n\n    def __repr__(self):\n        return 'd'\n")
 	got = f.check()
-	expect(t, got, "drift docs/routing.md app/checkout/dispatcher.py")
+	expect(t, got, "drift docs/routing.md shop/checkout/dispatcher.py")
 	if got[0].Detail != "private helpers changed: signature changed: Dispatcher._hash" {
 		t.Errorf("detail = %q", got[0].Detail)
 	}
@@ -263,11 +263,11 @@ func TestPrivateHelpersAreDrift(t *testing.T) {
 
 func TestTestFileChangesAreDrift(t *testing.T) {
 	f := newFixture(t)
-	f.write("app/checkout/test_dispatcher.py", "def test_route():\n    pass\n")
+	f.write("shop/checkout/test_dispatcher.py", "def test_route():\n    pass\n")
 	f.ack("docs/routing.md")
-	f.write("app/checkout/test_dispatcher.py", "def test_route():\n    pass\n\ndef test_new(x):\n    pass\n")
+	f.write("shop/checkout/test_dispatcher.py", "def test_route():\n    pass\n\ndef test_new(x):\n    pass\n")
 	got := f.check()
-	expect(t, got, "drift docs/routing.md app/checkout/test_dispatcher.py")
+	expect(t, got, "drift docs/routing.md shop/checkout/test_dispatcher.py")
 	if got[0].Detail != "tests changed" {
 		t.Errorf("detail = %q", got[0].Detail)
 	}
@@ -306,9 +306,9 @@ func TestOlderLockHashes(t *testing.T) {
 		}
 		f.lock.Pages[path] = entry
 	}
-	f.write("app/checkout/dispatcher.py", strings.Replace(dispatcher, "def route(self, session)", "def route(self, session, provider)", 1))
+	f.write("shop/checkout/dispatcher.py", strings.Replace(dispatcher, "def route(self, session)", "def route(self, session, provider)", 1))
 	got := f.check()
-	expect(t, got, "drift docs/routing.md app/checkout/dispatcher.py")
+	expect(t, got, "drift docs/routing.md shop/checkout/dispatcher.py")
 	if f.ack(); len(f.lock.Pages) == 0 {
 		t.Fatal("lock lost pages")
 	}
@@ -316,9 +316,9 @@ func TestOlderLockHashes(t *testing.T) {
 
 func TestNewTestFilesAreDrift(t *testing.T) {
 	f := newFixture(t)
-	f.write("app/checkout/test_new.py", "def test_x():\n    pass\n")
-	f.write("app/checkout/testdata/sample.json", "{}\n")
+	f.write("shop/checkout/test_new.py", "def test_x():\n    pass\n")
+	f.write("shop/checkout/testdata/sample.json", "{}\n")
 	expect(t, f.check(),
-		"drift docs/routing.md app/checkout/test_new.py",
-		"drift docs/routing.md app/checkout/testdata/sample.json")
+		"drift docs/routing.md shop/checkout/test_new.py",
+		"drift docs/routing.md shop/checkout/testdata/sample.json")
 }

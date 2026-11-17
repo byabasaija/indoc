@@ -67,7 +67,7 @@ Each `<app>/management/commands/<name>.py` that defines `class Command` is liste
 reference: 67 routes, 31 config, 3 commands
   django: 70 entries from 15 files, 4 unresolved
   python-env: 31 entries from 188 files
-    warning: in .env.example but not read by Python code: PAYMENT_ACCOUNT_CODE, WEB_CONCURRENCY
+    warning: in .env.example but not read by Python code: PAYMENTS_ACCOUNT_ID, WEB_CONCURRENCY
 ```
 
 A route that can never be reached, because an earlier pattern matches the same path, is reported as a warning too.

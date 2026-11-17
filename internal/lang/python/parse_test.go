@@ -28,7 +28,7 @@ class Dispatcher(Base):
     """Routes sessions."""
 
     def dispatch(self, session):
-        if session.cardpay:
+        if session.wallet:
             def inner():
                 return 1
             return inner()

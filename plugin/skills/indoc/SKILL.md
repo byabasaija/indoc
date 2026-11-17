@@ -37,15 +37,15 @@ Markdown files under the configured `pages:` globs (by default `documentation/`)
 
 ```markdown
 ---
-title: How checkout sessions are routed
+title: How checkout charges a card
 order: 2
 audience: dev
 sources:
-  - app/checkout/**
+  - shop/checkout/**
 ---
 ```
 
-- **Cite the code you describe** as `path::Symbol` (methods and nested names use dots: `app/checkout/dispatcher.py::Dispatcher.dispatch`). Every specific claim about behavior should cite the symbol that implements it. Citations are verified, anchor the page, and become links to the code.
+- **Cite the code you describe** as `path::Symbol` (methods and nested names use dots: `shop/checkout/service.py::CheckoutService.charge`). Every specific claim about behavior should cite the symbol that implements it. Citations are verified, anchor the page, and become links to the code.
 - Set `sources:` to the directories or files the page explains, as narrowly as accurate.
 - Add `strict: true` to pages whose readers depend on exact behavior: a partner or public API, webhooks, a CLI's output.
 - Use real commands from `map.tasks` and real request/response or CLI examples.

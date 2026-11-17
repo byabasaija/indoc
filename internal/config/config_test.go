@@ -71,7 +71,7 @@ func TestInferProjectName(t *testing.T) {
 
 func TestSourceURL(t *testing.T) {
 	cases := map[string]string{
-		"git@github.com:acme/shop.git":   "https://github.com/acme/shop/blob/HEAD/{path}#L{line}",
+		"git@github.com:acme/shop.git":                    "https://github.com/acme/shop/blob/HEAD/{path}#L{line}",
 		"https://github.com/byabasaija/indoc.git":         "https://github.com/byabasaija/indoc/blob/HEAD/{path}#L{line}",
 		"https://user:token@gitlab.com/group/sub/app.git": "https://gitlab.com/group/sub/app/-/blob/HEAD/{path}#L{line}",
 		"ssh://git@bitbucket.org:22/team/repo":            "https://bitbucket.org/team/repo/src/HEAD/{path}#lines-{line}",
