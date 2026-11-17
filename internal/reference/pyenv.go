@@ -58,7 +58,7 @@ type envRead struct {
 	file  string
 }
 
-func extractPythonEnv(root string, files []SourceFile, all []string) ([]doc.RefEntry, *Coverage) {
+func extractPythonEnv(root string, files []SourceFile) ([]doc.RefEntry, *Coverage) {
 	cov := &Coverage{Extractor: "python-env"}
 	py := newPyProject(root, nil)
 
@@ -155,26 +155,9 @@ func extractPythonEnv(root string, files []SourceFile, all []string) ([]doc.RefE
 		}
 	}
 
-	example, exampleFile := readEnvExample(root, all)
 	var out []doc.RefEntry
 	for _, name := range order {
-		e := reads[name].entry
-		if exampleFile != "" && !example[name] {
-			e.Description = "Not in " + exampleFile + "."
-		}
-		out = append(out, e)
-	}
-	if exampleFile != "" {
-		var unread []string
-		for k := range example {
-			if _, ok := reads[k]; !ok {
-				unread = append(unread, k)
-			}
-		}
-		sort.Strings(unread)
-		if len(unread) > 0 {
-			cov.Warnings = append(cov.Warnings, fmt.Sprintf("in %s but not read by Python code: %s", exampleFile, strings.Join(unread, ", ")))
-		}
+		out = append(out, reads[name].entry)
 	}
 	cov.Entries = len(out)
 	if cov.Entries == 0 && len(cov.Evidence) == 0 {

@@ -28,6 +28,7 @@ var (
 		regexp.MustCompile(`os\.Getenv\(\s*"([A-Z][A-Z0-9_]*)"`),
 		regexp.MustCompile(`process\.env\.([A-Z][A-Z0-9_]+)`),
 		regexp.MustCompile(`process\.env\[\s*["']([A-Z][A-Z0-9_]+)["']\s*\]`),
+		regexp.MustCompile(`import\.meta\.env\.([A-Z][A-Z0-9_]+)`),
 	}
 )
 

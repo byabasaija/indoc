@@ -121,10 +121,12 @@ In JavaScript and TypeScript, exported declarations are public and everything el
 | Cobra (Go) | | `os.Getenv` | ✅ command tree, flags, arguments | Supported |
 | Python (any) | | ✅ `os.environ`, `os.getenv`, pydantic settings | | Supported |
 | Go `HandleFunc`/`GET`, Flask-style decorators | best effort | | | Best effort |
-| Next.js, Astro, NestJS | | | | Next |
+| Next.js | ✅ App Router pages and route handlers (methods from exports), Pages Router pages and API routes | `process.env` | | Supported |
+| NestJS | ✅ `@Controller` + `@Get`/`@Post`/..., global prefix | `process.env` | | Supported |
+| Astro | ✅ `src/pages` pages and endpoints (methods from exports) | `import.meta.env` | | Supported |
 | Flask blueprints, Rails, Laravel | | | | Planned |
 
-Extraction is checked against each framework's own route table: Django's URL resolver on six real projects (524 routes), FastAPI's router on a real project and a fixture covering every supported construct, Express 4 and 5 by recording registrations at runtime, and Cobra's command tree on indoc's own CLI. All match route for route, including HTTP methods. Routes provided by installed packages (admin, allauth) are listed as external includes rather than guessed.
+Extraction is checked against each framework's own route table: Django's URL resolver on six real projects (524 routes), FastAPI's router on a real project and a fixture covering every supported construct, Express 4 and 5 by recording registrations at runtime, Next.js against `next build`'s route manifests, NestJS against the routes Nest registers, and Cobra's command tree on indoc's own CLI. All match route for route, including HTTP methods. Routes provided by installed packages (admin, allauth) are listed as external includes rather than guessed.
 
 Every extractor reports what it could not resolve, and `indoc scan` shows it. It also warns about things worth fixing: a route that can never be reached because an earlier pattern has the same path, and variables missing from `.env.example`. Default values that may be secrets (names containing `SECRET`, `PASSWORD`, `TOKEN`, `KEY`, ...) and credentials inside URLs are never published.
 

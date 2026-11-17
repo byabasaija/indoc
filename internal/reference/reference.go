@@ -1,7 +1,9 @@
 package reference
 
 import (
+	"fmt"
 	"sort"
+	"strings"
 
 	"github.com/byabasaija/indoc/internal/doc"
 )
@@ -52,13 +54,21 @@ func Extract(root string, files []string) (*Report, error) {
 		report.Coverage = append(report.Coverage, *expressCov)
 	}
 
+	js := newJSProject(root, files)
+	for _, extract := range []func(string, []string, *jsProject) ([]doc.RefEntry, *Coverage){extractNext, extractAstro, extractNest} {
+		if r, c := extract(root, files, js); c != nil {
+			routes = append(routes, r...)
+			report.Coverage = append(report.Coverage, *c)
+		}
+	}
+
 	cobraCommands, cobraCov := extractCobra(root, nonTest(files))
 	if cobraCov != nil {
 		commands = append(commands, cobraCommands...)
 		report.Coverage = append(report.Coverage, *cobraCov)
 	}
 
-	envEntries, envCov := extractPythonEnv(root, sources, files)
+	envEntries, envCov := extractPythonEnv(root, sources)
 	if envCov != nil {
 		config = append(config, envEntries...)
 		report.Coverage = append(report.Coverage, *envCov)
@@ -106,6 +116,9 @@ func Extract(root string, files []string) (*Report, error) {
 		return routes[i].Detail < routes[j].Detail
 	})
 	sort.SliceStable(config, func(i, j int) bool { return config[i].Name < config[j].Name })
+	if c := crossCheckEnvExample(root, files, config); c != nil {
+		report.Coverage = append(report.Coverage, *c)
+	}
 	sort.SliceStable(commands, func(i, j int) bool { return commands[i].Name < commands[j].Name })
 
 	for _, s := range []doc.RefSection{
@@ -142,4 +155,32 @@ func appendNew(dst, src []doc.RefEntry) []doc.RefEntry {
 		}
 	}
 	return dst
+}
+
+// crossCheckEnvExample marks variables missing from the committed example
+// env file and reports example variables nothing reads, across languages.
+func crossCheckEnvExample(root string, files []string, config []doc.RefEntry) *Coverage {
+	example, file := readEnvExample(root, files)
+	if file == "" {
+		return nil
+	}
+	read := map[string]bool{}
+	for i := range config {
+		read[config[i].Name] = true
+		if !example[config[i].Name] {
+			config[i].Description = strings.TrimSpace(config[i].Description + " Not in " + file + ".")
+		}
+	}
+	cov := &Coverage{Extractor: "env example", Evidence: []string{file}, Files: 1}
+	var unread []string
+	for k := range example {
+		if !read[k] {
+			unread = append(unread, k)
+		}
+	}
+	sort.Strings(unread)
+	if len(unread) > 0 {
+		cov.Warnings = append(cov.Warnings, fmt.Sprintf("in %s but not read by any extracted code: %s", file, strings.Join(unread, ", ")))
+	}
+	return cov
 }

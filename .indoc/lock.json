@@ -373,18 +373,18 @@
       }
     },
     "docs/reference.md": {
-      "page": "7f4f20febabeaa5f",
+      "page": "16b92482426b3bc7",
       "citations": {
         "internal/reference/reference.go::Coverage": {
           "surface": "a4c40678d4643931",
           "body": "",
-          "raw": "c447b9a7e00d4fb5",
+          "raw": "af842c308aa7f3b4",
           "hasher": "go/2"
         },
         "internal/reference/reference.go::Extract": {
           "surface": "17595d9732df58da",
-          "body": "65e39d530422d408",
-          "raw": "c447b9a7e00d4fb5",
+          "body": "7c128f8fb16ba172",
+          "raw": "af842c308aa7f3b4",
           "hasher": "go/2"
         }
       },
@@ -581,7 +581,7 @@
           "hasher": "go/2"
         },
         "internal/reference/extract.go": {
-          "body": "ee3d51c73d0294ad",
+          "body": "f98af20253d76dcf",
           "symbols": {
             "SourceFile": "131c92f89d100e24",
             "bytesContainNUL": "8e7d02757d319d9f",
@@ -605,7 +605,7 @@
             "routesIn",
             "window"
           ],
-          "raw": "1f9abacfc171751e",
+          "raw": "e5ddd4511dd07f06",
           "hasher": "go/2"
         },
         "internal/reference/extract_test.go": {
@@ -674,15 +674,80 @@
           "raw": "920ac34e2ae8c16f",
           "hasher": "go/2"
         },
+        "internal/reference/fsroutes.go": {
+          "body": "0ce4624895994688",
+          "symbols": {
+            "appSegments": "fdc73e4459f5c97b",
+            "cleanRoute": "8ef89957dd53979d",
+            "exportedMethods": "8e5a97f20d851092",
+            "extractAstro": "e0f56c0e5d4ffc0a",
+            "extractNext": "046adc12a56145c0",
+            "hasRoot": "452716aac1b4e6eb",
+            "hidden": "4cfbb5edc2b118dd",
+            "nextBasePath": "b5b4678949b0247f",
+            "packageDepends": "06f8a61f54b04b65"
+          },
+          "private": [
+            "appSegments",
+            "cleanRoute",
+            "exportedMethods",
+            "extractAstro",
+            "extractNext",
+            "hasRoot",
+            "hidden",
+            "nextBasePath",
+            "packageDepends"
+          ],
+          "raw": "e5565425eb5798a2",
+          "hasher": "go/2"
+        },
+        "internal/reference/fsroutes_test.go": {
+          "body": "e3483aed21ffcb72",
+          "symbols": {
+            "TestAstroExtraction": "55d19f5cd0a359be",
+            "TestNextExtraction": "49ea6650876c2196",
+            "readJSON": "c2ba21d2530d7658"
+          },
+          "private": [
+            "readJSON"
+          ],
+          "raw": "624aa2691d9f6cec",
+          "hasher": "go/2"
+        },
+        "internal/reference/nest.go": {
+          "body": "13cb82fd3ba52db4",
+          "symbols": {
+            "extractNest": "abe40a9043e88fb0",
+            "nestImports": "418e4620b2a9c3cf",
+            "nestJoin": "45b6b22a0f899ab2",
+            "nestPaths": "006c64267123d5bd"
+          },
+          "private": [
+            "extractNest",
+            "nestImports",
+            "nestJoin",
+            "nestPaths"
+          ],
+          "raw": "7270100a5c553469",
+          "hasher": "go/2"
+        },
+        "internal/reference/nest_test.go": {
+          "body": "23d614f069f112ee",
+          "symbols": {
+            "TestNestExtraction": "29bc48cda71c22e7"
+          },
+          "raw": "6285a97824c5363c",
+          "hasher": "go/2"
+        },
         "internal/reference/pyenv.go": {
-          "body": "fcc372b0fe4a3d22",
+          "body": "9c26791a3599348b",
           "symbols": {
             "contains": "ff1822e7196e7478",
             "envCall": "b50254727252b2ff",
             "envFromCall": "261265cfc4521986",
             "envFromSubscript": "483b4818d052d456",
             "envRead": "781e95f786145fd4",
-            "extractPythonEnv": "f75f1fc75d426ef2",
+            "extractPythonEnv": "8c11f782b15eb7fd",
             "isSettingsClass": "25f80a73d8762893",
             "optionalCall": "af61633125e18b15",
             "readEnvExample": "75e0352ec3a3ea10",
@@ -702,7 +767,7 @@
             "redactDefault",
             "settingsFields"
           ],
-          "raw": "fc71a06fc4d6f19b",
+          "raw": "774c62d06c378fdc",
           "hasher": "go/2"
         },
         "internal/reference/pyproject.go": {
@@ -741,19 +806,21 @@
           "hasher": "go/2"
         },
         "internal/reference/reference.go": {
-          "body": "a6d661a12e600f8a",
+          "body": "30359c588b248661",
           "symbols": {
             "Coverage": "a4c40678d4643931",
             "Extract": "17595d9732df58da",
             "Report": "70504ac63e96eb8e",
             "appendNew": "b08d8f22235162b4",
+            "crossCheckEnvExample": "b065f3ea67a592b8",
             "nonTest": "2a254ab8c4186979"
           },
           "private": [
             "appendNew",
+            "crossCheckEnvExample",
             "nonTest"
           ],
-          "raw": "c447b9a7e00d4fb5",
+          "raw": "af842c308aa7f3b4",
           "hasher": "go/2"
         },
         "internal/reference/sources.go": {
@@ -814,6 +881,11 @@
           },
           "raw": "1d05ab8562e60fca",
           "hasher": "python/293fdc02038e/2"
+        },
+        "internal/reference/testdata/nest_routes.js": {
+          "body": "bd7e4eafd3cdef07",
+          "raw": "36e82953271d2fd3",
+          "hasher": "javascript/44c892e0be05/2"
         }
       }
     },

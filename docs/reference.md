@@ -33,13 +33,25 @@ For every `FastAPI()` application, indoc lists routes from `@app.get(...)`-style
 
 indoc follows Express routers across files: `app.get(...)` and `router.post(...)`-style registrations, `router.route(path).get(...).post(...)` chains, `all()`, array paths, and `use()` mounts of routers and sub-applications, including routers imported with `require`, `import`, or `export default`, and TypeScript files imported as `.js`. A router that has routes but is never mounted, and route paths that are not literals, are reported. The extractor is checked against Express 4 and 5 at runtime.
 
+## Next.js
+
+Routes come from files. In the App Router, every `page` is a page route and every `route` file is an API route whose methods are the HTTP functions it exports (`export async function GET`, `export const POST`, `export { handler as DELETE }`). Route groups `(name)`, parallel slots `@name`, private `_folders`, and intercepting routes are left out of the URL or skipped, as Next does. In the Pages Router, files under `pages/` are pages and files under `pages/api/` are API routes; `_app` and `_document` are skipped. `basePath` from `next.config` is applied.
+
+## NestJS
+
+Every class decorated with `@Controller(path)` contributes its `@Get`, `@Post`, `@Put`, `@Patch`, `@Delete`, `@Options`, `@Head`, and `@All` methods, under the prefix from `app.setGlobalPrefix`. API versioning and `RouterModule` prefixes are reported as unresolved rather than guessed.
+
+## Astro
+
+Every `.astro`, `.md`, `.mdx`, or `.html` file in `src/pages` is a page; `.ts` and `.js` files there are endpoints with the methods they export (`GET`, `POST`, ..., or `ALL`). Files and folders starting with `_` are skipped; `index` maps to its folder; `[slug].png.ts` serves `/[slug].png`.
+
 ## Cobra
 
 Go commands built with Cobra are listed by their full command path (`indoc check`), with their flags (`-o/--out`, global flags marked), arguments from `Use`, and `Short` description. Commands created but never attached with `AddCommand` are reported.
 
 ## Environment variables
 
-Reads through django-environ (`env("X")`, `env.bool("X", default=False)`, `env.db()`), python-decouple (`config("X")`), `os.environ`, and `os.getenv` are listed with their type, default, or "required". Fields of pydantic `BaseSettings` classes are listed as the variables they read: `env_prefix` plus the field name, or the field's alias. If the repository has a `.env.example`, variables missing from it are marked, and variables in it that nothing reads are reported. `.env` itself is never read.
+JavaScript and TypeScript reads of `process.env.X` and `import.meta.env.X` are listed too. Reads through django-environ (`env("X")`, `env.bool("X", default=False)`, `env.db()`), python-decouple (`config("X")`), `os.environ`, and `os.getenv` are listed with their type, default, or "required". Fields of pydantic `BaseSettings` classes are listed as the variables they read: `env_prefix` plus the field name, or the field's alias. If the repository has a `.env.example`, variables missing from it are marked, and variables in it that no extracted code reads, in any language, are reported. `.env` itself is never read.
 
 Defaults that may be secrets are never published: values of variables whose names contain `SECRET`, `PASSWORD`, `TOKEN`, `KEY` and similar are hidden, and credentials inside URLs are masked.
 
