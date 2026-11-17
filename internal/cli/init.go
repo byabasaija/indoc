@@ -1,120 +1,130 @@
 package cli
 
 import (
-	"embed"
-	"encoding/json"
 	"fmt"
+	"io"
 	"os"
+	"path"
+	"path/filepath"
+	"strings"
 
+	"github.com/byabasaija/indoc/internal/code"
 	"github.com/byabasaija/indoc/internal/config"
-	"github.com/byabasaija/indoc/internal/doc"
 	"github.com/spf13/cobra"
 )
 
-//go:embed templates/AGENT_GUIDE.md templates/site.schema.json
-var initTemplates embed.FS
-
-var forceInit bool
+var (
+	initForce  bool
+	initPages  []string
+	initOutput string
+)
 
 var initCmd = &cobra.Command{
 	Use:   "init",
-	Short: "Initialize indoc configuration and agent scaffolding",
-	RunE:  runInit,
+	Short: "Create .indoc/config.yaml",
+	Long: `init creates .indoc/config.yaml, inferring the project name and where pages
+live. Publishing is opt-in: only Markdown files matched by ` + "`pages:`" + ` are
+built into the site.
+
+When the repository already has Markdown docs, init lists them instead of
+publishing them all. Choose which to include with --pages, or edit the config.`,
+	Args: cobra.NoArgs,
+	RunE: func(cmd *cobra.Command, args []string) error {
+		return runInit(cfgFile, cmd.OutOrStdout(), initPages, initOutput, initForce)
+	},
 }
 
 func init() {
-	initCmd.Flags().BoolVarP(&forceInit, "force", "f", false, "overwrite existing .indoc.yaml if it exists")
+	initCmd.Flags().BoolVarP(&initForce, "force", "f", false, "overwrite an existing .indoc/config.yaml")
+	initCmd.Flags().StringSliceVar(&initPages, "pages", nil, "page globs to publish (repeat or comma-separate)")
+	initCmd.Flags().StringVar(&initOutput, "output", "", "build output directory (default "+config.DefaultOutputDir+")")
 	rootCmd.AddCommand(initCmd)
 }
 
-func runInit(cmd *cobra.Command, args []string) error {
-	targetFile := config.DefaultConfigFileName
-	if _, err := os.Stat(targetFile); err == nil && !forceInit {
-		return fmt.Errorf("configuration file '%s' already exists. Use --force to overwrite", targetFile)
+var docusaurusConfigs = []string{"docusaurus.config.js", "docusaurus.config.ts", "docusaurus.config.mjs"}
+
+func runInit(configPath string, out io.Writer, pagesFlag []string, output string, force bool) error {
+	paths := config.Resolve(configPath)
+	if _, err := os.Stat(paths.Config); err == nil && !force {
+		return fmt.Errorf("%s already exists; use --force to replace it", paths.Config)
 	}
 
 	cfg := config.Default()
-	if err := cfg.Save(targetFile); err != nil {
-		return fmt.Errorf("failed to create %s: %w", targetFile, err)
+	cfg.ProjectName = config.InferProjectName(paths.Root)
+	if output != "" {
+		cfg.OutputDir = output
 	}
 
-	template := doc.Document{
-		ProjectName: cfg.ProjectName,
-		Appearance: &doc.Appearance{
-			Colors: &doc.Colors{
-				Primary: "#0969da",
-				Accent:  "#1f2328",
-			},
-		},
-		Overview:  doc.Page{Title: "Overview"},
-		Guides:    []doc.Page{},
-		Reference: []doc.RefSection{},
-	}
-	site, err := json.MarshalIndent(template, "", "  ")
+	files, err := code.ListFiles(paths.Root, nil)
 	if err != nil {
-		return fmt.Errorf("failed to create document template: %w", err)
+		return err
 	}
-	site = append(site, '\n')
+	var markdown, docsMarkdown []string
+	for _, f := range files {
+		if !strings.EqualFold(path.Ext(f), ".md") {
+			continue
+		}
+		markdown = append(markdown, f)
+		if strings.HasPrefix(f, "docs/") {
+			docsMarkdown = append(docsMarkdown, f)
+		}
+	}
 
-	if err := os.MkdirAll(configDir, 0755); err != nil {
-		return fmt.Errorf("failed to create %s: %w", configDir, err)
+	reason := ""
+	switch {
+	case len(pagesFlag) > 0:
+		cfg.Pages = pagesFlag
+	case hasAny(paths.Root, docusaurusConfigs):
+		cfg.Pages = []string{"docs/**/*.md"}
+		reason = "Docusaurus project: using its docs/ folder."
+	case len(docsMarkdown) == 0:
+		cfg.Pages = []string{"docs/**/*.md"}
+		reason = "No existing docs/: new pages go in docs/."
+	default:
+		cfg.Pages = []string{}
+		reason = "docs/ already has Markdown. Nothing is published until you choose."
 	}
-	guide, err := initTemplates.ReadFile("templates/AGENT_GUIDE.md")
-	if err != nil {
-		return fmt.Errorf("failed to read agent guide template: %w", err)
+
+	if err := cfg.Save(paths.Config); err != nil {
+		return err
 	}
-	schema, err := initTemplates.ReadFile("templates/site.schema.json")
-	if err != nil {
-		return fmt.Errorf("failed to read document schema template: %w", err)
-	}
-	files := []struct {
-		path    string
-		content []byte
-	}{
-		{path: siteFile, content: site},
-		{path: agentGuideFile, content: guide},
-		{path: schemaFile, content: schema},
-	}
-	for _, file := range files {
-		if err := writeScaffoldFile(file.path, file.content); err != nil {
+	ignore := filepath.Join(filepath.Dir(paths.Config), ".gitignore")
+	if _, err := os.Stat(ignore); os.IsNotExist(err) {
+		if err := os.WriteFile(ignore, []byte("# Build output and local state. lock.json and config.yaml are committed.\nsite/\n"), 0o644); err != nil {
 			return err
 		}
 	}
 
-	fmt.Printf("Wrote %s\n", targetFile)
-	for _, path := range []string{siteFile, agentGuideFile, schemaFile} {
-		fmt.Printf("Prepared %s\n", path)
+	fmt.Fprintf(out, "Wrote %s (project: %s)\n", paths.Config, cfg.ProjectName)
+	if reason != "" {
+		fmt.Fprintln(out, reason)
 	}
-	fmt.Println("Next:")
-	fmt.Println("  1. Set project_name, source_dirs, and output_dir in .indoc.yaml.")
-	fmt.Printf("  2. Ask your coding agent to read %s and follow it.\n", agentGuideFile)
-	fmt.Printf("  3. Bundle the result with: indoc bundle --input %s\n", siteFile)
-
+	if len(cfg.Pages) > 0 {
+		fmt.Fprintf(out, "pages: %s\n", strings.Join(cfg.Pages, ", "))
+	}
+	if len(cfg.Pages) == 0 && len(markdown) > 0 {
+		fmt.Fprintln(out, "\nExisting Markdown files (not published):")
+		for i, f := range markdown {
+			if i == 30 {
+				fmt.Fprintf(out, "  ... and %d more\n", len(markdown)-30)
+				break
+			}
+			fmt.Fprintf(out, "  %s\n", f)
+		}
+		fmt.Fprintln(out, "\nChoose which to publish, for example:\n  indoc init --force --pages 'docs/partner-integration.md,docs/guides/**/*.md'")
+	}
+	if _, err := os.Stat(filepath.Join(paths.Root, config.LegacyPath)); err == nil {
+		fmt.Fprintf(out, "\n%s is the old config format and is no longer read; you can delete it.\n", config.LegacyPath)
+	}
+	fmt.Fprintf(out, "\nBuild output: %s (gitignored). Commit %s and, once created, .indoc/lock.json.\n", cfg.OutputDir, paths.Config)
 	return nil
 }
 
-const (
-	configDir      = ".indoc"
-	siteFile       = ".indoc/site.json"
-	agentGuideFile = ".indoc/AGENT_GUIDE.md"
-	schemaFile     = ".indoc/site.schema.json"
-)
-
-func writeScaffoldFile(path string, content []byte) error {
-	file, err := os.OpenFile(path, os.O_WRONLY|os.O_CREATE|os.O_EXCL, 0644)
-	if err != nil {
-		if os.IsExist(err) {
-			return nil
+func hasAny(root string, names []string) bool {
+	for _, n := range names {
+		if _, err := os.Stat(filepath.Join(root, n)); err == nil {
+			return true
 		}
-		return fmt.Errorf("failed to create %s: %w", path, err)
 	}
-	if _, err := file.Write(content); err != nil {
-		file.Close()
-		os.Remove(path)
-		return fmt.Errorf("failed to write %s: %w", path, err)
-	}
-	if err := file.Close(); err != nil {
-		return fmt.Errorf("failed to close %s: %w", path, err)
-	}
-	return nil
+	return false
 }

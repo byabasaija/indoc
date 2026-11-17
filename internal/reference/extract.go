@@ -33,16 +33,16 @@ var (
 	}
 )
 
-// Extract reads source files and returns route and configuration sections.
-// Descriptions are left empty. The agent does not invent these entries.
-func Extract(files []SourceFile) ([]doc.RefSection, error) {
+// Extract reads source files under root and returns route and configuration
+// sections. File paths are relative to root and appear that way in citations.
+func Extract(root string, files []SourceFile) ([]doc.RefSection, error) {
 	var routes []doc.RefEntry
 	var config []doc.RefEntry
 	seenRoutes := map[string]bool{}
 	seenConfig := map[string]bool{}
 
 	for _, file := range files {
-		content, ok, err := readSource(file.Path)
+		content, ok, err := readSource(filepath.Join(root, filepath.FromSlash(file.Path)))
 		if err != nil {
 			return nil, err
 		}

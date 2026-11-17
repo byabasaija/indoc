@@ -1,91 +1,114 @@
 # indoc
 
-`indoc` compiles a portable, static documentation site from your codebase. Your coding agent writes the overview and guides; `indoc` extracts source facts such as routes and environment variables, then bundles everything into `./static/docs`.
+**Documentation that fails CI when it stops matching the code.**
 
-No API key or docs-specific runtime service. The output works for web apps and CLI-only projects: mount it in your app if you have one, publish it to any static host, or ship it as a release artifact.
+Docs rot quietly. A function gets a new parameter, a route moves, and the guide that explains them keeps saying the old thing until a user hits it. indoc ties each Markdown page to the code it describes and tells you, in CI, when that code changes and the page does not.
 
-## Commands
+```
+$ indoc check
+docs/dev/checkout-routing.md
+  ✗ STALE      shop/core/services/checkout/dispatcher.py::CheckoutDispatcher.dispatch  cited symbol's signature changed
+    DRIFT      shop/core/services/checkout/session.py  implementation changed; signatures unchanged
 
-```bash
+6 pages checked: 1 stale, 1 drift
+Error: docs do not match the code
+```
+
+Your coding agent writes the pages. indoc never calls an AI model and needs no API key.
+
+## How it works
+
+A page lists the code it covers and cites the symbols it explains:
+
+```markdown
+---
+title: How checkout sessions are routed
+sources:
+  - shop/core/services/checkout/**
+---
+
+Every request lands in `shop/core/services/checkout/dispatcher.py::CheckoutDispatcher.dispatch`,
+which picks a handler from the merchant's payment provider.
+```
+
+`indoc ack` records what each page was verified against in `.indoc/lock.json`. `indoc check` compares the current code with that record:
+
+| Change | Result |
+|---|---|
+| A cited symbol changed (signature or body) | **stale**: check fails |
+| A signature was added, removed, or changed under `sources` | **stale**: check fails |
+| Only implementation changed under `sources` | **drift**: reported, fails only with `--strict` |
+| Comments or formatting | ignored |
+
+Citations are verified: a renamed function breaks the citation, and the build refuses to publish it.
+
+## Install
+
+```sh
 go install github.com/byabasaija/indoc/cmd/indoc@latest
-
-indoc init
-indoc scan --json
-indoc bundle --input .indoc/site.json --out ./static/docs
 ```
 
-`indoc init` creates `.indoc.yaml` plus a starter document, JSON schema, and agent workflow guide under `.indoc/`. Ask your coding agent to read `.indoc/AGENT_GUIDE.md` and follow it. The guide explains how to use scan output to create or update `.indoc/site.json` and bundle it.
+## Use it
 
-`scan` prints added, modified, and deleted files, a fresh reference (routes and env vars), and the previous overview and guides so the agent can edit them. `bundle` writes `index.html`, `style.css`, `app.js`, and `docs.js`. Optionally run `indoc serve` to preview the bundle locally at `http://127.0.0.1:4173`; it is not needed to build, publish, or use the docs.
-
-## What gets written
-
-The document has three parts:
-
-- **Overview.** What the system does and how a request moves through it.
-- **Guides.** Tasks a reader came to finish: run it, authenticate, the one flow that is hard to infer. A few pages, not one page per file.
-- **Reference.** Routes and environment variables copied from `indoc scan`. The agent does not invent these.
-
-## Use or publish the bundle
-
-The generated site is static and self-contained. For a web app, serve the output directory from the app you already run. For example, FastAPI:
-
-```python
-from fastapi.staticfiles import StaticFiles
-
-app.mount("/docs", StaticFiles(directory="static/docs", html=True), name="docs")
+```sh
+indoc init      # create .indoc/config.yaml
+                # ask your agent to document the project (see below)
+indoc bundle    # build the site, record pages in the lock
+indoc check     # in CI: fail when docs no longer match the code
 ```
 
-Express: `app.use("/docs", express.static("static/docs"))`
+| Command | Does |
+|---|---|
+| `indoc init` | Create `.indoc/config.yaml`. Publishing is opt-in: existing Markdown is listed, not published. |
+| `indoc scan --json` | Pages, findings, and extracted reference facts, for your agent |
+| `indoc check` | Fail when pages no longer match the code. `--warn` to report only, `--strict` to fail on drift too. |
+| `indoc ack [page...]` | Record new or edited pages. Name a page to confirm it is still correct after a code change. |
+| `indoc bundle` | Build the static site |
+| `indoc preview` | Serve the site on localhost and rebuild on save |
 
-Go: `http.Handle("/docs/", http.StripPrefix("/docs/", http.FileServer(http.Dir("static/docs"))))`
+### With a coding agent
 
-For a CLI-only project, no application server is needed. Publish `./static/docs` with a static hosting provider, attach it to a release, or keep it as a local docs artifact. `indoc serve` is only a convenient local preview.
+The skill in [`.github/skills/indoc/SKILL.md`](.github/skills/indoc/SKILL.md) tells an agent how to work with indoc: agree on readers and an outline with you, write pages with citations, and fix stale pages after code changes. Ask it to "document this project" or "update the stale docs".
 
-## Configuration
+### Already using Docusaurus or MkDocs?
 
-`indoc init` writes `.indoc.yaml`:
+Keep it. Add `sources:` and citations to your existing pages and run `indoc check` in CI. indoc reads Docusaurus frontmatter (`sidebar_label`, `sidebar_position`). Building the site with indoc is optional.
 
-```yaml
-version: "1"
-project_name: "Hospital API"
-source_dirs:
-  - "."
-output_dir: "./static/docs"
-exclude:
-  - node_modules
-  - vendor
-  - .git
-  - .indoc
-  - dist
-  - build
-```
-
-Hashes and the last bundled document are stored in `.indoc/cache.json`.
-
-The generated site uses a clean, light documentation layout by default. To brand it, add an `appearance` object to `.indoc/site.json`:
-
-```json
-{
-  "appearance": {
-    "logo": "../assets/logo.svg",
-    "colors": {
-      "primary": "#0969da",
-      "accent": "#1f883d"
-    }
-  }
-}
-```
-
-Logo paths are relative to `.indoc/site.json` and copied into the bundle; an `http` or `https` URL can also be used. Both colors are optional 6-digit hex values.
-
-## Layout
+## Files
 
 ```
-cmd/indoc/            CLI entrypoint
-internal/scanner/     SHA-256 incremental scan
-internal/reference/   route and env extraction
-internal/doc/         overview, guides, reference
-internal/bundler/     embedded viewer and site writer
-internal/cli/         init, scan, bundle, optional serve preview
+.indoc/
+├── config.yaml   committed
+├── lock.json     committed: what each page was verified against
+├── .gitignore
+└── site/         build output, gitignored
+docs/             your pages (location set by `pages:` in config.yaml)
 ```
+
+To serve the site from an existing app, set `output_dir` to a folder the app serves. The site uses relative links, so it works under any path.
+
+## Language support
+
+Precise staleness and `path::Symbol` citations need a parser for the language. Every other part of indoc works on any repository.
+
+| Language | Status |
+|---|---|
+| Python | ✅ Agrees with CPython's own parser on 409,406 symbols across 29,536 files |
+| Go | ✅ Go standard library parser |
+| Others | Files are tracked, but any change is reported as drift and citations cannot be verified. Planned: TypeScript/JavaScript, Rust, and more through a shared parser runtime. |
+
+## Reference extraction
+
+`indoc bundle` adds reference pages extracted from source, so routes and environment variables are never hand-copied.
+
+| Source | Routes | Environment variables | Status |
+|---|---|---|---|
+| Flask/FastAPI-style decorators, Express `app.get`, Go `HandleFunc`/`GET` | ✅ | `os.getenv`, `os.environ`, `process.env`, `os.Getenv` | Best effort |
+| Django + DRF | | | Planned next |
+| FastAPI routers and settings, Cobra commands | | | Planned |
+
+See [ROADMAP.md](ROADMAP.md) for what is next and what indoc deliberately does not do.
+
+## License
+
+See [LICENSE](LICENSE).

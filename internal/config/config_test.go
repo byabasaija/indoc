@@ -6,83 +6,65 @@ import (
 	"testing"
 )
 
-func TestDefaultConfig(t *testing.T) {
-	cfg := Default()
-	if cfg.Version != "1" {
-		t.Errorf("expected version '1', got '%s'", cfg.Version)
+func TestSaveLoadRoundTrip(t *testing.T) {
+	dir := t.TempDir()
+	path := filepath.Join(dir, DefaultPath)
+	want := &Config{Version: "1", ProjectName: "shop", Pages: []string{"docs/**/*.md"}, OutputDir: "shop/static/docs"}
+	if err := want.Save(path); err != nil {
+		t.Fatal(err)
 	}
-	if cfg.OutputDir != "./static/docs" {
-		t.Errorf("expected output_dir './static/docs', got '%s'", cfg.OutputDir)
-	}
-	if len(cfg.SourceDirs) != 1 || cfg.SourceDirs[0] != "." {
-		t.Errorf("expected default source '.', got %#v", cfg.SourceDirs)
-	}
-}
-
-func TestSaveAndLoadRoundtrip(t *testing.T) {
-	tempDir := t.TempDir()
-	configPath := filepath.Join(tempDir, ".indoc.yaml")
-
-	original := &Config{
-		Version:     "1",
-		ProjectName: "Hospital Core API",
-		SourceDirs:  []string{"./backend/controllers", "./backend/models"},
-		OutputDir:   "./custom/docs",
-		Exclude:     []string{"node_modules"},
-	}
-
-	if err := original.Save(configPath); err != nil {
-		t.Fatalf("failed to save config: %v", err)
-	}
-
-	loaded, found, err := Load(configPath)
+	got, err := Load(path)
 	if err != nil {
-		t.Fatalf("failed to load config: %v", err)
+		t.Fatal(err)
 	}
-	if !found {
-		t.Fatal("expected config file to be found")
-	}
-
-	if loaded.ProjectName != original.ProjectName {
-		t.Errorf("expected ProjectName '%s', got '%s'", original.ProjectName, loaded.ProjectName)
-	}
-	if loaded.OutputDir != original.OutputDir {
-		t.Errorf("expected OutputDir '%s', got '%s'", original.OutputDir, loaded.OutputDir)
-	}
-	if len(loaded.SourceDirs) != 2 || loaded.SourceDirs[0] != original.SourceDirs[0] {
-		t.Errorf("expected source dirs %#v, got %#v", original.SourceDirs, loaded.SourceDirs)
+	if got.ProjectName != want.ProjectName || got.OutputDir != want.OutputDir || len(got.Pages) != 1 {
+		t.Fatalf("got %+v", got)
 	}
 }
 
-func TestLoadNonExistent(t *testing.T) {
-	cfg, found, err := Load("/path/to/non/existent/config.yaml")
-	if err != nil {
-		t.Fatalf("expected no error for missing config, got %v", err)
-	}
-	if found {
-		t.Error("expected found to be false for missing config file")
-	}
-	if cfg == nil {
-		t.Fatal("expected default config to be returned")
-	}
-	if cfg.OutputDir != "./static/docs" {
-		t.Errorf("expected default output dir, got %s", cfg.OutputDir)
+func TestLoadDefaultsOutputDir(t *testing.T) {
+	path := filepath.Join(t.TempDir(), "config.yaml")
+	os.WriteFile(path, []byte("project_name: x\n"), 0o644)
+	cfg, err := Load(path)
+	if err != nil || cfg.OutputDir != DefaultOutputDir {
+		t.Fatalf("cfg=%+v err=%v", cfg, err)
 	}
 }
 
-func TestLoadInvalidYAML(t *testing.T) {
-	tempDir := t.TempDir()
-	configPath := filepath.Join(tempDir, "invalid.yaml")
-
-	if err := os.WriteFile(configPath, []byte("invalid: [unclosed yaml"), 0644); err != nil {
-		t.Fatalf("failed to write test file: %v", err)
+func TestLoadMissing(t *testing.T) {
+	if _, err := Load(filepath.Join(t.TempDir(), "nope.yaml")); err == nil {
+		t.Fatal("want error for missing config")
 	}
+}
 
-	_, found, err := Load(configPath)
-	if err == nil {
-		t.Fatal("expected error parsing invalid YAML, got nil")
+func TestResolve(t *testing.T) {
+	p := Resolve("")
+	if p.Root != "." || p.Config != DefaultPath || p.Lock != filepath.Join(".indoc", "lock.json") {
+		t.Fatalf("%+v", p)
 	}
-	if !found {
-		t.Error("expected found to be true since file exists")
+	p = Resolve("/repo/.indoc/config.yaml")
+	if p.Root != "/repo" || p.Lock != "/repo/.indoc/lock.json" {
+		t.Fatalf("%+v", p)
+	}
+}
+
+func TestInferProjectName(t *testing.T) {
+	cases := map[string]string{
+		"go.mod":         "module github.com/byabasaija/indoc\n\ngo 1.27\n",
+		"pyproject.toml": "[build-system]\nname = \"wrong\"\n\n[project]\nname = \"shop\"\n",
+		"package.json":   `{"name": "@acme/web"}`,
+	}
+	want := map[string]string{"go.mod": "indoc", "pyproject.toml": "shop", "package.json": "web"}
+	for file, content := range cases {
+		dir := t.TempDir()
+		os.WriteFile(filepath.Join(dir, file), []byte(content), 0o644)
+		if got := InferProjectName(dir); got != want[file] {
+			t.Errorf("%s: got %q, want %q", file, got, want[file])
+		}
+	}
+	dir := filepath.Join(t.TempDir(), "plain-dir")
+	os.Mkdir(dir, 0o755)
+	if got := InferProjectName(dir); got != "plain-dir" {
+		t.Errorf("fallback: got %q", got)
 	}
 }

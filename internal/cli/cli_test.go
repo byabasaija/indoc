@@ -3,233 +3,228 @@ package cli
 import (
 	"bytes"
 	"encoding/json"
+	"errors"
 	"os"
 	"path/filepath"
 	"strings"
 	"testing"
 
-	"github.com/byabasaija/indoc/internal/doc"
+	"github.com/byabasaija/indoc/internal/config"
 )
 
 func TestCommandsRegistered(t *testing.T) {
-	commands := rootCmd.Commands()
-	names := make(map[string]bool)
-	for _, cmd := range commands {
-		names[cmd.Name()] = true
+	names := map[string]bool{}
+	for _, c := range rootCmd.Commands() {
+		names[c.Name()] = true
 	}
-
-	expected := []string{"init", "scan", "bundle", "serve", "version"}
-	for _, exp := range expected {
-		if !names[exp] {
-			t.Errorf("expected command '%s' to be registered on rootCmd", exp)
+	for _, want := range []string{"init", "scan", "check", "ack", "bundle", "preview", "version"} {
+		if !names[want] {
+			t.Errorf("command %q not registered", want)
 		}
 	}
-	if names["generate"] {
-		t.Error("generate still calls an LLM and should not be registered")
+	if names["serve"] {
+		t.Error("serve was replaced by preview")
 	}
 }
 
-func TestVersionCommandOutput(t *testing.T) {
-	buf := new(bytes.Buffer)
-	rootCmd.SetOut(buf)
-	rootCmd.SetErr(buf)
-	rootCmd.SetArgs([]string{"version"})
+type repo struct {
+	t    *testing.T
+	root string
+	cfg  string
+}
 
-	if err := rootCmd.Execute(); err != nil {
-		t.Fatalf("version command failed: %v", err)
+func newRepo(t *testing.T) *repo {
+	r := &repo{t: t, root: t.TempDir()}
+	r.cfg = filepath.Join(r.root, config.DefaultPath)
+	return r
+}
+
+func (r *repo) write(path, content string) {
+	r.t.Helper()
+	full := filepath.Join(r.root, path)
+	os.MkdirAll(filepath.Dir(full), 0o755)
+	if err := os.WriteFile(full, []byte(content), 0o644); err != nil {
+		r.t.Fatal(err)
 	}
 }
 
-func TestInitCreatesAgentScaffoldingWithoutOverwritingSite(t *testing.T) {
-	dir := t.TempDir()
-	oldDir, err := os.Getwd()
+func (r *repo) read(path string) string {
+	r.t.Helper()
+	data, err := os.ReadFile(filepath.Join(r.root, path))
 	if err != nil {
-		t.Fatal(err)
+		r.t.Fatal(err)
 	}
-	if err := os.Chdir(dir); err != nil {
-		t.Fatal(err)
-	}
-	defer func() {
-		if err := os.Chdir(oldDir); err != nil {
-			t.Errorf("restore working directory: %v", err)
-		}
-	}()
+	return string(data)
+}
 
-	if err := runInit(nil, nil); err != nil {
+const appPy = `import os
+
+@app.get("/health")
+def health():
+    return os.getenv("DATABASE_URL")
+
+def admit(patient):
+    return patient
+`
+
+const admitPage = `---
+title: Admitting patients
+sources: [app/**]
+---
+Admission is handled by ` + "`app/main.py::admit`" + `.
+`
+
+func TestWorkflow(t *testing.T) {
+	r := newRepo(t)
+	r.write("go.mod", "module example.com/hospital\n")
+	r.write("app/main.py", appPy)
+
+	var out bytes.Buffer
+	if err := runInit(r.cfg, &out, nil, "", false); err != nil {
 		t.Fatalf("init: %v", err)
 	}
-
-	var site doc.Document
-	siteData, err := os.ReadFile(siteFile)
-	if err != nil {
-		t.Fatal(err)
+	if !strings.Contains(out.String(), "project: hospital") || !strings.Contains(out.String(), "docs/**/*.md") {
+		t.Fatalf("init output:\n%s", out.String())
 	}
-	if err := json.Unmarshal(siteData, &site); err != nil {
-		t.Fatalf("site template JSON: %v", err)
+	if !strings.Contains(r.read(".indoc/.gitignore"), "site/") {
+		t.Fatal("init did not gitignore build output")
 	}
-	if site.ProjectName == "" || site.Overview.Markdown != "" {
-		t.Fatalf("site template = %+v", site)
-	}
-	if site.Appearance == nil || site.Appearance.Logo != "" ||
-		site.Appearance.Colors == nil || site.Appearance.Colors.Primary == "" {
-		t.Fatalf("site template is missing appearance options: %+v", site.Appearance)
+	if err := runInit(r.cfg, &out, nil, "", false); err == nil {
+		t.Fatal("second init without --force must fail")
 	}
 
-	guide, err := os.ReadFile(agentGuideFile)
-	if err != nil {
-		t.Fatal(err)
-	}
-	if !strings.Contains(string(guide), "entire `reference` array") {
-		t.Fatalf("agent guide does not explain reference handling:\n%s", guide)
-	}
-	schema, err := os.ReadFile(schemaFile)
-	if err != nil {
-		t.Fatal(err)
-	}
-	if !json.Valid(schema) {
-		t.Fatal("document schema is not valid JSON")
+	r.write("docs/index.md", "# Hospital\n\nOverview of ``app/main.py::health``.\n")
+	r.write("docs/admit.md", admitPage)
+
+	out.Reset()
+	if err := runCheck(r.cfg, &out, false, false, false); !errors.Is(err, errCheckFailed) {
+		t.Fatalf("check on unstamped pages: err=%v\n%s", err, out.String())
 	}
 
-	customSite := []byte("{\"custom\":true}\n")
-	if err := os.WriteFile(siteFile, customSite, 0644); err != nil {
+	out.Reset()
+	if err := runBundle(r.cfg, "", &out); err != nil {
+		t.Fatalf("bundle: %v\n%s", err, out.String())
+	}
+	payload := r.read(".indoc/site/docs.js")
+	for _, want := range []string{"Admitting patients", "/health", "DATABASE_URL"} {
+		if !strings.Contains(payload, want) {
+			t.Errorf("site payload missing %q", want)
+		}
+	}
+	if !strings.Contains(r.read(".indoc/lock.json"), "app/main.py::admit") {
+		t.Fatal("bundle did not record pages in the lock")
+	}
+
+	out.Reset()
+	if err := runCheck(r.cfg, &out, false, false, false); err != nil {
+		t.Fatalf("check after bundle: %v\n%s", err, out.String())
+	}
+
+	// Signature change: stale, fails CI.
+	r.write("app/main.py", strings.Replace(appPy, "def admit(patient)", "def admit(patient, ward)", 1))
+	out.Reset()
+	err := runCheck(r.cfg, &out, false, false, true)
+	if !errors.Is(err, errCheckFailed) {
+		t.Fatalf("check after signature change: err=%v", err)
+	}
+	var report struct {
+		Failing  int
+		Findings []struct{ Page, Kind, Ref string }
+	}
+	if err := json.Unmarshal(out.Bytes(), &report); err != nil {
+		t.Fatalf("check --json: %v\n%s", err, out.String())
+	}
+	if report.Failing == 0 || report.Findings[0].Kind != "stale" {
+		t.Fatalf("report = %+v", report)
+	}
+
+	// --warn reports but passes.
+	out.Reset()
+	if err := runCheck(r.cfg, &out, false, true, false); err != nil {
+		t.Fatalf("check --warn: %v", err)
+	}
+
+	// ack with no args must not silence it; naming the page does.
+	out.Reset()
+	if err := runAck(r.cfg, &out, nil); err != nil {
 		t.Fatal(err)
 	}
-	forceInit = true
-	defer func() { forceInit = false }()
-	if err := runInit(nil, nil); err != nil {
-		t.Fatalf("forced init: %v", err)
+	if err := runCheck(r.cfg, &out, false, false, false); err == nil {
+		t.Fatal("ack without targets silenced a stale page")
 	}
-	got, err := os.ReadFile(siteFile)
-	if err != nil {
+	if err := runAck(r.cfg, &out, []string{"docs/admit.md", "docs/index.md"}); err != nil {
 		t.Fatal(err)
 	}
-	if !bytes.Equal(got, customSite) {
-		t.Fatalf("init overwrote existing site: %s", got)
+	out.Reset()
+	if err := runCheck(r.cfg, &out, false, false, false); err != nil {
+		t.Fatalf("check after ack: %v\n%s", err, out.String())
+	}
+
+	// scan reports pages and reference for the agent.
+	out.Reset()
+	if err := runScan(r.cfg, &out, true); err != nil {
+		t.Fatal(err)
+	}
+	var scan scanReport
+	if err := json.Unmarshal(out.Bytes(), &scan); err != nil {
+		t.Fatal(err)
+	}
+	if scan.ProjectName != "hospital" || len(scan.Pages) != 2 || len(scan.Reference) != 2 || scan.Parsed != 1 {
+		t.Fatalf("scan = %+v", scan)
 	}
 }
 
-func TestScanThenBundleRemembersDocument(t *testing.T) {
-	dir := t.TempDir()
-	source := filepath.Join(dir, "app")
-	if err := os.Mkdir(source, 0755); err != nil {
+func TestBundleRefusesBrokenCitations(t *testing.T) {
+	r := newRepo(t)
+	r.write("app/main.py", appPy)
+	if err := runInit(r.cfg, &bytes.Buffer{}, nil, "", false); err != nil {
 		t.Fatal(err)
 	}
-	sourceFile := filepath.Join(source, "main.py")
-	body := "import os\n\n@app.get(\"/health\")\ndef health():\n    return os.getenv(\"DATABASE_URL\")\n"
-	if err := os.WriteFile(sourceFile, []byte(body), 0644); err != nil {
+	r.write("docs/index.md", "See `app/main.py::discharge`.\n")
+	err := runBundle(r.cfg, "", &bytes.Buffer{})
+	if err == nil || !strings.Contains(err.Error(), "app/main.py::discharge") {
+		t.Fatalf("bundle with broken citation: %v", err)
+	}
+}
+
+func TestInitWithExistingDocsPublishesNothing(t *testing.T) {
+	r := newRepo(t)
+	r.write("docs/partner-integration.md", "# Partners\n")
+	r.write("docs/code-review-gaps.md", "# Security gaps\n")
+	var out bytes.Buffer
+	if err := runInit(r.cfg, &out, nil, "", false); err != nil {
 		t.Fatal(err)
 	}
-
-	configPath := filepath.Join(dir, ".indoc.yaml")
-	cachePath := filepath.Join(dir, "cache.json")
-	outDir := filepath.Join(dir, "static", "docs")
-	cfg := "version: \"1\"\nproject_name: Hospital API\nsource_dirs:\n  - " + source + "\noutput_dir: " + outDir + "\n"
-	if err := os.WriteFile(configPath, []byte(cfg), 0644); err != nil {
-		t.Fatal(err)
-	}
-
-	var scanBuf bytes.Buffer
-	if err := executeScan(scanOptions{
-		configPath: configPath,
-		cachePath:  cachePath,
-		asJSON:     true,
-		out:        &scanBuf,
-	}); err != nil {
-		t.Fatalf("scan: %v", err)
-	}
-
-	var report scanReport
-	if err := json.Unmarshal(scanBuf.Bytes(), &report); err != nil {
-		t.Fatalf("scan json: %v\n%s", err, scanBuf.String())
-	}
-	if report.ProjectName != "Hospital API" || report.Previous != nil {
-		t.Fatalf("report = %+v", report)
-	}
-	if len(report.Reference) != 2 || report.Reference[0].Entries[0].Name != "/health" {
-		t.Fatalf("reference = %+v", report.Reference)
-	}
-	if report.Reference[1].Entries[0].Name != "DATABASE_URL" {
-		t.Fatalf("config = %+v", report.Reference[1])
-	}
-
-	input := filepath.Join(dir, "site.json")
-	if err := os.WriteFile(filepath.Join(dir, "logo.svg"), []byte("<svg></svg>"), 0644); err != nil {
-		t.Fatal(err)
-	}
-	document := map[string]any{
-		"project_name": "Hospital API",
-		"appearance": map[string]any{
-			"logo": "logo.svg",
-			"colors": map[string]string{
-				"primary": "#0969da",
-				"accent":  "#1f883d",
-			},
-		},
-		"overview": map[string]string{
-			"markdown": "Admits patients.\n\n## Flow\n\nRequest, then record.",
-		},
-		"guides": []map[string]string{{
-			"title":    "Run it",
-			"markdown": "Start the API.",
-		}},
-		"reference": report.Reference,
-	}
-	raw, err := json.Marshal(document)
+	cfg, err := config.Load(r.cfg)
 	if err != nil {
 		t.Fatal(err)
 	}
-	if err := os.WriteFile(input, raw, 0644); err != nil {
-		t.Fatal(err)
+	if len(cfg.Pages) != 0 {
+		t.Fatalf("existing docs were published by default: %v", cfg.Pages)
+	}
+	if !strings.Contains(out.String(), "docs/code-review-gaps.md") {
+		t.Fatalf("init did not list existing docs:\n%s", out.String())
+	}
+	if err := runCheck(r.cfg, &out, false, false, false); err == nil || !strings.Contains(err.Error(), "no pages configured") {
+		t.Fatalf("check without pages: %v", err)
 	}
 
-	var bundleBuf bytes.Buffer
-	if err := executeBundle(bundleOptions{
-		input:      input,
-		outputDir:  outDir,
-		configPath: configPath,
-		cachePath:  cachePath,
-		out:        &bundleBuf,
-	}); err != nil {
-		t.Fatalf("bundle: %v", err)
-	}
-	index, err := os.ReadFile(filepath.Join(outDir, "index.html"))
-	if err != nil {
+	if err := runInit(r.cfg, &out, []string{"docs/partner-integration.md"}, "", true); err != nil {
 		t.Fatal(err)
 	}
-	if !bytes.Contains(index, []byte("Hospital API")) {
-		t.Fatalf("index = %s", index)
-	}
-	if _, err := os.Stat(filepath.Join(outDir, "assets", "logo.svg")); err != nil {
-		t.Fatalf("bundled logo: %v", err)
-	}
-	payload, err := os.ReadFile(filepath.Join(outDir, "docs.js"))
-	if err != nil {
+	if err := runBundle(r.cfg, "", &bytes.Buffer{}); err != nil {
 		t.Fatal(err)
 	}
-	if !bytes.Contains(payload, []byte(`"primary":"#0969da"`)) {
-		t.Fatalf("custom colors missing from payload: %s", payload)
+	if strings.Contains(r.read(".indoc/site/docs.js"), "Security gaps") {
+		t.Fatal("unselected page was published")
 	}
+}
 
-	if err := os.WriteFile(sourceFile, []byte(body+"\n# changed\n"), 0644); err != nil {
+func TestVersionCommand(t *testing.T) {
+	buf := new(bytes.Buffer)
+	rootCmd.SetOut(buf)
+	rootCmd.SetArgs([]string{"version"})
+	if err := rootCmd.Execute(); err != nil {
 		t.Fatal(err)
-	}
-	scanBuf.Reset()
-	if err := executeScan(scanOptions{
-		configPath: configPath,
-		cachePath:  cachePath,
-		asJSON:     true,
-		out:        &scanBuf,
-	}); err != nil {
-		t.Fatalf("second scan: %v", err)
-	}
-	report = scanReport{}
-	if err := json.Unmarshal(scanBuf.Bytes(), &report); err != nil {
-		t.Fatal(err)
-	}
-	if report.Previous == nil || report.Previous.ProjectName != "Hospital API" {
-		t.Fatalf("previous = %+v", report.Previous)
-	}
-	if len(report.Previous.Guides) != 1 || len(report.Stale) != 2 {
-		t.Fatalf("guides=%d stale=%+v", len(report.Previous.Guides), report.Stale)
 	}
 }

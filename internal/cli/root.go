@@ -1,23 +1,26 @@
 package cli
 
 import (
-	"strings"
-
-	"github.com/byabasaija/indoc/internal/scanner"
+	"github.com/byabasaija/indoc/internal/config"
 	"github.com/spf13/cobra"
 )
 
 var (
-	cfgFile   string
-	cacheFile string
+	cfgFile string
 
 	rootCmd = &cobra.Command{
 		Use:   "indoc",
-		Short: "Compile a static documentation site from agent-written pages and extracted code facts",
-		Long: `indoc scans a project, extracts routes and environment variables, and compiles
-overview pages, guides, and that reference into a portable static site.
+		Short: "Documentation that fails CI when it stops matching the code",
+		Long: `indoc keeps Markdown documentation tied to the code it describes.
 
-The host agent writes the prose. indoc does not call a model and does not need an API key.`,
+Pages cite code as path::Symbol and list the files they cover. indoc records
+what each page was verified against in .indoc/lock.json, and ` + "`indoc check`" + `
+fails when that code changes and the page does not. ` + "`indoc bundle`" + ` builds
+a static site with reference facts (routes, environment variables) extracted
+from source.
+
+indoc never calls an AI model. Your coding agent writes the pages.`,
+		SilenceUsage: true,
 	}
 )
 
@@ -27,13 +30,5 @@ func Execute() error {
 }
 
 func init() {
-	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file path (default is .indoc.yaml)")
-	rootCmd.PersistentFlags().StringVar(&cacheFile, "cache", "", "cache manifest path (default is .indoc/cache.json)")
-}
-
-func resolvedCachePath() string {
-	if strings.TrimSpace(cacheFile) == "" {
-		return scanner.DefaultCacheFile
-	}
-	return cacheFile
+	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default "+config.DefaultPath+")")
 }

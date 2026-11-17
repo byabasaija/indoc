@@ -1,0 +1,5 @@
+version: "1"
+project_name: indoc
+pages:
+    - docs/**/*.md
+output_dir: .indoc/site

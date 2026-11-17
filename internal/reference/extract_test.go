@@ -42,7 +42,7 @@ func TestExtractRoutesAndConfig(t *testing.T) {
 	writeFile(t, goFile, goSrc)
 	writeFile(t, js, jsSrc)
 
-	sections, err := Extract([]SourceFile{
+	sections, err := Extract("", []SourceFile{
 		{Path: py, Language: "Python"},
 		{Path: goFile, Language: "Go"},
 		{Path: js, Language: "JavaScript"},

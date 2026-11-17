@@ -78,28 +78,6 @@ func TestValidateRejectsUnknownReferenceKind(t *testing.T) {
 	}
 }
 
-func TestStaleReference(t *testing.T) {
-	prev := &Document{
-		Reference: []RefSection{{
-			Kind: KindRoutes,
-			Entries: []RefEntry{
-				{Name: "/health", Detail: "GET", Source: "app/main.py:4"},
-				{Name: "/visits", Detail: "POST", Source: "app/visits.py:10"},
-			},
-		}},
-	}
-	stale := StaleReference(prev, []string{"app/main.py"}, []string{"app/visits.py"})
-	if len(stale) != 2 {
-		t.Fatalf("stale = %+v", stale)
-	}
-	if stale[0].Reason != "modified" || stale[1].Reason != "deleted" {
-		t.Fatalf("reasons = %+v", stale)
-	}
-	if len(StaleReference(nil, nil, nil)) != 0 {
-		t.Fatal("nil previous document should yield no stale entries")
-	}
-}
-
 func TestSourcePath(t *testing.T) {
 	if got := SourcePath("app/main.py:12"); got != "app/main.py" {
 		t.Fatalf("got %q", got)

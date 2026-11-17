@@ -67,15 +67,6 @@ type Heading struct {
 	Level int    `json:"level"`
 }
 
-// StaleRef is a previously published reference entry whose source file changed.
-type StaleRef struct {
-	Kind   string `json:"kind"`
-	Name   string `json:"name"`
-	Detail string `json:"detail,omitempty"`
-	Source string `json:"source"`
-	Reason string `json:"reason"`
-}
-
 // Normalize fills ids and titles, then checks the document is bundleable.
 func Normalize(d *Document) error {
 	if d == nil {
@@ -200,41 +191,6 @@ func isHexColor(color string) bool {
 	return err == nil
 }
 
-// StaleReference lists reference entries from a previous document whose source file changed.
-func StaleReference(prev *Document, modified, deleted []string) []StaleRef {
-	if prev == nil {
-		return []StaleRef{}
-	}
-	mod := pathSet(modified)
-	del := pathSet(deleted)
-	var stale []StaleRef
-	for _, section := range prev.Reference {
-		for _, entry := range section.Entries {
-			path := SourcePath(entry.Source)
-			reason := ""
-			if del[path] {
-				reason = "deleted"
-			} else if mod[path] {
-				reason = "modified"
-			}
-			if reason == "" {
-				continue
-			}
-			stale = append(stale, StaleRef{
-				Kind:   section.Kind,
-				Name:   entry.Name,
-				Detail: entry.Detail,
-				Source: entry.Source,
-				Reason: reason,
-			})
-		}
-	}
-	if stale == nil {
-		return []StaleRef{}
-	}
-	return stale
-}
-
 // SourcePath returns the file path from a "path:line" source citation.
 func SourcePath(source string) string {
 	source = strings.TrimSpace(source)
@@ -303,12 +259,4 @@ func defaultRefTitle(kind string) string {
 	default:
 		return kind
 	}
-}
-
-func pathSet(paths []string) map[string]bool {
-	set := make(map[string]bool, len(paths))
-	for _, path := range paths {
-		set[strings.TrimSpace(path)] = true
-	}
-	return set
 }
