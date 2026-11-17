@@ -1,9 +1,8 @@
 // Package glob matches slash-separated paths against patterns with `**`.
 //
-//   - any run of characters except '/'
-//     ?     one character except '/'
-//     **    any run of characters including '/', as a whole segment
-//     [..]  character class, as in filepath.Match
+// Pattern syntax: `*` matches any run of characters except '/', `?` matches
+// one character except '/', `**` as a whole segment matches any number of
+// segments, and `[...]` is a character class as in filepath.Match.
 //
 // A pattern without a '/' still matches only at the root: "*.md" does not
 // match "docs/a.md". Use "**/*.md" for that.
