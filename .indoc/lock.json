@@ -1108,7 +1108,7 @@
       }
     },
     "documentation/site.md": {
-      "page": "db86d36909113318",
+      "page": "470684961c599036",
       "citations": {
         "internal/cli/bundle.go::editLink": {
           "surface": "7c023cbaf4f922aa",
@@ -1307,11 +1307,12 @@
           "hasher": "go/2"
         },
         "internal/site/site_test.go": {
-          "body": "663102bc4abc4918",
+          "body": "e65136ed9aec7dae",
           "symbols": {
             "TestLanding": "3c18404c6fab744f",
             "TestLayoutAndLinks": "20c522e3db29fb83",
             "TestLegacyViewerRemoved": "7187d912e7d8be91",
+            "TestLogoIsFavicon": "eae28e96b0cf0133",
             "TestMermaidOnlyWhenUsed": "cd62c00a1da3567b",
             "TestReferenceTables": "ae59f9f109f5a7e9",
             "TestStaleFilesRemoved": "4823141262fe41dd",
@@ -1326,12 +1327,12 @@
             "exists",
             "read"
           ],
-          "raw": "5f63d9346f9961f1",
+          "raw": "e7a8913bb2ad680d",
           "hasher": "go/2"
         },
         "internal/site/templates/page.html": {
-          "body": "4c423c290750a9be",
-          "raw": "4c423c290750a9be",
+          "body": "c5c23b354d813aa9",
+          "raw": "c5c23b354d813aa9",
           "hasher": "bytes"
         },
         "internal/site/write.go": {

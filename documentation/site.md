@@ -60,7 +60,7 @@ These keys in `.indoc/config.yaml` shape the site (`internal/cli/bundle.go::site
 
 ```yaml
 appearance:
-  logo: design/logo.svg          # path in the repository, or a URL
+  logo: design/logo.svg          # path in the repository, or a URL; also the favicon
   colors:
     primary: "#0969da"           # links, active nav, focus
     accent: "#8250df"

@@ -10,7 +10,8 @@
 {{- with .Canonical}}
 <link rel="canonical" href="{{.}}">
 {{- end}}
-<meta name="generator" content="indoc">
+{{- if .Logo}}<link rel="icon" href="{{.Logo}}">
+{{end}}<meta name="generator" content="indoc">
 <link rel="stylesheet" href="{{.Root}}assets/indoc.css">
 {{- if .CustomCSS}}
 <link rel="stylesheet" href="{{.Root}}assets/custom.css">

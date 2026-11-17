@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="indoc">
+  <defs>
+    <mask id="indoc-cut">
+      <rect width="64" height="64" fill="#fff"/>
+      <rect x="26.25" y="28.5" width="11.5" height="26.5" rx="5.75" fill="#000"/>
+      <circle cx="32" cy="15.5" r="9" fill="#000"/>
+    </mask>
+  </defs>
+  <rect width="64" height="64" rx="15" fill="#1f2328" mask="url(#indoc-cut)"/>
+  <path d="M27.6 15.9l3 3 5.8-6" fill="none" stroke="#1f2328" stroke-width="3.6" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

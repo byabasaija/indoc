@@ -197,3 +197,14 @@ func TestLegacyViewerRemoved(t *testing.T) {
 		t.Error("a user's style.css was removed")
 	}
 }
+
+func TestLogoIsFavicon(t *testing.T) {
+	s := basicSite(t)
+	os.WriteFile(filepath.Join(s.RepoRoot, "logo.svg"), []byte("<svg/>"), 0o644)
+	s.Logo = "logo.svg"
+	out := build(t, s)
+	page := read(t, out, "guides/setup/index.html")
+	if !strings.Contains(page, `<link rel="icon" href="../../assets/logo-`) {
+		t.Errorf("logo not used as favicon")
+	}
+}
