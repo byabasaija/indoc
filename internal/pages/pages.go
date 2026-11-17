@@ -18,18 +18,18 @@ import (
 
 // Page is one Markdown documentation page.
 type Page struct {
-	Path      string // slash-separated, relative to the repository root
-	Title     string
-	Order     int
-	HasOrder  bool
-	Audience  string
-	Layout    string
-	Sources   []string // globs of code this page describes
+	Path     string // slash-separated, relative to the repository root
+	Title    string
+	Order    int
+	HasOrder bool
+	Audience string
+	Layout   string
+	Sources  []string // globs of code this page describes
 	// Strict makes any change to a cited symbol, including its body, fail
 	// check. For pages describing externally visible behavior.
 	Strict    bool
-	Body      string   // Markdown without frontmatter
-	Raw       []byte   // whole file, for hashing
+	Body      string // Markdown without frontmatter
+	Raw       []byte // whole file, for hashing
 	Citations []Citation
 }
 
