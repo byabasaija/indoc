@@ -386,7 +386,7 @@ Each phase ends with a concrete check against a real repo, shop unless noted.
 * `.github/workflows/release.yml`: on a `v*` tag, static builds for macOS, Linux, Windows (amd64, arm64), `checksums.txt`, GitHub release; refuses if the plugin's pinned version differs from the tag.
 * `action.yml`: `uses: byabasaija/indoc@vX.Y.Z`, with `mode: default | strict | warn`.
 * `.github/workflows/ci.yml`: gofmt, vet, tests, indoc's own `check --strict`, and grammar reproducibility.
-* **Remaining:** choose a license (`LICENSE` is empty), tag and publish v0.1.0, then the exit test below on a fresh machine with each host. Cursor and other MCP clients: document running `indoc mcp`.
+* **Remaining:** tag and publish v0.1.0 (license: MIT), then the exit test below on a fresh machine with each host. Cursor and other MCP clients: document running `indoc mcp`.
 * **Exit:** fresh machine, one plugin install, "document this project" → bundled site, no indoc commands typed.
 ### Phase 6: Viewer
 * Pre-rendered page-per-file output replacing the hash-routed SPA; default theme per section 8.

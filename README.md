@@ -165,4 +165,4 @@ See [ROADMAP.md](ROADMAP.md) for what is next and what indoc deliberately does n
 
 ## License
 
-See [LICENSE](LICENSE).
+MIT. See [LICENSE](LICENSE).
