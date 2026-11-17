@@ -7,7 +7,7 @@
 # INDOC_BIN=/path/to/indoc uses a local build instead.
 set -eu
 
-VERSION="0.2.0" # must equal the plugin version; the release workflow checks it
+VERSION="0.3.0" # must equal the plugin version; the release workflow checks it
 RELEASES="${INDOC_RELEASES_URL:-https://github.com/byabasaija/indoc/releases/download}"
 
 if [ -n "${INDOC_BIN:-}" ]; then

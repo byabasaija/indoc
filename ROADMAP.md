@@ -8,7 +8,7 @@ Want something here sooner? [Open an issue](https://github.com/byabasaija/indoc/
 
 | Version | What it added |
 |---|---|
-| **0.3** (next) | New pages go in `documentation/`, so plans and agent notes in `docs/` are never mixed in or published |
+| **0.3** | New pages go in `documentation/`, so plans and agent notes in `docs/` are never mixed in or published |
 | **0.2** | A pre-rendered docs site: search, dark mode, highlighting, copy buttons, Mermaid, landing page, edit links |
 | **0.1** | `check` and the lock; `path::Symbol` citations; Python, JavaScript/TypeScript, and Go parsers; routes, env vars, and commands from Django, DRF, FastAPI, Express, Next.js, NestJS, Astro, and Cobra; MCP server and plugin for Claude Code and Copilot CLI; GitHub Action |
 
