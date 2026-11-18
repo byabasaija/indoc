@@ -1116,7 +1116,7 @@
       }
     },
     "documentation/site.md": {
-      "page": "9505d40e9cc8ff3f",
+      "page": "596482de295b4444",
       "citations": {
         "internal/cli/bundle.go::editLink": {
           "surface": "7c023cbaf4f922aa",
@@ -1151,7 +1151,7 @@
         "internal/site/site.go::Build": {
           "surface": "b40cda3ec9f95359",
           "body": "d8620248c3acc27f",
-          "raw": "57d2e6338e35eb6f",
+          "raw": "2dae0ea20b4fa8b3",
           "hasher": "go/2"
         }
       },
@@ -1263,7 +1263,7 @@
           "hasher": "javascript/44c892e0be05/2"
         },
         "internal/site/site.go": {
-          "body": "dfb3e25c034146b9",
+          "body": "055acf2afdcb4e3c",
           "symbols": {
             "Build": "b40cda3ec9f95359",
             "Link": "d7c60ea0d7835f63",
@@ -1273,6 +1273,7 @@
             "builder.assets": "b4ec11e7fdd7703b",
             "builder.categoryRank": "ae8d547a37e17bc1",
             "builder.categoryTitle": "e9667abdc839591b",
+            "builder.checkCollisions": "1a4c9037f3bcc3d7",
             "builder.copyFile": "461572243aa470eb",
             "builder.isFolder": "358eaf71304af29f",
             "builder.less": "72cd38f41843868f",
@@ -1304,6 +1305,7 @@
             "builder.assets",
             "builder.categoryRank",
             "builder.categoryTitle",
+            "builder.checkCollisions",
             "builder.copyFile",
             "builder.isFolder",
             "builder.less",
@@ -1330,11 +1332,11 @@
             "writer.finish",
             "writer.write"
           ],
-          "raw": "57d2e6338e35eb6f",
+          "raw": "2dae0ea20b4fa8b3",
           "hasher": "go/2"
         },
         "internal/site/site_test.go": {
-          "body": "841dcfe8910c77a0",
+          "body": "9c07332d1c8400f5",
           "symbols": {
             "TestLanding": "3c18404c6fab744f",
             "TestLandingSectionErrors": "06dd8fc4274b866e",
@@ -1345,6 +1347,7 @@
             "TestMermaidOnlyWhenUsed": "cd62c00a1da3567b",
             "TestReferenceTables": "ae59f9f109f5a7e9",
             "TestStaleFilesRemoved": "4823141262fe41dd",
+            "TestURLCollisions": "8e8f2ff211de670e",
             "basicSite": "31a2e0164be82723",
             "build": "227a27ce1384a0c5",
             "exists": "adc92eea098ab63c",
@@ -1356,7 +1359,7 @@
             "exists",
             "read"
           ],
-          "raw": "ba8cdecdf0b8da8b",
+          "raw": "723ad5eccb7ad86f",
           "hasher": "go/2"
         },
         "internal/site/templates/page.html": {

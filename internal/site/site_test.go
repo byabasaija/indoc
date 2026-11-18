@@ -271,3 +271,27 @@ func TestLandingSectionErrors(t *testing.T) {
 		t.Errorf("missing logo image: %v", err)
 	}
 }
+
+func TestURLCollisions(t *testing.T) {
+	s := basicSite(t)
+	s.Pages = append(s.Pages, Page{Source: "docs/guides.md", Title: "Guides too", Markdown: "# x\n"})
+	err := Build(s, t.TempDir())
+	if err == nil || !strings.Contains(err.Error(), "docs/guides/index.md and docs/guides.md would both be published at /guides/") {
+		t.Errorf("page/page collision: %v", err)
+	}
+
+	s = basicSite(t)
+	s.Pages = append(s.Pages, Page{Source: "docs/reference/routes.md", Title: "My routes", Markdown: "# x\n"})
+	s.Reference = []doc.RefSection{{ID: "routes", Title: "Routes", Kind: doc.KindRoutes}}
+	err = Build(s, t.TempDir())
+	if err == nil || !strings.Contains(err.Error(), `docs/reference/routes.md and the generated "Routes" reference page would both be published at /reference/routes/`) {
+		t.Errorf("page/reference collision: %v", err)
+	}
+
+	s = basicSite(t) // a reference/ folder of your own is fine when names differ
+	s.Pages = append(s.Pages, Page{Source: "docs/reference/glossary.md", Title: "Glossary", Markdown: "# x\n"})
+	s.Reference = []doc.RefSection{{ID: "routes", Title: "Routes", Kind: doc.KindRoutes}}
+	if err := Build(s, t.TempDir()); err != nil {
+		t.Errorf("no collision: %v", err)
+	}
+}

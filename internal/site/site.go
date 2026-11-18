@@ -178,6 +178,32 @@ func (b *builder) plan() error {
 		})
 	}
 	b.pages = ordered
+	return b.checkCollisions()
+}
+
+// checkCollisions refuses two pages at one URL: the later would silently
+// overwrite the earlier. It happens with guides.md next to guides/index.md,
+// or a page at reference/routes.md next to the generated Routes page.
+func (b *builder) checkCollisions() error {
+	seen := map[string]*built{}
+	for _, p := range b.pages {
+		prev, ok := seen[p.Slug]
+		if !ok {
+			seen[p.Slug] = p
+			continue
+		}
+		name := func(x *built) string {
+			if x.Reference != nil {
+				return fmt.Sprintf("the generated %q reference page", x.Title)
+			}
+			return x.Source
+		}
+		fix := "rename or move one of them"
+		if p.Reference != nil || prev.Reference != nil {
+			fix = "rename or move your page; generated reference pages live under reference/"
+		}
+		return fmt.Errorf("%s and %s would both be published at %s; %s", name(prev), name(p), "/"+urlOf(p.Slug), fix)
+	}
 	return nil
 }
 

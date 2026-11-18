@@ -22,7 +22,7 @@ The sidebar mirrors the folders your pages live in:
 | `documentation/guides/index.md` | `/guides/` | Names the "Guides" group and comes first in it |
 | `documentation/guides/setup.md` | `/guides/setup/` | In the "Guides" group |
 
-Pages sort by `order`, then title. A group sorts by its `index.md`'s `order`, or the lowest `order` inside it. Reference pages go last, under "Reference". Links between Markdown files (`[setup](guides/setup.md#install)`) become links between pages, and local images are copied into the site.
+Pages sort by `order`, then title. A group sorts by its `index.md`'s `order`, or the lowest `order` inside it. Reference pages go last, under "Reference". Links between Markdown files (`[setup](guides/setup.md#install)`) become links between pages, and local images are copied into the site. Two pages that would land at the same URL, such as `guides.md` next to `guides/index.md`, or a page at `reference/routes.md` next to the generated Routes page, stop the build with both named, instead of one silently replacing the other.
 
 ## Landing page
 
