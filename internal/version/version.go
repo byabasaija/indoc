@@ -5,7 +5,7 @@ import "fmt"
 var (
 	// Version is the current semantic version of the indoc binary.
 	// Can be overridden at compile time via: -ldflags "-X github.com/byabasaija/indoc/internal/version.Version=v0.1.0"
-	Version = "0.4.0-dev"
+	Version = "0.5.0-dev"
 
 	// GitCommit is the git SHA at build time.
 	GitCommit = "none"

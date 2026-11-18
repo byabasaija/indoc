@@ -15,17 +15,18 @@ So `main` must never pin a version whose release doesn't exist yet, or every plu
    - `internal/version/version.go`: `Version = "X.Y.Z-dev"`
    - The `byabasaija/indoc@vX.Y.Z` examples in `README.md`, `documentation/ci.md`, and `plugin/skills/indoc/SKILL.md`
 2. Run `indoc bundle`, then `indoc check --strict`, and `go test ./...`. The launcher change drifts `documentation/agents.md`; `indoc ack` it once you've confirmed it's still right.
-3. Commit (`chore: release X.Y.Z`) and tag the commit. **Do not push `main` yet.**
+3. If the release changes behavior users rely on, write `.github/release-notes/vX.Y.Z.md` with an **Upgrading** section; the workflow uses it instead of generated notes.
+4. Commit (`chore: release X.Y.Z`) and tag the commit. **Do not push `main` yet.**
    ```sh
    git tag -a vX.Y.Z -m "indoc X.Y.Z: <one line>"
    git push origin vX.Y.Z
    ```
-4. Wait for the **Release** workflow to finish and confirm the release has six archives, `install.sh`, and `checksums.txt`.
-5. Push `main`. Plugin installs now pin a release that exists.
+5. Wait for the **Release** workflow to finish and confirm the release has six archives, `install.sh`, and `checksums.txt`.
+6. Push `main`. Plugin installs now pin a release that exists.
    ```sh
    git push origin main
    ```
-6. Check the launcher against the published release:
+7. Check the launcher against the published release:
    ```sh
    CLAUDE_PLUGIN_DATA=$(mktemp -d) sh plugin/bin/indoc version
    ```
