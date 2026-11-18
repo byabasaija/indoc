@@ -37,6 +37,8 @@ type Page struct {
 	Hero     *Hero
 	Features []Feature
 	Featured []Action
+	// CitationStyle overrides the site's citations style for this page.
+	CitationStyle string
 	// Sections orders the landing page's blocks; nil means hero, features, body.
 	Sections []Section
 }
@@ -85,6 +87,16 @@ type LogoItem struct {
 
 // SectionTypes are the landing blocks indoc knows.
 var SectionTypes = []string{"hero", "features", "body", "markdown", "contributors", "logos"}
+
+// ValidCitationStyle reports whether s is a citations style.
+func ValidCitationStyle(s string) bool {
+	for _, v := range CitationStyles {
+		if s == v {
+			return true
+		}
+	}
+	return false
+}
 
 // UnmarshalYAML accepts "hero" as shorthand for {type: hero}.
 func (s *Section) UnmarshalYAML(n *yaml.Node) error {
@@ -154,6 +166,7 @@ type frontmatter struct {
 	Features        []Feature `yaml:"features"`
 	Featured        []Action  `yaml:"featured"`
 	Sections        []Section `yaml:"sections"`
+	Citations       string    `yaml:"citations"`
 }
 
 // Match returns the files (from a ListFiles result) selected by globs.
@@ -221,6 +234,10 @@ func Parse(pagePath string, raw []byte) (Page, error) {
 			return Page{}, fmt.Errorf("%s: %w", pagePath, err)
 		}
 		p.Sections = fm.Sections
+		if fm.Citations != "" && !ValidCitationStyle(fm.Citations) {
+			return Page{}, fmt.Errorf("%s: citations must be one of %s, got %q", pagePath, strings.Join(CitationStyles, ", "), fm.Citations)
+		}
+		p.CitationStyle = fm.Citations
 		for _, s := range fm.Sources {
 			s = strings.TrimSpace(s)
 			if s == "" {
@@ -360,10 +377,26 @@ func firstNonEmpty(values ...string) string {
 	return ""
 }
 
-// Linkify turns citations outside fenced code blocks into Markdown links.
-// link returns the URL for a citation, or "" to leave it as written. A
-// citation wrapped in backticks keeps them inside the link text.
-func Linkify(body string, link func(Citation) string) string {
+// Citation styles: how citations appear in the published page. Checking is
+// the same in every style.
+const (
+	CitationsShort  = "short"  // the symbol name, `Dispatcher.dispatch` (default)
+	CitationsFull   = "full"   // as written, `app/checkout/dispatcher.py::Dispatcher.dispatch`
+	CitationsHidden = "hidden" // removed when in parentheses, otherwise the symbol name, unlinked
+)
+
+// CitationStyles lists the valid styles.
+var CitationStyles = []string{CitationsShort, CitationsFull, CitationsHidden}
+
+// parenCitations matches a parenthetical holding only citations, such as
+// " (`a.py::A`)" or " (see `a.py::A`, `b.py::B`)", with the space before it.
+var parenCitations = regexp.MustCompile("\\s*\\((?:\\s*(?:see\\s+)?`?" + citationRe.String() + "`?\\s*(?:,|;|and)?)+\\s*\\)")
+
+// RenderCitations rewrites the citations in a page body for publishing.
+// href gives a citation's link target; the citation as written becomes the
+// link title, so readers can still see the full path. Citations in fenced
+// code, and ones already inside links, are left alone.
+func RenderCitations(body, style string, href func(Citation) string) string {
 	lines := strings.Split(body, "\n")
 	inFence, fence := false, ""
 	for i, line := range lines {
@@ -380,31 +413,37 @@ func Linkify(body string, link func(Citation) string) string {
 		if inFence {
 			continue
 		}
-		lines[i] = linkifyLine(line, link)
+		if style == CitationsHidden {
+			line = parenCitations.ReplaceAllString(line, "")
+		}
+		lines[i] = renderCitationLine(line, style, href)
 	}
 	return strings.Join(lines, "\n")
 }
 
-func linkifyLine(line string, link func(Citation) string) string {
+func renderCitationLine(line, style string, href func(Citation) string) string {
 	var b strings.Builder
 	last := 0
 	for _, m := range citationRe.FindAllStringSubmatchIndex(line, -1) {
 		start, end := m[0], m[1]
 		c := Citation{Path: strings.TrimPrefix(line[m[2]:m[3]], "./"), Symbol: line[m[4]:m[5]]}
-		ticked := start > 0 && end < len(line) && line[start-1] == '`' && line[end] == '`'
-		if ticked {
+		if start > 0 && end < len(line) && line[start-1] == '`' && line[end] == '`' {
 			start, end = start-1, end+1
 		}
 		// Leave citations that are already link text ([x]) or a link target (](x)) alone.
-		if start > 0 && line[start-1] == '[' || start > 1 && line[start-2:start] == "](" {
+		if start > 0 && line[start-1] == '[' || start > 1 && line[start-2:start] == "](" || start < last {
 			continue
 		}
-		url := link(c)
-		if url == "" || start < last {
-			continue
+		label := "`" + c.Symbol + "`"
+		if style == CitationsFull {
+			label = "`" + c.Ref() + "`"
 		}
 		b.WriteString(line[last:start])
-		b.WriteString("[" + line[start:end] + "](" + url + ")")
+		if url := href(c); style != CitationsHidden && url != "" {
+			b.WriteString("[" + label + "](" + url + " \"" + c.Ref() + "\")")
+		} else {
+			b.WriteString(label)
+		}
 		last = end
 	}
 	b.WriteString(line[last:])

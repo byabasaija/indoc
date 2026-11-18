@@ -91,7 +91,7 @@ func linkSources(p *project, sections []doc.RefSection) {
 		for j := range sections[i].Entries {
 			e := &sections[i].Entries[j]
 			file, line := splitSource(e.Source)
-			e.URL = p.cfg.SourceLink(file, line)
+			e.URL = p.cfg.PublicLink(file, line)
 		}
 	}
 }
@@ -102,10 +102,11 @@ func splitSource(source string) (string, int) {
 	return file, line
 }
 
-// citationLink resolves a citation to its symbol's current line.
+// citationLink resolves a citation to its symbol's current line, or "" when
+// the site does not link to the code.
 func citationLink(p *project) func(pages.Citation) string {
 	return func(c pages.Citation) string {
-		if p.cfg.SourceURL == "" {
+		if !p.cfg.SourceLinks || p.cfg.SourceURL == "" {
 			return ""
 		}
 		f, ok := p.repo.Analyze(c.Path)
@@ -120,6 +121,34 @@ func citationLink(p *project) func(pages.Citation) string {
 	}
 }
 
+// citationTarget is where a citation in the text points: the code when the
+// site links to it, otherwise the page's "Checked against the code" box,
+// which shows the full path.
+func citationTarget(p *project) func(pages.Citation) string {
+	link := citationLink(p)
+	return func(c pages.Citation) string {
+		if u := link(c); u != "" {
+			return u
+		}
+		return "#verified"
+	}
+}
+
+// verified lists what a page was checked against, for the box at its end.
+func verified(p *project, pg pages.Page) []site.Ref {
+	link := citationLink(p)
+	seen := map[string]bool{}
+	var out []site.Ref
+	for _, c := range pg.Citations {
+		if seen[c.Ref()] {
+			continue
+		}
+		seen[c.Ref()] = true
+		out = append(out, site.Ref{Label: c.Ref(), URL: link(c)})
+	}
+	return out
+}
+
 // siteFor collects what the site is built from.
 func siteFor(p *project, sections []doc.RefSection) *site.Site {
 	s := &site.Site{
@@ -130,7 +159,9 @@ func siteFor(p *project, sections []doc.RefSection) *site.Site {
 		ShowAuthors: p.cfg.ShowAuthors,
 		RepoRoot:    p.paths.Root,
 		Reference:   sections,
-		Repo:        githubRepo(p.cfg.SourceURL),
+	}
+	if p.cfg.SourceLinks {
+		s.Repo = githubRepo(p.cfg.SourceURL)
 	}
 	if s.Name == "" {
 		s.Name = "Documentation"
@@ -150,8 +181,17 @@ func siteFor(p *project, sections []doc.RefSection) *site.Site {
 	}
 	editURL, editLabel := "", ""
 	for _, pg := range p.pages {
-		if p.cfg.SourceURL != "" {
+		if p.cfg.SourceLinks {
 			editURL, editLabel = editLink(p.cfg.SourceLink(pg.Path, 0))
+		}
+		style := pg.CitationStyle
+		if style == "" {
+			style = p.cfg.CitationStyle()
+		}
+		var checked []site.Ref
+		var covers []string
+		if style != pages.CitationsHidden {
+			checked, covers = verified(p, pg), pg.Sources
 		}
 		updated, author := gitLastChange(p.paths.Root, pg.Path)
 		if !p.cfg.ShowAuthors {
@@ -160,8 +200,9 @@ func siteFor(p *project, sections []doc.RefSection) *site.Site {
 		s.Pages = append(s.Pages, site.Page{
 			Source: pg.Path, Title: pg.Title, Description: pg.Description,
 			Order: pg.Order, HasOrder: pg.HasOrder, Layout: pg.Layout,
-			Markdown: pages.Linkify(pg.Body, citationLink(p)),
-			Hero:     pg.Hero, Features: pg.Features, Featured: pg.Featured, Sections: pg.Sections,
+			Markdown: pages.RenderCitations(pg.Body, style, citationTarget(p)),
+			Verified: checked, Covers: covers,
+			Hero: pg.Hero, Features: pg.Features, Featured: pg.Featured, Sections: pg.Sections,
 			EditURL: editURL, EditLabel: editLabel, Updated: updated, Author: author,
 		})
 	}

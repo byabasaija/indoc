@@ -32,6 +32,7 @@ Every order is charged by
 | `audience` | Optional reader group, such as `partner` or `dev`. |
 | `sources` | Globs of code this page describes. `**` matches any depth. |
 | `strict` | `true` makes body changes to cited symbols fail the check. |
+| `citations` | `short`, `full`, or `hidden`: how this page shows citations (see below). |
 | `description` | One line for search results and link previews. |
 | `layout` | `landing` on the home page adds a hero, feature cards, and optional `sections:` such as a contributors wall; see [Customizing the site](site.md). |
 
@@ -52,7 +53,25 @@ For pages whose readers depend on exact behavior, such as a partner API or a CLI
 
 Cite the symbols a page actually explains. Citations inside fenced code blocks are ignored.
 
-3. **It becomes a link.** When `source_url` is set in `.indoc/config.yaml`, `indoc bundle` turns each citation into a link to the symbol's current line (`internal/pages/pages.go::Linkify`). Line numbers are resolved at build time, so links stay right as code moves.
+Put citations in parentheses after the claim they support, so the sentence reads well on its own:
+
+```markdown
+Orders are charged once per idempotency key (`shop/checkout/service.py::CheckoutService.charge`).
+```
+
+### How citations look in the site
+
+Citations are for the checker; readers should not have to read file paths. `indoc bundle` rewrites them (`internal/pages/pages.go::RenderCitations`) in one of three styles, set with `citations:` in `.indoc/config.yaml` or per page in frontmatter:
+
+| Style | The example above reads |
+|---|---|
+| `short` (default) | "Orders are charged once per idempotency key (`CheckoutService.charge`)." |
+| `full` | The citation as written, file path included. |
+| `hidden` | "Orders are charged once per idempotency key." |
+
+Use `hidden` on pages for readers outside the team, such as partners or customers. Hidden citations are still checked; parenthesized ones are removed and any others show the symbol name.
+
+Each page with citations ends with a **Checked against the code** box listing every citation in full and the `sources` it watches; a citation in the text opens it. With `source_links: true` in the config, citations and the box link to the symbol's current line instead, so links stay right as code moves. Leave it off for private repositories: those links would be 404s for most readers.
 
 ## Sources
 

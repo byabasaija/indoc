@@ -36,9 +36,16 @@ type Config struct {
 	OutputDir   string          `yaml:"output_dir"`
 	Exclude     []string        `yaml:"exclude,omitempty"`
 	Appearance  *doc.Appearance `yaml:"appearance,omitempty"`
-	// SourceURL links citations and reference entries to the code, e.g.
+	// SourceURL is the template for links to the code, e.g.
 	// https://github.com/org/repo/blob/HEAD/{path}#L{line}
 	SourceURL string `yaml:"source_url,omitempty"`
+	// SourceLinks publishes links to the code: citations, reference entries,
+	// "Edit this page", and the repository in the header. Off by default:
+	// in a private repository those links are 404s for most readers.
+	SourceLinks bool `yaml:"source_links,omitempty"`
+	// Citations is how citations appear in pages: short (the symbol name,
+	// default), full (path::Symbol), or hidden. Pages can override it.
+	Citations string `yaml:"citations,omitempty"`
 	// Links appear in the site header, e.g. the repository or a website.
 	Links []Link `yaml:"links,omitempty"`
 	// Footer is a line of Markdown shown at the bottom of every page.
@@ -57,6 +64,25 @@ type Config struct {
 type Link struct {
 	Text string `yaml:"text"`
 	URL  string `yaml:"url"`
+}
+
+// CitationStyles are the values of citations; the first is the default.
+var CitationStyles = []string{"short", "full", "hidden"}
+
+// CitationStyle returns the configured citations style, or the default.
+func (c *Config) CitationStyle() string {
+	if c.Citations == "" {
+		return CitationStyles[0]
+	}
+	return c.Citations
+}
+
+// PublicLink is SourceLink when source_links is on, and "" otherwise.
+func (c *Config) PublicLink(path string, line int) string {
+	if !c.SourceLinks {
+		return ""
+	}
+	return c.SourceLink(path, line)
 }
 
 // SourceLink fills the source_url template, or returns "" when unset.
@@ -167,6 +193,9 @@ func Load(path string) (*Config, error) {
 	if err := yaml.Unmarshal(data, cfg); err != nil {
 		return nil, fmt.Errorf("parse %s: %w", path, err)
 	}
+	if cfg.Citations != "" && !contains(CitationStyles, cfg.Citations) {
+		return nil, fmt.Errorf("%s: citations must be one of %s, got %q", path, strings.Join(CitationStyles, ", "), cfg.Citations)
+	}
 	if cfg.OutputDir == "" {
 		cfg.OutputDir = DefaultOutputDir
 	}
@@ -258,4 +287,13 @@ func packageJSONName(path string) string {
 	}
 	name := pkg.Name
 	return name[strings.LastIndex(name, "/")+1:]
+}
+
+func contains(list []string, s string) bool {
+	for _, v := range list {
+		if v == s {
+			return true
+		}
+	}
+	return false
 }

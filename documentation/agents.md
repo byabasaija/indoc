@@ -35,7 +35,7 @@ On first use the plugin's launcher downloads the indoc release matching the plug
 | Tool | Does | Changes files |
 |---|---|---|
 | `indoc_scan` | Pages, check findings with reasons, extracted reference, extractor coverage, and a project map. Sets the project up on first use. | Only on first use |
-| `indoc_setup` | Creates `.indoc/config.yaml`, sets which Markdown files are published, and sets the logo | Yes |
+| `indoc_setup` | Creates `.indoc/config.yaml`, sets which Markdown files are published, the logo, and whether the site links to the code (`source_links`) | Yes |
 | `indoc_check` | Findings and the number that would fail CI | No |
 | `indoc_ack` | Records pages as verified | Yes |
 | `indoc_bundle` | Builds the site; refuses broken citations | Yes |
@@ -44,9 +44,10 @@ On first use the plugin's launcher downloads the indoc release matching the plug
 
 1. Scans the project: frameworks, entry points, real commands, existing Markdown, and images that look like a logo.
 2. Asks which existing Markdown to publish, if there is any.
-3. Asks which logo to use, offering the candidates it found (and warning when one is a tall lockup that will be unreadable in the header), or asks you for one. `indoc_setup` checks the file exists before writing it to the config (`internal/cli/mcp.go::setLogo`).
-4. Proposes the readers and an outline, including a landing page with a tagline and feature cards, and waits for your approval.
-5. Writes the pages with citations, builds the site, and runs the check.
+3. Asks whether the docs' readers can open the repository, and only then turns on links to the code.
+4. Asks which logo to use, offering the candidates it found (and warning when one is a tall lockup that will be unreadable in the header), or asks you for one. `indoc_setup` checks the file exists before writing it to the config (`internal/cli/mcp.go::setLogo`).
+5. Proposes the readers and an outline, each page labeled as a tutorial, how-to, reference, or explanation, with a landing page, and waits for your approval.
+6. Writes the pages with citations, builds the site, and runs the check.
 
 When a repository already has Markdown, `indoc_scan` lists it and publishes nothing (`internal/cli/mcp.go::setup`); the agent asks you which files to publish and passes them to `indoc_setup`. Each tool takes an optional `root`; otherwise it uses `CLAUDE_PROJECT_DIR` or the directory the server started in.
 

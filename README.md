@@ -52,7 +52,7 @@ Your coding agent writes the pages. indoc checks them. indoc never calls an AI m
 ## Why indoc
 
 - 🔴 **Stale docs fail CI.** Pages cite code as `path::Symbol`. Change a cited signature and `indoc check` names the page and what changed. Comments, formatting, and logging changes are ignored, so it doesn't cry wolf.
-- 🔗 **Citations are verified.** Rename a function and the page citing it is reported as broken; the site won't build until it's fixed. In the built site every citation links to the exact line.
+- 🔗 **Citations are verified.** Rename a function and the page citing it is reported as broken; the site won't build until it's fixed. Readers see a clean symbol name, not a file path, and a "Checked against the code" box on each page; public repos can link every citation to its exact line.
 - 🧭 **Reference from the source.** Routes, environment variables, and CLI commands are extracted from Django, FastAPI, Express, Next.js, NestJS, Astro, and Cobra. Nobody copies them by hand.
 - 🤖 **Made for coding agents.** Install the plugin for Claude Code or Copilot CLI and say "document this project". It agrees on readers and an outline with you, writes, checks, and builds.
 - 📦 **One binary, one static site.** No Node, no Python, no config sprawl. The output is plain HTML with search, dark mode, and highlighting that works on any host or straight from disk.

@@ -34,7 +34,7 @@ func init() {
 const mcpInstructions = `indoc keeps Markdown documentation tied to the code it describes.
 Start with indoc_scan: it sets the project up on first use and returns the pages, what needs updating, the routes/configuration/commands extracted from source, and a map of the project.
 If it reports that existing docs were found and nothing is published, ask the user which files to publish and call indoc_setup with those globs.
-Before writing new pages, ask the user which logo to use (map.logos lists candidates; set it with indoc_setup) and propose the readers and an outline, with the home page as a landing page (layout: landing, hero, features), to the user. Pages are Markdown with frontmatter (title, order, sources globs, strict) and cite code as path::Symbol.
+Before writing new pages, ask the user whether the docs' readers can open the repository (if so, set source_links with indoc_setup), which logo to use (map.logos lists candidates; set it with indoc_setup) and propose the readers and an outline, with the home page as a landing page (layout: landing, hero, features), to the user. Pages are Markdown with frontmatter (title, order, sources globs, strict) and cite code as path::Symbol.
 After writing, call indoc_bundle (it refuses broken citations), then indoc_check. After code changes, indoc_check lists stale pages with reasons; update them, or indoc_ack a page only after re-reading it against the code.`
 
 var rootSchema = map[string]any{
@@ -55,8 +55,9 @@ func mcpServer() *mcp.Server {
 				Name: "indoc_setup", Title: "Set up indoc",
 				Description: "Create .indoc/config.yaml for the project, set which Markdown files are published (pages globs such as documentation/**/*.md), and set the site's logo. When the repository already has Markdown, nothing is published until pages are given: ask the user which files to publish. Set logo only to a file or URL the user chose.",
 				InputSchema: obj(map[string]any{
-					"pages": pagesSchema,
-					"logo":  map[string]any{"type": "string", "description": "The project's logo: an image path relative to the repository root (SVG or a square PNG works best), or an https URL. Shown in the header, as the favicon, and on a landing page."},
+					"pages":        pagesSchema,
+					"logo":         map[string]any{"type": "string", "description": "The project's logo: an image path relative to the repository root (SVG or a square PNG works best), or an https URL. Shown in the header, as the favicon, and on a landing page."},
+					"source_links": map[string]any{"type": "boolean", "description": "Whether the site links to the code (citations, reference entries, edit links). True only if the docs' readers can open the repository, such as a public repository."},
 				}),
 				Idempotent: true,
 				Handler:    toolSetup,
@@ -93,10 +94,12 @@ func mcpServer() *mcp.Server {
 }
 
 type toolArgs struct {
-	Root   string   `json:"root"`
-	Pages  []string `json:"pages"`
-	Logo   string   `json:"logo"`
-	Strict bool     `json:"strict"`
+	Root  string   `json:"root"`
+	Pages []string `json:"pages"`
+	Logo  string   `json:"logo"`
+	// SourceLinks is a pointer so "not given" differs from false.
+	SourceLinks *bool `json:"source_links"`
+	Strict      bool  `json:"strict"`
 }
 
 func parseArgs(raw json.RawMessage) (toolArgs, string, error) {
@@ -167,6 +170,17 @@ func toolSetup(raw json.RawMessage) (string, any, bool) {
 			return failed(err)
 		}
 		text += "Logo set: " + a.Logo + "\n"
+	}
+	if a.SourceLinks != nil {
+		cfg, err := config.Load(cfgPath)
+		if err != nil {
+			return failed(err)
+		}
+		cfg.SourceLinks = *a.SourceLinks
+		if err := cfg.Save(cfgPath); err != nil {
+			return failed(err)
+		}
+		text += fmt.Sprintf("source_links: %t\n", cfg.SourceLinks)
 	}
 	if needsChoice {
 		text += choosePages

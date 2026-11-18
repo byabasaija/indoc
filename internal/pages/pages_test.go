@@ -86,23 +86,37 @@ func TestMatch(t *testing.T) {
 	}
 }
 
-func TestLinkify(t *testing.T) {
+func TestRenderCitations(t *testing.T) {
 	body := "See `app/x.py::A.run` and app/y.go::Serve.\n" +
 		"```\napp/x.py::A.run\n```\n" +
-		"Already [`app/x.py::A.run`](http://x) linked; unknown `app/z.py::Nope`.\n" +
-		"In parentheses (`app/x.py::A.run`) and [text](app/x.py::A.run).\n"
-	got := Linkify(body, func(c Citation) string {
-		if c.Path == "app/z.py" {
-			return ""
+		"Already [`app/x.py::A.run`](http://x) linked.\n" +
+		"Charges the card (`app/x.py::A.run`). Retries (see `app/x.py::A.run`, `app/y.go::Serve`) twice.\n"
+	href := func(c Citation) string { return "https://src/" + c.Path }
+	none := func(Citation) string { return "" }
+	for _, tc := range []struct {
+		style string
+		href  func(Citation) string
+		want  string
+	}{
+		{CitationsShort, href, "See [`A.run`](https://src/app/x.py \"app/x.py::A.run\") and [`Serve`](https://src/app/y.go \"app/y.go::Serve\").\n" +
+			"```\napp/x.py::A.run\n```\n" +
+			"Already [`app/x.py::A.run`](http://x) linked.\n" +
+			"Charges the card ([`A.run`](https://src/app/x.py \"app/x.py::A.run\")). Retries (see [`A.run`](https://src/app/x.py \"app/x.py::A.run\"), [`Serve`](https://src/app/y.go \"app/y.go::Serve\")) twice.\n"},
+		{CitationsFull, none, "See `app/x.py::A.run` and `app/y.go::Serve`.\n" +
+			"```\napp/x.py::A.run\n```\n" +
+			"Already [`app/x.py::A.run`](http://x) linked.\n" +
+			"Charges the card (`app/x.py::A.run`). Retries (see `app/x.py::A.run`, `app/y.go::Serve`) twice.\n"},
+		{CitationsHidden, href, "See `A.run` and `Serve`.\n" +
+			"```\napp/x.py::A.run\n```\n" +
+			"Already [`app/x.py::A.run`](http://x) linked.\n" +
+			"Charges the card. Retries twice.\n"},
+	} {
+		if got := RenderCitations(body, tc.style, tc.href); got != tc.want {
+			t.Errorf("%s:\n%s\nwant:\n%s", tc.style, got, tc.want)
 		}
-		return "https://src/" + c.Path + "#" + c.Symbol
-	})
-	want := "See [`app/x.py::A.run`](https://src/app/x.py#A.run) and [app/y.go::Serve](https://src/app/y.go#Serve).\n" +
-		"```\napp/x.py::A.run\n```\n" +
-		"Already [`app/x.py::A.run`](http://x) linked; unknown `app/z.py::Nope`.\n" +
-		"In parentheses ([`app/x.py::A.run`](https://src/app/x.py#A.run)) and [text](app/x.py::A.run).\n"
-	if got != want {
-		t.Errorf("Linkify:\n%s\nwant:\n%s", got, want)
+	}
+	if _, err := Parse("x.md", []byte("---\ncitations: tiny\n---\n")); err == nil || !strings.Contains(err.Error(), "citations must be one of") {
+		t.Errorf("invalid citations style: %v", err)
 	}
 }
 

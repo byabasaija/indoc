@@ -51,6 +51,10 @@ type Site struct {
 // Link is a header link.
 type Link struct{ Text, URL string }
 
+// Ref is a citation as written (path::Symbol) and, when the site links to
+// the code, its URL.
+type Ref struct{ Label, URL string }
+
 // Page is one Markdown page with what the site needs about it.
 type Page struct {
 	Source      string // repository-relative path of the Markdown file
@@ -64,6 +68,8 @@ type Page struct {
 	Features    []pages.Feature
 	Featured    []pages.Action
 	Sections    []pages.Section // landing blocks in order; nil means hero, features, body
+	Verified    []Ref           // citations the page was checked against, for the box at its end
+	Covers      []string        // its sources globs
 	EditURL     string
 	EditLabel   string
 	Updated     string // YYYY-MM-DD from git
@@ -387,7 +393,7 @@ func (b *builder) renderSections(p *built) error {
 				out.Repo = b.site.Repo
 			}
 			if out.Repo == "" {
-				return fmt.Errorf("sections[%d]: contributors needs repo: owner/repo (source_url is not a GitHub URL)", i)
+				return fmt.Errorf("sections[%d]: contributors needs repo: owner/repo (or source_links: true with a GitHub source_url)", i)
 			}
 			out.Limit = s.Limit
 			if out.Limit == 0 {

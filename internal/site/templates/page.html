@@ -130,6 +130,20 @@
 
     {{- if not .NotFound}}
     <footer class="page-footer">
+      {{- if or .Page.Verified .Page.Covers}}
+      <details class="verified" id="verified">
+        <summary><svg viewBox="0 0 16 16" aria-hidden="true"><path d="m3.5 8.5 3 3 6-7"/></svg>Checked against the code{{with .Page.Verified}} · {{len .}} reference{{if gt (len .) 1}}s{{end}}{{end}}</summary>
+        {{- with .Page.Verified}}
+        <ul>
+          {{- range .}}
+          <li>{{if .URL}}<a href="{{.URL}}"><code>{{.Label}}</code></a>{{else}}<code>{{.Label}}</code>{{end}}</li>
+          {{- end}}
+        </ul>
+        {{- end}}
+        {{- with .Page.Covers}}<p class="covers">Also watches {{range $i, $c := .}}{{if $i}}, {{end}}<code>{{$c}}</code>{{end}}</p>{{end}}
+        <p class="how">The build fails when this code changes and the page does not.</p>
+      </details>
+      {{- end}}
       {{- if or .Page.EditURL .Updated}}
       <div class="page-meta">
         {{- with .Page.EditURL}}

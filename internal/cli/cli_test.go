@@ -288,19 +288,48 @@ func TestBundleLinksCitationsAndSources(t *testing.T) {
 	if err := runInit(r.cfg, &bytes.Buffer{}, nil, "", false); err != nil {
 		t.Fatal(err)
 	}
-	r.write(".indoc/config.yaml", r.read(".indoc/config.yaml")+"source_url: https://example.test/{path}#L{line}\n")
+	base := r.read(".indoc/config.yaml") + "source_url: https://example.test/{path}#L{line}\n"
+	r.write(".indoc/config.yaml", base)
 	r.write("documentation/index.md", admitPage)
 	if err := runBundle(r.cfg, "", &bytes.Buffer{}); err != nil {
 		t.Fatal(err)
 	}
-	payload := r.site()
+	// Default: no links to the code (it may be private). Citations show the
+	// symbol and point at the page's "Checked against the code" box.
+	site := r.site()
+	if strings.Contains(site, "https://example.test/") {
+		t.Error("linked to the code without source_links")
+	}
+	for _, want := range []string{`href="#verified"`, `id="verified"`, `<code>app/main.py::admit</code>`} {
+		if !strings.Contains(site, want) {
+			t.Errorf("default site missing %s", want)
+		}
+	}
+	if strings.Contains(site, ">app/main.py::admit</code></a> ") {
+		t.Error("citation shown with its full path in the text")
+	}
+
+	r.write(".indoc/config.yaml", base+"source_links: true\n")
+	if err := runBundle(r.cfg, "", &bytes.Buffer{}); err != nil {
+		t.Fatal(err)
+	}
+	site = r.site()
 	for _, want := range []string{
 		`href="https://example.test/app/main.py#L7"`, // citation -> def admit
 		`href="https://example.test/app/main.py#L3"`, // route source -> @app.get
+		`View source`, // page footer link (not GitHub, so not an edit link)
 	} {
-		if !strings.Contains(payload, want) {
-			t.Errorf("payload missing %s", want)
+		if !strings.Contains(site, want) {
+			t.Errorf("source_links site missing %s", want)
 		}
+	}
+
+	r.write(".indoc/config.yaml", base+"citations: hidden\n")
+	if err := runBundle(r.cfg, "", &bytes.Buffer{}); err != nil {
+		t.Fatal(err)
+	}
+	if site = r.site(); strings.Contains(site, `id="verified"`) || strings.Contains(site, "app/main.py::admit") {
+		t.Error("hidden citations still visible")
 	}
 }
 

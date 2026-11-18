@@ -37,7 +37,7 @@ indoc init
 | Anything else | `documentation/**/*.md` |
 | `documentation/` already has Markdown | empty: nothing is published until you choose |
 
-`init` also sets `source_url` from your git remote, so citations in the built site link to the code.
+`init` also sets `source_url` from your git remote. The site links to the code only after you add `source_links: true`, which you should do when your readers can open the repository; see [Writing pages](writing-pages.md#how-citations-look-in-the-site).
 
 Pages do not go in `docs/` unless the project is a Docusaurus site. In most repositories `docs/` collects plans, review findings, and notes written by coding agents, and none of it should be published by accident. `init` lists the Markdown it did not publish; to publish some of it as well, add it to `pages:`:
 

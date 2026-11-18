@@ -152,6 +152,17 @@
     }
   }
 
+  // Citations point at the "Checked against the code" box; open it on arrival.
+  var checked = document.getElementById("verified");
+  if (checked) {
+    var openChecked = function () { if (location.hash === "#verified") checked.open = true; };
+    window.addEventListener("hashchange", openChecked);
+    document.querySelectorAll('a[href="#verified"]').forEach(function (a) {
+      a.addEventListener("click", function () { checked.open = true; });
+    });
+    openChecked();
+  }
+
   // Contributors wall on landing pages, loaded in the browser like the star
   // count so builds stay offline. Without JavaScript or GitHub, the section
   // still links to the contributors page.

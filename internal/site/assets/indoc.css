@@ -229,6 +229,16 @@ img { max-width: 100%; }
 .feature .more { display: inline-flex; align-items: center; gap: 4px; margin-top: 16px; font-weight: 500; }
 .feature .more svg { width: 14px; height: 14px; }
 .is-landing .prose:not(:empty) { margin-top: 56px; }
+.verified { margin: 0 0 24px; border: 1px solid var(--border-muted); border-radius: var(--radius); background: var(--bg-subtle); font-size: 0.9rem; scroll-margin-top: 80px; }
+.verified summary { cursor: pointer; padding: 10px 14px; color: var(--fg-muted); display: flex; align-items: center; gap: 8px; list-style: none; }
+.verified summary::-webkit-details-marker { display: none; }
+.verified summary svg { width: 15px; height: 15px; stroke: #1a7f37; stroke-width: 2; fill: none; stroke-linecap: round; stroke-linejoin: round; flex: none; }
+.verified summary:hover { color: var(--fg); }
+.verified ul { margin: 0; padding: 4px 14px 0 36px; }
+.verified li { margin: 2px 0; }
+.verified code { font-size: 0.82rem; overflow-wrap: anywhere; }
+.verified .covers, .verified .how { margin: 8px 14px 12px 36px; color: var(--fg-muted); }
+.verified .how { font-size: 0.82rem; }
 .landing-section { margin-top: 72px; }
 .section-title { text-align: center; font-size: 1.5rem; letter-spacing: -0.015em; margin: 0 0 24px; }
 .landing-prose { margin: 0; }

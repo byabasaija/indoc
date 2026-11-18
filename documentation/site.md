@@ -118,6 +118,8 @@ links:                           # header links
     url: https://acme.dev/blog
 footer: "© Acme. [Status](https://status.acme.dev)"   # Markdown
 site_url: https://docs.acme.dev  # adds canonical URLs and sitemap.xml
+source_links: true               # link to the code; only if readers can open the repository
+citations: short                 # short (default), full, or hidden
 show_authors: true               # "Last updated by Jane on …"
 allow_html: false                # raw HTML in pages is escaped unless true
 ```
@@ -129,7 +131,7 @@ Two optional files next to the config change the theme without a fork:
 
 ## Page footer
 
-When `source_url` points at GitHub or GitLab, each page gets an "Edit this page" link; other hosts get "View source" (`internal/cli/bundle.go::editLink`). The "Last updated" date comes from the last commit that touched the page (`internal/cli/bundle.go::gitLastChange`); the author is shown only with `show_authors: true`.
+With `source_links: true` and a `source_url` on GitHub or GitLab, each page gets an "Edit this page" link; other hosts get "View source" (`internal/cli/bundle.go::editLink`). The "Last updated" date comes from the last commit that touched the page (`internal/cli/bundle.go::gitLastChange`); the author is shown only with `show_authors: true`.
 
 ## Code and diagrams
 
