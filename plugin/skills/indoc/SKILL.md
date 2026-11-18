@@ -87,7 +87,7 @@ featured:
 ---
 ```
 
-The hero shows the logo unless `hero.image` is set. Links are to other pages' Markdown files. Keep the tagline to what the project does, not adjectives.
+For an open-source project with a GitHub repository, offer a contributors wall: add `sections: [hero, features, {type: contributors}, body]`. A `logos` section can show who uses the project, but only with logos the user provides. The hero shows the logo unless `hero.image` is set. Links are to other pages' Markdown files. Keep the tagline to what the project does, not adjectives.
 
 ## 4. Update docs after code changes
 

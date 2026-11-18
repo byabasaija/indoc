@@ -63,6 +63,7 @@ type Page struct {
 	Hero        *pages.Hero
 	Features    []pages.Feature
 	Featured    []pages.Action
+	Sections    []pages.Section // landing blocks in order; nil means hero, features, body
 	EditURL     string
 	EditLabel   string
 	Updated     string // YYYY-MM-DD from git
@@ -79,7 +80,20 @@ type built struct {
 	Text      string
 	Reference *doc.RefSection
 	mermaid   bool
+	sections  []section // landing blocks, rendered
 }
+
+// section is a landing block ready for the template.
+type section struct {
+	Type  string
+	Title string
+	HTML  template.HTML // markdown
+	Repo  string        // contributors
+	Limit int           // contributors
+	Logos []logo        // logos
+}
+
+type logo struct{ Src, Name, Href string }
 
 const manifestName = ".indoc-site"
 
@@ -301,6 +315,82 @@ func (b *builder) render() error {
 		}
 		p.HTML, p.Headings, p.Text, p.mermaid = template.HTML(res.HTML), res.Headings, res.Text, res.UsesMermaid
 		b.mermaid = b.mermaid || res.UsesMermaid
+		if p.Layout == "landing" {
+			if err := b.renderSections(p); err != nil {
+				return fmt.Errorf("%s: %w", p.Source, err)
+			}
+		}
+	}
+	return nil
+}
+
+// renderSections prepares a landing page's blocks in their listed order.
+// Without a list the order is hero, features, body; the body is appended
+// when the list leaves it out, so page content is never dropped.
+func (b *builder) renderSections(p *built) error {
+	list := p.Sections
+	if list == nil {
+		list = []pages.Section{{Type: "hero"}, {Type: "features"}, {Type: "body"}}
+	}
+	hasBody := false
+	for _, s := range list {
+		hasBody = hasBody || s.Type == "body"
+	}
+	if !hasBody {
+		list = append(list, pages.Section{Type: "body"})
+	}
+	for i, s := range list {
+		out := section{Type: s.Type, Title: s.Title}
+		switch s.Type {
+		case "markdown":
+			res, err := render.Render(s.Body, render.Options{
+				AllowHTML: b.site.AllowHTML,
+				Link:      func(dest string) string { return b.resolveLink(p, dest) },
+				Image:     func(src string) string { return b.resolveImage(p, src) },
+			})
+			if err != nil {
+				return err
+			}
+			out.HTML = template.HTML(res.HTML)
+			p.Text += " " + res.Text
+			p.mermaid = p.mermaid || res.UsesMermaid
+			b.mermaid = b.mermaid || res.UsesMermaid
+		case "contributors":
+			out.Repo = s.Repo
+			if out.Repo == "" {
+				out.Repo = b.site.Repo
+			}
+			if out.Repo == "" {
+				return fmt.Errorf("sections[%d]: contributors needs repo: owner/repo (source_url is not a GitHub URL)", i)
+			}
+			out.Limit = s.Limit
+			if out.Limit == 0 {
+				out.Limit = 48
+			}
+			if out.Title == "" {
+				out.Title = "Contributors"
+			}
+		case "logos":
+			for j, it := range s.Items {
+				src := it.Image
+				if !strings.Contains(src, "://") {
+					if src = b.resolveImage(p, it.Image); src == "" {
+						if sitePath, err := b.copyFile(path.Clean(strings.TrimPrefix(it.Image, "/")), "assets/img"); err == nil {
+							src = rootPrefix(p.Slug) + sitePath
+						}
+					}
+					if src == "" {
+						return fmt.Errorf("sections[%d].items[%d]: image %q not found", i, j, it.Image)
+					}
+				}
+				href := it.Link
+				if r := b.resolveLink(p, it.Link); r != "" {
+					href = r
+				}
+				out.Logos = append(out.Logos, logo{Src: src, Name: it.Name, Href: href})
+			}
+		}
+		p.sections = append(p.sections, out)
 	}
 	return nil
 }

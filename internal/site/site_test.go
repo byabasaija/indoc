@@ -208,3 +208,66 @@ func TestLogoIsFavicon(t *testing.T) {
 		t.Errorf("logo not used as favicon")
 	}
 }
+
+func TestLandingSectionOrder(t *testing.T) {
+	s := basicSite(t)
+	os.WriteFile(filepath.Join(s.RepoRoot, "docs", "img", "acme.svg"), []byte("<svg/>"), 0o644)
+	s.Repo = "owner/project"
+	home := &s.Pages[0]
+	home.Layout = "landing"
+	home.Hero = &pages.Hero{Title: "Demo"}
+	home.Features = []pages.Feature{{Title: "Fast"}}
+	home.Markdown = "Body text."
+	home.Sections = []pages.Section{
+		{Type: "hero"},
+		{Type: "logos", Title: "Used by", Items: []pages.LogoItem{
+			{Image: "img/acme.svg", Name: "Acme", Link: "https://acme.test"},
+			{Image: "https://cdn.test/beta.png", Name: "Beta"},
+		}},
+		{Type: "markdown", Title: "Why", Body: "See [setup](guides/setup.md)."},
+		{Type: "features"},
+		{Type: "contributors"},
+	}
+	out := build(t, s)
+	page := read(t, out, "index.html")
+	order := []string{`class="hero"`, `Used by`, `class="section-title">Why`, `class="features"`, `data-contributors="owner/project"`, `Body text.`}
+	last := -1
+	for _, mark := range order {
+		i := strings.Index(page, mark)
+		if i < 0 {
+			t.Fatalf("missing %q", mark)
+		}
+		if i < last {
+			t.Errorf("%q out of order", mark)
+		}
+		last = i
+	}
+	for _, want := range []string{
+		`<a href="https://acme.test" title="Acme"><img src="assets/img/acme-`,
+		`<img src="https://cdn.test/beta.png" alt="Beta"`,
+		`href="guides/setup/"`, // links in a markdown section resolve like the body's
+		`data-limit="48"`,      // default
+		`>Contributors</h2>`,   // default title
+		`github.com/owner/project/graphs/contributors`,
+	} {
+		if !strings.Contains(page, want) {
+			t.Errorf("landing lacks %q", want)
+		}
+	}
+	if !strings.Contains(read(t, out, "assets/search-index.js"), "See setup") {
+		t.Error("markdown section text is not searchable")
+	}
+}
+
+func TestLandingSectionErrors(t *testing.T) {
+	s := basicSite(t)
+	s.Pages[0].Layout = "landing"
+	s.Pages[0].Sections = []pages.Section{{Type: "contributors"}}
+	if err := Build(s, t.TempDir()); err == nil || !strings.Contains(err.Error(), "contributors needs repo") {
+		t.Errorf("contributors without a GitHub repo: %v", err)
+	}
+	s.Pages[0].Sections = []pages.Section{{Type: "logos", Items: []pages.LogoItem{{Image: "img/missing.svg"}}}}
+	if err := Build(s, t.TempDir()); err == nil || !strings.Contains(err.Error(), `image "img/missing.svg" not found`) {
+		t.Errorf("missing logo image: %v", err)
+	}
+}

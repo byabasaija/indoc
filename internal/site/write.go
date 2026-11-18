@@ -50,6 +50,7 @@ type view struct {
 	Actions   []action
 	Features  []feature
 	Featured  []navItem
+	Sections  []section
 	Mermaid   bool
 	Brand     template.CSS
 	Head      template.HTML
@@ -191,6 +192,7 @@ func (b *builder) nav(current *built) []navGroup {
 
 func (b *builder) landing(p *built, v *view) {
 	v.Landing = true
+	v.Sections = p.sections
 	v.Hero = p.Hero
 	if v.Hero == nil {
 		v.Hero = &pages.Hero{}

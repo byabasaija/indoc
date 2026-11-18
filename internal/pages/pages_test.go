@@ -2,6 +2,7 @@ package pages
 
 import (
 	"reflect"
+	"strings"
 	"testing"
 )
 
@@ -102,5 +103,35 @@ func TestLinkify(t *testing.T) {
 		"In parentheses ([`app/x.py::A.run`](https://src/app/x.py#A.run)) and [text](app/x.py::A.run).\n"
 	if got != want {
 		t.Errorf("Linkify:\n%s\nwant:\n%s", got, want)
+	}
+}
+
+func TestLandingSections(t *testing.T) {
+	raw := "---\nlayout: landing\nsections:\n  - hero\n  - type: markdown\n    title: Why\n    body: Because.\n  - features\n  - type: contributors\n    limit: 12\n  - type: logos\n    items:\n      - image: a.svg\n        name: A\n---\n# Home\n"
+	p, err := Parse("documentation/index.md", []byte(raw))
+	if err != nil {
+		t.Fatal(err)
+	}
+	var types []string
+	for _, s := range p.Sections {
+		types = append(types, s.Type)
+	}
+	if strings.Join(types, ",") != "hero,markdown,features,contributors,logos" || p.Sections[1].Title != "Why" || p.Sections[3].Limit != 12 {
+		t.Fatalf("sections = %+v", p.Sections)
+	}
+
+	for want, bad := range map[string]string{
+		`unknown type "contributers"`: "  - contributers\n",
+		"hero appears twice":          "  - hero\n  - hero\n",
+		"markdown needs a body":       "  - type: markdown\n",
+		"logos needs items":           "  - logos\n",
+		"must be owner/repo":          "  - type: contributors\n    repo: just-a-name\n",
+		"limit must be between":       "  - type: contributors\n    limit: 500\n",
+		"image is required":           "  - type: logos\n    items:\n      - name: A\n",
+	} {
+		_, err := Parse("x.md", []byte("---\nsections:\n"+bad+"---\n"))
+		if err == nil || !strings.Contains(err.Error(), want) {
+			t.Errorf("%q: got %v, want %q", strings.TrimSpace(bad), err, want)
+		}
 	}
 }

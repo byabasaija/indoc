@@ -37,6 +37,8 @@ type Page struct {
 	Hero     *Hero
 	Features []Feature
 	Featured []Action
+	// Sections orders the landing page's blocks; nil means hero, features, body.
+	Sections []Section
 }
 
 // Hero is the top of a landing page.
@@ -60,6 +62,69 @@ type Feature struct {
 	Details  string `yaml:"details"`
 	Link     string `yaml:"link"`
 	LinkText string `yaml:"link_text"`
+}
+
+// Section is one block of a landing page, in the order listed under
+// `sections:`. In frontmatter it is either a bare type ("hero") or a map
+// with a type and its options.
+type Section struct {
+	Type  string     `yaml:"type"`
+	Title string     `yaml:"title"`
+	Body  string     `yaml:"body"`  // markdown: Markdown content
+	Repo  string     `yaml:"repo"`  // contributors: owner/repo; defaults to the GitHub repo in source_url
+	Limit int        `yaml:"limit"` // contributors: how many to show (default 48, at most 100)
+	Items []LogoItem `yaml:"items"` // logos
+}
+
+// LogoItem is one logo in a logos section, such as a company using the project.
+type LogoItem struct {
+	Image string `yaml:"image"` // path relative to the page, repository path, or URL
+	Name  string `yaml:"name"`  // alt text and tooltip
+	Link  string `yaml:"link"`
+}
+
+// SectionTypes are the landing blocks indoc knows.
+var SectionTypes = []string{"hero", "features", "body", "markdown", "contributors", "logos"}
+
+// UnmarshalYAML accepts "hero" as shorthand for {type: hero}.
+func (s *Section) UnmarshalYAML(n *yaml.Node) error {
+	if n.Kind == yaml.ScalarNode {
+		s.Type = n.Value
+		return nil
+	}
+	type plain Section
+	return n.Decode((*plain)(s))
+}
+
+func validSections(ss []Section) error {
+	seen := map[string]bool{}
+	for i, s := range ss {
+		known := false
+		for _, t := range SectionTypes {
+			known = known || s.Type == t
+		}
+		switch {
+		case !known:
+			return fmt.Errorf("sections[%d]: unknown type %q (use %s)", i, s.Type, strings.Join(SectionTypes, ", "))
+		case (s.Type == "hero" || s.Type == "features" || s.Type == "body") && seen[s.Type]:
+			return fmt.Errorf("sections[%d]: %s appears twice", i, s.Type)
+		case s.Type == "markdown" && strings.TrimSpace(s.Body) == "":
+			return fmt.Errorf("sections[%d]: markdown needs a body", i)
+		case s.Type == "logos" && len(s.Items) == 0:
+			return fmt.Errorf("sections[%d]: logos needs items", i)
+		case s.Type == "contributors" && s.Repo != "" && strings.Count(s.Repo, "/") != 1:
+			return fmt.Errorf("sections[%d]: contributors repo must be owner/repo, got %q", i, s.Repo)
+		case s.Limit < 0 || s.Limit > 100:
+			return fmt.Errorf("sections[%d]: limit must be between 1 and 100", i)
+		}
+		for j, it := range s.Items {
+			if strings.TrimSpace(it.Image) == "" {
+				return fmt.Errorf("sections[%d].items[%d]: image is required", i, j)
+			}
+		}
+		seen[s.Type] = true
+	}
+	return nil
 }
 
 // Citation is a `path::Symbol` reference in a page.
@@ -88,6 +153,7 @@ type frontmatter struct {
 	Hero            *Hero     `yaml:"hero"`
 	Features        []Feature `yaml:"features"`
 	Featured        []Action  `yaml:"featured"`
+	Sections        []Section `yaml:"sections"`
 }
 
 // Match returns the files (from a ListFiles result) selected by globs.
@@ -151,6 +217,10 @@ func Parse(pagePath string, raw []byte) (Page, error) {
 		p.Strict = fm.Strict
 		p.Description = strings.TrimSpace(fm.Description)
 		p.Hero, p.Features, p.Featured = fm.Hero, fm.Features, fm.Featured
+		if err := validSections(fm.Sections); err != nil {
+			return Page{}, fmt.Errorf("%s: %w", pagePath, err)
+		}
+		p.Sections = fm.Sections
 		for _, s := range fm.Sources {
 			s = strings.TrimSpace(s)
 			if s == "" {

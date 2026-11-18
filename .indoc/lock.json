@@ -214,8 +214,8 @@
           "hasher": "bytes"
         },
         "plugin/skills/indoc/SKILL.md": {
-          "body": "aacb6191acb2cda1",
-          "raw": "aacb6191acb2cda1",
+          "body": "be0d72de54fe3ddb",
+          "raw": "be0d72de54fe3ddb",
           "hasher": "bytes"
         }
       }
@@ -372,7 +372,7 @@
         "internal/cli/bundle.go::runBundle": {
           "surface": "afbcb60d55daccfa",
           "body": "4c33e356e3345660",
-          "raw": "4d64316a6eccca24",
+          "raw": "91ec097942b46abd",
           "hasher": "go/2"
         },
         "internal/cli/init.go::runInit": {
@@ -390,7 +390,7 @@
       },
       "sources": {
         "internal/cli/bundle.go": {
-          "body": "0f083e485935e0f2",
+          "body": "21fb98dfed805429",
           "symbols": {
             "buildSite": "a025c648708f8f48",
             "citationLink": "840bb03b38bba364",
@@ -415,7 +415,7 @@
             "siteFor",
             "splitSource"
           ],
-          "raw": "4d64316a6eccca24",
+          "raw": "91ec097942b46abd",
           "hasher": "go/2"
         },
         "internal/cli/init.go": {
@@ -478,7 +478,7 @@
       }
     },
     "documentation/index.md": {
-      "page": "a410dc722c1b303a",
+      "page": "979a21fb223f5418",
       "citations": {
         "internal/code/code.go::Analyze": {
           "surface": "498b2762e77d0628",
@@ -1116,42 +1116,48 @@
       }
     },
     "documentation/site.md": {
-      "page": "470684961c599036",
+      "page": "9505d40e9cc8ff3f",
       "citations": {
         "internal/cli/bundle.go::editLink": {
           "surface": "7c023cbaf4f922aa",
           "body": "5ab551982e7c7030",
-          "raw": "4d64316a6eccca24",
+          "raw": "91ec097942b46abd",
           "hasher": "go/2"
         },
         "internal/cli/bundle.go::gitLastChange": {
           "surface": "4c7a4daf2cb930a4",
           "body": "2dc4c2511680d66f",
-          "raw": "4d64316a6eccca24",
+          "raw": "91ec097942b46abd",
           "hasher": "go/2"
         },
         "internal/cli/bundle.go::siteFor": {
           "surface": "3a09b09748126992",
-          "body": "908d7e4d34a4b8e1",
-          "raw": "4d64316a6eccca24",
+          "body": "0c8aa5d361413bc5",
+          "raw": "91ec097942b46abd",
           "hasher": "go/2"
         },
         "internal/pages/pages.go::Hero": {
           "surface": "93665241ccacfd85",
           "body": "",
-          "raw": "4276e81309cb19ab",
+          "raw": "31937c79850ef939",
+          "hasher": "go/2"
+        },
+        "internal/pages/pages.go::Section": {
+          "surface": "37cb2bc17070df9b",
+          "body": "",
+          "raw": "31937c79850ef939",
           "hasher": "go/2"
         },
         "internal/site/site.go::Build": {
           "surface": "b40cda3ec9f95359",
           "body": "d8620248c3acc27f",
-          "raw": "82937f948cef8c90",
+          "raw": "57d2e6338e35eb6f",
           "hasher": "go/2"
         }
       },
       "sources": {
         "internal/cli/bundle.go": {
-          "body": "0f083e485935e0f2",
+          "body": "21fb98dfed805429",
           "symbols": {
             "buildSite": "a025c648708f8f48",
             "citationLink": "840bb03b38bba364",
@@ -1176,11 +1182,11 @@
             "siteFor",
             "splitSource"
           ],
-          "raw": "4d64316a6eccca24",
+          "raw": "91ec097942b46abd",
           "hasher": "go/2"
         },
         "internal/pages/pages.go": {
-          "body": "63022fc79fd3c80f",
+          "body": "a317af5845dc9b6c",
           "symbols": {
             "Action": "75dfe11cbbcd9aa6",
             "Citation": "4ff1d172532f8877",
@@ -1189,18 +1195,22 @@
             "Hero": "93665241ccacfd85",
             "Linkify": "b31743bf804e9b22",
             "Load": "92343c81f51a3dd1",
+            "LogoItem": "60e8655655887672",
             "Match": "b6ece7cdf64077ba",
-            "Page": "397f1260720056e8",
+            "Page": "5e7695487555f5cb",
             "Page.Anchored": "91797e9211489847",
             "Parse": "21d7718c70908c49",
+            "Section": "37cb2bc17070df9b",
+            "Section.UnmarshalYAML": "79d04d262972b3d1",
             "fenceMarker": "da58d0423dfd6529",
             "findCitations": "a7fd3bcc744cf263",
             "firstHeading": "a09462356d2e5c85",
             "firstNonEmpty": "a4fc998c56dbd5b9",
-            "frontmatter": "9285ec73cee51084",
+            "frontmatter": "5853c1da18ec10fe",
             "linkifyLine": "22fde92b484bff29",
             "splitFrontmatter": "392c5658a5874645",
-            "titleFromPath": "0ccab65379cf0320"
+            "titleFromPath": "0ccab65379cf0320",
+            "validSections": "25136085ec5ab234"
           },
           "private": [
             "fenceMarker",
@@ -1210,21 +1220,23 @@
             "frontmatter",
             "linkifyLine",
             "splitFrontmatter",
-            "titleFromPath"
+            "titleFromPath",
+            "validSections"
           ],
-          "raw": "4276e81309cb19ab",
+          "raw": "31937c79850ef939",
           "hasher": "go/2"
         },
         "internal/site/assets/indoc.css": {
-          "body": "ff03f73cb362c213",
-          "raw": "ff03f73cb362c213",
+          "body": "458c6376b0342c7e",
+          "raw": "458c6376b0342c7e",
           "hasher": "bytes"
         },
         "internal/site/assets/indoc.js": {
-          "body": "e80a016b99f0b7e0",
+          "body": "6393b5164b132706",
           "symbols": {
             "copyText": "2156b8cd9c42e36d",
             "dark": "675dce303af63061",
+            "draw": "e3b0c44298fc1c14",
             "escapeHTML": "fc635dba7d931de8",
             "highlight": "b2c5ed5ffdf6b5c7",
             "move": "38397f97c84d4b5e",
@@ -1237,6 +1249,7 @@
           "private": [
             "copyText",
             "dark",
+            "draw",
             "escapeHTML",
             "highlight",
             "move",
@@ -1246,15 +1259,15 @@
             "show",
             "snippet"
           ],
-          "raw": "4033d05c286c1aaf",
+          "raw": "9a8e5dd788662451",
           "hasher": "javascript/44c892e0be05/2"
         },
         "internal/site/site.go": {
-          "body": "dc9cfa95e398e3a0",
+          "body": "dfb3e25c034146b9",
           "symbols": {
             "Build": "b40cda3ec9f95359",
             "Link": "d7c60ea0d7835f63",
-            "Page": "18c902b22254064d",
+            "Page": "a03e0bc6c53b58d5",
             "Site": "6127c0a159b68927",
             "builder": "87e1504af65bd86b",
             "builder.assets": "b4ec11e7fdd7703b",
@@ -1265,18 +1278,21 @@
             "builder.less": "72cd38f41843868f",
             "builder.plan": "968c7118e062ba41",
             "builder.render": "bdd8cf3c89def1e3",
+            "builder.renderSections": "893fd410d409f585",
             "builder.resolveImage": "9bd21065e7021313",
             "builder.resolveLink": "35658f81ca7efb9d",
             "builder.searchIndex": "b866e3a29a08428f",
-            "built": "3a738f57981828db",
+            "built": "aaaf7faedc67a308",
             "commonDir": "acbb3d0fb641a90f",
             "humanize": "a8e40962f5500bfa",
+            "logo": "f8f779128ec729b3",
             "pageLess": "b0681c15b476cd81",
             "rank": "475c17380f316fbf",
             "refText": "eb4d031f6f68518b",
             "relURL": "28519d825dddf49d",
             "rootPrefix": "748b4484d23b165a",
             "searchEntry": "8703558b8e9c913f",
+            "section": "45bf258f622827cd",
             "slugPath": "cbd6507c802f6c4b",
             "urlOf": "d501530eafb4f60d",
             "writer": "b9796fdf4c482343",
@@ -1293,31 +1309,36 @@
             "builder.less",
             "builder.plan",
             "builder.render",
+            "builder.renderSections",
             "builder.resolveImage",
             "builder.resolveLink",
             "builder.searchIndex",
             "built",
             "commonDir",
             "humanize",
+            "logo",
             "pageLess",
             "rank",
             "refText",
             "relURL",
             "rootPrefix",
             "searchEntry",
+            "section",
             "slugPath",
             "urlOf",
             "writer",
             "writer.finish",
             "writer.write"
           ],
-          "raw": "82937f948cef8c90",
+          "raw": "57d2e6338e35eb6f",
           "hasher": "go/2"
         },
         "internal/site/site_test.go": {
-          "body": "e65136ed9aec7dae",
+          "body": "841dcfe8910c77a0",
           "symbols": {
             "TestLanding": "3c18404c6fab744f",
+            "TestLandingSectionErrors": "06dd8fc4274b866e",
+            "TestLandingSectionOrder": "a28d5ceb15496e83",
             "TestLayoutAndLinks": "20c522e3db29fb83",
             "TestLegacyViewerRemoved": "7187d912e7d8be91",
             "TestLogoIsFavicon": "eae28e96b0cf0133",
@@ -1335,16 +1356,16 @@
             "exists",
             "read"
           ],
-          "raw": "e7a8913bb2ad680d",
+          "raw": "ba8cdecdf0b8da8b",
           "hasher": "go/2"
         },
         "internal/site/templates/page.html": {
-          "body": "c5c23b354d813aa9",
-          "raw": "c5c23b354d813aa9",
+          "body": "a9321eb3ed8d7b99",
+          "raw": "a9321eb3ed8d7b99",
           "hasher": "bytes"
         },
         "internal/site/write.go": {
-          "body": "ed530e57a0769f57",
+          "body": "194a219e4d0c152c",
           "symbols": {
             "action": "7dbbf684e45c7f1e",
             "builder.execute": "e3d06716413fa76a",
@@ -1356,7 +1377,7 @@
             "feature": "92b02d70eb008f96",
             "navGroup": "0fb1bb38ceab36f6",
             "navItem": "e11e00936f210838",
-            "view": "02e3ed0c82a40e4e"
+            "view": "3e639213db7700d6"
           },
           "private": [
             "action",
@@ -1371,13 +1392,13 @@
             "navItem",
             "view"
           ],
-          "raw": "81536ffa8de5ca56",
+          "raw": "26590cc16f150bdc",
           "hasher": "go/2"
         }
       }
     },
     "documentation/writing-pages.md": {
-      "page": "a4c172812c72e439",
+      "page": "1537097406a8d582",
       "citations": {
         "internal/code/code.go::Analyze": {
           "surface": "498b2762e77d0628",
@@ -1400,13 +1421,13 @@
         "internal/pages/pages.go::Linkify": {
           "surface": "b31743bf804e9b22",
           "body": "ff79ab1e5f006210",
-          "raw": "4276e81309cb19ab",
+          "raw": "31937c79850ef939",
           "hasher": "go/2"
         },
         "internal/pages/pages.go::Parse": {
           "surface": "21d7718c70908c49",
-          "body": "69b45d784d25fc64",
-          "raw": "4276e81309cb19ab",
+          "body": "e739c177897e490d",
+          "raw": "31937c79850ef939",
           "hasher": "go/2"
         }
       },
@@ -1434,7 +1455,7 @@
           "hasher": "go/2"
         },
         "internal/pages/pages.go": {
-          "body": "63022fc79fd3c80f",
+          "body": "a317af5845dc9b6c",
           "symbols": {
             "Action": "75dfe11cbbcd9aa6",
             "Citation": "4ff1d172532f8877",
@@ -1443,18 +1464,22 @@
             "Hero": "93665241ccacfd85",
             "Linkify": "b31743bf804e9b22",
             "Load": "92343c81f51a3dd1",
+            "LogoItem": "60e8655655887672",
             "Match": "b6ece7cdf64077ba",
-            "Page": "397f1260720056e8",
+            "Page": "5e7695487555f5cb",
             "Page.Anchored": "91797e9211489847",
             "Parse": "21d7718c70908c49",
+            "Section": "37cb2bc17070df9b",
+            "Section.UnmarshalYAML": "79d04d262972b3d1",
             "fenceMarker": "da58d0423dfd6529",
             "findCitations": "a7fd3bcc744cf263",
             "firstHeading": "a09462356d2e5c85",
             "firstNonEmpty": "a4fc998c56dbd5b9",
-            "frontmatter": "9285ec73cee51084",
+            "frontmatter": "5853c1da18ec10fe",
             "linkifyLine": "22fde92b484bff29",
             "splitFrontmatter": "392c5658a5874645",
-            "titleFromPath": "0ccab65379cf0320"
+            "titleFromPath": "0ccab65379cf0320",
+            "validSections": "25136085ec5ab234"
           },
           "private": [
             "fenceMarker",
@@ -1464,21 +1489,23 @@
             "frontmatter",
             "linkifyLine",
             "splitFrontmatter",
-            "titleFromPath"
+            "titleFromPath",
+            "validSections"
           ],
-          "raw": "4276e81309cb19ab",
+          "raw": "31937c79850ef939",
           "hasher": "go/2"
         },
         "internal/pages/pages_test.go": {
-          "body": "b768bfa9676d7254",
+          "body": "3a29fa6ef27df08c",
           "symbols": {
+            "TestLandingSections": "73973a9ed7c767d7",
             "TestLinkify": "1573063d76c9937b",
             "TestMatch": "ace37652a65aedac",
             "TestParseDocusaurusKeysAndFallbackTitles": "469c2144a116974d",
             "TestParseFrontmatterAndCitations": "d463991d1ab22c96",
             "TestParseRejectsBadFrontmatter": "7213cdfdef0417c9"
           },
-          "raw": "264a8578d291eba0",
+          "raw": "90721e04f2eb2100",
           "hasher": "go/2"
         }
       }

@@ -54,6 +54,55 @@ featured:                         # the right-hand column
 
 The Markdown body follows the cards.
 
+### Sections
+
+To change the order, or add blocks, list them under `sections:` (`internal/pages/pages.go::Section`). Blocks appear in the order listed; without the list the order is hero, features, body.
+
+```yaml
+sections:
+  - hero
+  - type: logos
+    title: Used by
+    items:
+      - image: images/acme.svg      # relative to the page, a repository path, or a URL
+        name: Acme
+        link: https://acme.dev
+  - features
+  - type: markdown
+    title: Why teams switch
+    body: |
+      Any Markdown, full width: lists, tables, images, diagrams.
+  - type: contributors              # avatars from GitHub
+    title: Built by
+    limit: 48                       # up to 100
+  - body                            # the page's own Markdown
+```
+
+| Block | Shows |
+|---|---|
+| `hero` | Image, title, tagline, and buttons from `hero:` |
+| `features` | The cards from `features:` |
+| `body` | The page's Markdown. Added at the end when the list leaves it out, so content is never dropped. |
+| `markdown` | A titled, full-width block of Markdown from `body:`. Links and images resolve like the page's own. |
+| `contributors` | The repository's contributors as avatars, linking to their profiles. `repo: owner/repo` defaults to the GitHub repository in `source_url`. |
+| `logos` | A row of logos, such as companies using the project, muted until hovered. |
+
+`contributors` loads from GitHub's API in the reader's browser, like the star count, so `bundle` stays offline and deterministic. Bots are left out. Without JavaScript, or when GitHub's rate limit is reached, the block still links to the contributors page. Mistakes such as an unknown block type or a missing logo image stop the build with the page and section named (`internal/site/site.go::Build`).
+
+### Recipes
+
+Images from other services work in any `markdown` block or in the body:
+
+```markdown
+[![Contributors](https://contrib.rocks/image?repo=owner/repo)](https://github.com/owner/repo/graphs/contributors)
+
+[![Star history](https://api.star-history.com/svg?repos=owner/repo&type=Date)](https://star-history.com/#owner/repo)
+
+![License](https://img.shields.io/github/license/owner/repo) ![Release](https://img.shields.io/github/v/release/owner/repo) ![Downloads](https://img.shields.io/github/downloads/owner/repo/total)
+```
+
+For layouts Markdown cannot express, set `allow_html: true` and write HTML in a `markdown` block; the theme's colors are CSS variables such as `var(--brand)` and `var(--fg-muted)`.
+
 ## Configuration
 
 These keys in `.indoc/config.yaml` shape the site (`internal/cli/bundle.go::siteFor`):

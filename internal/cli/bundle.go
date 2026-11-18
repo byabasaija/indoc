@@ -161,7 +161,7 @@ func siteFor(p *project, sections []doc.RefSection) *site.Site {
 			Source: pg.Path, Title: pg.Title, Description: pg.Description,
 			Order: pg.Order, HasOrder: pg.HasOrder, Layout: pg.Layout,
 			Markdown: pages.Linkify(pg.Body, citationLink(p)),
-			Hero:     pg.Hero, Features: pg.Features, Featured: pg.Featured,
+			Hero:     pg.Hero, Features: pg.Features, Featured: pg.Featured, Sections: pg.Sections,
 			EditURL: editURL, EditLabel: editLabel, Updated: updated, Author: author,
 		})
 	}

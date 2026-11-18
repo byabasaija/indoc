@@ -33,7 +33,7 @@ Every order is charged by
 | `sources` | Globs of code this page describes. `**` matches any depth. |
 | `strict` | `true` makes body changes to cited symbols fail the check. |
 | `description` | One line for search results and link previews. |
-| `layout` | `landing` on the home page adds a hero and feature cards; see [Customizing the site](site.md). |
+| `layout` | `landing` on the home page adds a hero, feature cards, and optional `sections:` such as a contributors wall; see [Customizing the site](site.md). |
 
 Docusaurus keys `sidebar_label` and `sidebar_position` are read too, so an existing Docusaurus docs folder works unchanged.
 

@@ -73,21 +73,24 @@
 
   <main class="content" id="content">
     {{- if .Landing}}
+    {{- range .Sections}}
+    {{- if eq .Type "hero"}}
     <section class="hero">
-      {{- with .HeroImage}}<img class="hero-image" src="{{.}}" alt="">{{end}}
-      <h1>{{if .Hero.Title}}{{.Hero.Title}}{{else}}{{.Site.Name}}{{end}}</h1>
-      {{- with .Hero.Tagline}}<p class="tagline">{{inline .}}</p>{{end}}
-      {{- if .Actions}}
+      {{- with $.HeroImage}}<img class="hero-image" src="{{.}}" alt="">{{end}}
+      <h1>{{if $.Hero.Title}}{{$.Hero.Title}}{{else}}{{$.Site.Name}}{{end}}</h1>
+      {{- with $.Hero.Tagline}}<p class="tagline">{{inline .}}</p>{{end}}
+      {{- if $.Actions}}
       <div class="actions">
-        {{- range .Actions}}
+        {{- range $.Actions}}
         <a class="button {{.Theme}}" href="{{.Href}}">{{.Text}}{{if eq .Theme "primary"}} <svg viewBox="0 0 16 16" aria-hidden="true"><path d="m6 4 4 4-4 4"/></svg>{{end}}</a>
         {{- end}}
       </div>
       {{- end}}
     </section>
-    {{- if .Features}}
+    {{- else if eq .Type "features"}}
+    {{- if $.Features}}
     <section class="features">
-      {{- range .Features}}
+      {{- range $.Features}}
       <article class="feature">
         <svg class="sparkle" viewBox="0 0 16 16" aria-hidden="true"><path d="M8 0c.5 4.2 1.8 6.9 8 8-6.2 1.1-7.5 3.8-8 8-.5-4.2-1.8-6.9-8-8 6.2-1.1 7.5-3.8 8-8Z"/></svg>
         <h2>{{.Title}}</h2>
@@ -97,17 +100,33 @@
       {{- end}}
     </section>
     {{- end}}
+    {{- else if eq .Type "body"}}
+    {{- template "body" $}}
+    {{- else if eq .Type "markdown"}}
+    <section class="landing-section">
+      {{- with .Title}}<h2 class="section-title">{{.}}</h2>{{end}}
+      <div class="prose landing-prose">{{.HTML}}</div>
+    </section>
+    {{- else if eq .Type "contributors"}}
+    <section class="landing-section contributors" data-contributors="{{.Repo}}" data-limit="{{.Limit}}">
+      <h2 class="section-title">{{.Title}}</h2>
+      <div class="avatars" aria-live="polite"></div>
+      <p class="section-more"><a href="https://github.com/{{.Repo}}/graphs/contributors">See all contributors on GitHub</a></p>
+    </section>
+    {{- else if eq .Type "logos"}}
+    <section class="landing-section logos">
+      {{- with .Title}}<h2 class="section-title">{{.}}</h2>{{end}}
+      <div class="logo-row">
+        {{- range .Logos}}
+        {{- if .Href}}<a href="{{.Href}}" title="{{.Name}}"><img src="{{.Src}}" alt="{{.Name}}" loading="lazy"></a>{{else}}<img src="{{.Src}}" alt="{{.Name}}" title="{{.Name}}" loading="lazy">{{end}}
+        {{- end}}
+      </div>
+    </section>
     {{- end}}
-
-    <article class="prose">
-      {{- if .Page.Reference}}
-      <h1>{{.Page.Title}}</h1>
-      {{.Page.HTML}}
-      {{- with .Page.Reference}}{{template "reference" .}}{{end}}
-      {{- else}}
-      {{.Page.HTML}}
-      {{- end}}
-    </article>
+    {{- end}}
+    {{- else}}
+    {{- template "body" .}}
+    {{- end}}
 
     {{- if not .NotFound}}
     <footer class="page-footer">
@@ -177,4 +196,16 @@
   </tbody>
 </table>
 </div>
+{{- end}}
+
+{{- define "body"}}
+    <article class="prose">
+      {{- if .Page.Reference}}
+      <h1>{{.Page.Title}}</h1>
+      {{.Page.HTML}}
+      {{- with .Page.Reference}}{{template "reference" .}}{{end}}
+      {{- else}}
+      {{.Page.HTML}}
+      {{- end}}
+    </article>
 {{- end}}

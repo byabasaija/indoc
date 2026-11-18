@@ -152,6 +152,38 @@
     }
   }
 
+  // Contributors wall on landing pages, loaded in the browser like the star
+  // count so builds stay offline. Without JavaScript or GitHub, the section
+  // still links to the contributors page.
+  document.querySelectorAll("[data-contributors]").forEach(function (section) {
+    var repo = section.getAttribute("data-contributors");
+    var limit = Number(section.getAttribute("data-limit")) || 48;
+    var grid = section.querySelector(".avatars");
+    if (!grid || !window.fetch) return;
+    var key = "indoc-contributors-" + repo + "-" + limit;
+    var draw = function (people) {
+      grid.innerHTML = people.map(function (p) {
+        var name = escapeHTML(p.login);
+        var src = p.avatar_url + (p.avatar_url.indexOf("?") < 0 ? "?" : "&") + "s=96";
+        return '<a href="' + escapeHTML(p.html_url) + '" title="' + name + '"><img src="' + escapeHTML(src) +
+          '" alt="' + name + '" width="48" height="48" loading="lazy"></a>';
+      }).join("");
+    };
+    var cached = null;
+    try { cached = JSON.parse(sessionStorage.getItem(key) || "null"); } catch (e) {}
+    if (cached) { draw(cached); return; }
+    fetch("https://api.github.com/repos/" + repo + "/contributors?per_page=" + limit)
+      .then(function (r) { return r.ok ? r.json() : null; })
+      .then(function (list) {
+        if (!Array.isArray(list)) return;
+        var people = list.filter(function (p) {
+          return p.type !== "Bot" && !/\[bot\]$/.test(p.login);
+        }).map(function (p) { return { login: p.login, avatar_url: p.avatar_url, html_url: p.html_url }; });
+        try { sessionStorage.setItem(key, JSON.stringify(people)); } catch (e) {}
+        draw(people);
+      }).catch(function () {});
+  });
+
   // Search
   var box = document.querySelector("[data-search]");
   var index = window.INDOC_SEARCH || [];

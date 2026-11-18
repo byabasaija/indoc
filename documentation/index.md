@@ -23,6 +23,12 @@ features:
   - title: A static site, anywhere
     details: One HTML file per page, relative links, no server. Mount it in your app, publish it, or open it from disk.
     link: getting-started.md
+sections:
+  - hero
+  - features
+  - type: contributors
+    title: Built by
+  - body
 featured:
   - text: Writing pages
     link: writing-pages.md

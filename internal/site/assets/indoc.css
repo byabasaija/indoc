@@ -229,6 +229,18 @@ img { max-width: 100%; }
 .feature .more { display: inline-flex; align-items: center; gap: 4px; margin-top: 16px; font-weight: 500; }
 .feature .more svg { width: 14px; height: 14px; }
 .is-landing .prose:not(:empty) { margin-top: 56px; }
+.landing-section { margin-top: 72px; }
+.section-title { text-align: center; font-size: 1.5rem; letter-spacing: -0.015em; margin: 0 0 24px; }
+.landing-prose { margin: 0; }
+.avatars { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; }
+.avatars:empty { display: none; }
+.avatars a { display: block; border-radius: 50%; transition: transform 0.15s; }
+.avatars a:hover { transform: translateY(-2px); }
+.avatars img { display: block; width: 48px; height: 48px; border-radius: 50%; border: 1px solid var(--border-muted); background: var(--bg-subtle); }
+.section-more { text-align: center; margin: 20px 0 0; font-size: 0.95rem; }
+.logo-row { display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 28px 44px; }
+.logo-row img { display: block; height: 36px; width: auto; max-width: 160px; object-fit: contain; filter: grayscale(1); opacity: 0.7; transition: filter 0.15s, opacity 0.15s; }
+.logo-row a:hover img, .logo-row img:hover { filter: none; opacity: 1; }
 
 /* Prose */
 .prose { overflow-wrap: break-word; }
@@ -348,6 +360,7 @@ img { max-width: 100%; }
   body.menu-open .sidebar { transform: none; box-shadow: var(--shadow); }
   .content { padding: 28px 20px 0; }
   .features { margin-top: 40px; }
+  .landing-section { margin-top: 52px; }
 }
 @media print {
   .topbar, .sidebar, .rail, .pager, .copy, .site-footer { display: none !important; }
