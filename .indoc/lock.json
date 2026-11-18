@@ -100,18 +100,24 @@
       }
     },
     "documentation/agents.md": {
-      "page": "8e8cb884353f96f1",
+      "page": "05cd2cf6b9186257",
       "citations": {
         "internal/cli/mcp.go::mcpServer": {
           "surface": "9a5340343b623d99",
-          "body": "c2c5d6a49e184108",
-          "raw": "5bba8556dcf86cc6",
+          "body": "b436a550f742af26",
+          "raw": "2c0eef80db73c19c",
+          "hasher": "go/2"
+        },
+        "internal/cli/mcp.go::setLogo": {
+          "surface": "b742c192766d29cd",
+          "body": "cc967b6f6735bbf4",
+          "raw": "2c0eef80db73c19c",
           "hasher": "go/2"
         },
         "internal/cli/mcp.go::setup": {
           "surface": "edddf1d25b166fce",
           "body": "0bfae943ab8f8106",
-          "raw": "5bba8556dcf86cc6",
+          "raw": "2c0eef80db73c19c",
           "hasher": "go/2"
         },
         "internal/mcp/mcp.go::Server.Serve": {
@@ -123,16 +129,17 @@
       },
       "sources": {
         "internal/cli/mcp.go": {
-          "body": "c589690bc690ef6b",
+          "body": "0edffab2d42f6b89",
           "symbols": {
             "failed": "e2d8ad0f8686e095",
             "init": "c78f10468427bc77",
             "jsonResult": "9f55bbb8e304d7b0",
             "mcpServer": "9a5340343b623d99",
             "parseArgs": "5742436b2e50f95d",
+            "setLogo": "b742c192766d29cd",
             "setup": "edddf1d25b166fce",
             "toolAck": "42ce2831f7f94ddc",
-            "toolArgs": "bcdfd02fff46879e",
+            "toolArgs": "64ee85da79c658b0",
             "toolBundle": "b7b189252a902197",
             "toolCheck": "520a6a0ff0e78eef",
             "toolScan": "8a5357d04f22f339",
@@ -144,6 +151,7 @@
             "jsonResult",
             "mcpServer",
             "parseArgs",
+            "setLogo",
             "setup",
             "toolAck",
             "toolArgs",
@@ -152,7 +160,7 @@
             "toolScan",
             "toolSetup"
           ],
-          "raw": "5bba8556dcf86cc6",
+          "raw": "2c0eef80db73c19c",
           "hasher": "go/2"
         },
         "internal/mcp/mcp.go": {
@@ -206,8 +214,8 @@
           "hasher": "bytes"
         },
         "plugin/skills/indoc/SKILL.md": {
-          "body": "642f016d425dc3d7",
-          "raw": "642f016d425dc3d7",
+          "body": "aacb6191acb2cda1",
+          "raw": "aacb6191acb2cda1",
           "hasher": "bytes"
         }
       }

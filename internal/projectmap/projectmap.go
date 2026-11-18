@@ -9,6 +9,9 @@ package projectmap
 import (
 	"bufio"
 	"encoding/json"
+	"image"
+	_ "image/jpeg" // logo sizes
+	_ "image/png"
 	"os"
 	"os/exec"
 	"path"
@@ -30,6 +33,16 @@ type Map struct {
 	Docs        []string   `json:"docs"`      // Markdown not selected by pages:
 	HotFiles    []Count    `json:"hot_files"` // most commits in the last 90 days
 	Central     []Count    `json:"central"`   // most-imported in-repo Python modules
+	Logos       []Logo     `json:"logos"`     // images that look like the project's logo, best first
+}
+
+// Logo is an image file that may be the project's logo. Width and Height are
+// pixels (0 for SVG and formats indoc does not measure); a square mark suits
+// the site header and favicon better than a tall lockup with text.
+type Logo struct {
+	Path   string `json:"path"`
+	Width  int    `json:"width,omitempty"`
+	Height int    `json:"height,omitempty"`
 }
 
 // Language is a file count per language.
@@ -63,7 +76,7 @@ var extLanguages = map[string]string{
 
 // Build summarizes the repository. pageFiles are the files already published.
 func Build(root string, files, pageFiles []string) *Map {
-	m := &Map{Languages: []Language{}, Frameworks: []string{}, EntryPoints: []string{}, Tasks: []Task{}, Docs: []string{}, HotFiles: []Count{}, Central: []Count{}}
+	m := &Map{Languages: []Language{}, Frameworks: []string{}, EntryPoints: []string{}, Tasks: []Task{}, Docs: []string{}, HotFiles: []Count{}, Central: []Count{}, Logos: []Logo{}}
 	published := map[string]bool{}
 	for _, f := range pageFiles {
 		published[f] = true
@@ -100,7 +113,85 @@ func Build(root string, files, pageFiles []string) *Map {
 	m.Tasks = tasks(root, fileSet)
 	m.HotFiles = hotFiles(root, fileSet)
 	m.Central = centralModules(root, files)
+	m.Logos = logos(root, files)
 	return m
+}
+
+// skipLogoDir reports images in test data, third-party code, or indoc's own
+// output, judged by whole folder names.
+func skipLogoDir(f string) bool {
+	dirs := strings.Split(strings.ToLower(path.Dir(f)), "/")
+	for _, d := range dirs {
+		switch d {
+		case "test", "tests", "testdata", "fixtures", "__tests__", "vendor", "site-packages", "node_modules", ".indoc":
+			return true
+		}
+	}
+	return false
+}
+
+var logoExts = map[string]int{".svg": 0, ".png": 1, ".webp": 2, ".jpg": 3, ".jpeg": 3, ".ico": 4}
+
+// logos finds images named like a logo, ranked by name (logo, then brand or
+// mark, then favicon or icon), format (SVG first), and depth. Test fixtures
+// and third-party folders are skipped.
+func logos(root string, files []string) []Logo {
+	type cand struct {
+		path             string
+		name, ext, depth int
+	}
+	var cands []cand
+	for _, f := range files {
+		ext, ok := logoExts[strings.ToLower(path.Ext(f))]
+		if !ok {
+			continue
+		}
+		if skipLogoDir(f) {
+			continue
+		}
+		base := strings.ToLower(path.Base(f))
+		name := -1
+		switch {
+		case strings.Contains(base, "logo"):
+			name = 0
+		case strings.Contains(base, "brand") || strings.Contains(base, "wordmark"):
+			name = 1
+		case strings.Contains(base, "favicon") || strings.HasPrefix(base, "icon") || strings.Contains(base, "apple-touch-icon"):
+			name = 2
+		}
+		if name < 0 {
+			continue
+		}
+		cands = append(cands, cand{f, name, ext, strings.Count(f, "/")})
+	}
+	sort.Slice(cands, func(i, j int) bool {
+		a, b := cands[i], cands[j]
+		if a.name != b.name {
+			return a.name < b.name
+		}
+		if a.ext != b.ext {
+			return a.ext < b.ext
+		}
+		if a.depth != b.depth {
+			return a.depth < b.depth
+		}
+		return a.path < b.path
+	})
+	out := []Logo{}
+	for _, c := range cands {
+		if len(out) == 8 {
+			break
+		}
+		l := Logo{Path: c.path}
+		if fh, err := os.Open(filepath.Join(root, filepath.FromSlash(c.path))); err == nil {
+			if cfg, _, err := image.DecodeConfig(fh); err == nil {
+				l.Width, l.Height = cfg.Width, cfg.Height
+			}
+			fh.Close()
+		}
+		out = append(out, l)
+	}
+	return out
 }
 
 func isBoilerplateDoc(f string) bool {

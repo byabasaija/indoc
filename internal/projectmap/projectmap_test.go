@@ -1,6 +1,9 @@
 package projectmap
 
 import (
+	"bytes"
+	"image"
+	"image/png"
 	"os"
 	"path/filepath"
 	"reflect"
@@ -52,5 +55,40 @@ func TestBuild(t *testing.T) {
 	}
 	if m.Languages[0].Name != "Python" || m.Languages[0].Files != 4 || !m.Languages[0].Parsed {
 		t.Errorf("languages = %+v", m.Languages)
+	}
+}
+
+func TestLogos(t *testing.T) {
+	root := t.TempDir()
+	png := func(w, h int) []byte {
+		img := image.NewRGBA(image.Rect(0, 0, w, h))
+		var b bytes.Buffer
+		png.Encode(&b, img)
+		return b.Bytes()
+	}
+	for p, c := range map[string][]byte{
+		"static/images/logo.png":          png(140, 195),
+		"static/images/favicons/icon.png": png(192, 192),
+		"design/logo.svg":                 []byte("<svg/>"),
+		"static/latest-logo.png":          png(10, 10),
+		"tests/fixtures/logo.png":         png(10, 10),
+		"node_modules/pkg/logo.svg":       []byte("<svg/>"),
+		"static/bookmark.png":             png(10, 10),
+		"static/photo.png":                png(10, 10),
+	} {
+		full := filepath.Join(root, p)
+		os.MkdirAll(filepath.Dir(full), 0o755)
+		os.WriteFile(full, c, 0o644)
+	}
+	files, _ := code.ListFiles(root, nil)
+	got := Build(root, files, nil).Logos
+	want := []Logo{
+		{Path: "design/logo.svg"},
+		{Path: "static/latest-logo.png", Width: 10, Height: 10},
+		{Path: "static/images/logo.png", Width: 140, Height: 195},
+		{Path: "static/images/favicons/icon.png", Width: 192, Height: 192},
+	}
+	if !reflect.DeepEqual(got, want) {
+		t.Errorf("logos =\n %+v\nwant\n %+v", got, want)
 	}
 }

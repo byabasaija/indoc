@@ -53,6 +53,8 @@ type scanReport struct {
 	Coverage []reference.Coverage `json:"coverage"`
 	// Map summarizes the repository for choosing what to document.
 	Map *projectmap.Map `json:"map"`
+	// Logo is appearance.logo from the config; empty when none is set.
+	Logo string `json:"logo"`
 	// Files is the number of repository files; Parsed of those have a
 	// language parser and support path::Symbol citations.
 	Files  int `json:"files"`
@@ -60,7 +62,7 @@ type scanReport struct {
 }
 
 func runScan(configPath string, out io.Writer, asJSON bool) error {
-	p, err := openProject(configPath)
+	p, err := openProjectForScan(configPath)
 	if err != nil {
 		return err
 	}
@@ -72,11 +74,15 @@ func runScan(configPath string, out io.Writer, asJSON bool) error {
 	report := scanReport{
 		ProjectName: p.cfg.ProjectName,
 		OutputDir:   p.cfg.OutputDir,
+		Pages:       []scanPage{},
 		Findings:    nonNil(drift.Check(p.repo, p.pages, p.lock)),
 		Reference:   sections,
 		Coverage:    ref.Coverage,
 		Map:         projectmap.Build(p.paths.Root, p.repo.Files, pagePaths(p)),
 		Files:       len(p.repo.Files),
+	}
+	if a := p.cfg.Appearance; a != nil {
+		report.Logo = a.Logo
 	}
 	for _, f := range p.repo.Files {
 		if code.Parsable(f) {

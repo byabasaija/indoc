@@ -13,7 +13,7 @@ So `main` must never pin a version whose release doesn't exist yet, or every plu
    - `plugin/bin/indoc`: `VERSION="X.Y.Z"`
    - `plugin/.claude-plugin/plugin.json`: `"version": "X.Y.Z"`
    - `internal/version/version.go`: `Version = "X.Y.Z-dev"`
-   - The `byabasaija/indoc@vX.Y.Z` examples in `README.md` and `documentation/ci.md`
+   - The `byabasaija/indoc@vX.Y.Z` examples in `README.md`, `documentation/ci.md`, and `plugin/skills/indoc/SKILL.md`
 2. Run `indoc bundle`, then `indoc check --strict`, and `go test ./...`. The launcher change drifts `documentation/agents.md`; `indoc ack` it once you've confirmed it's still right.
 3. Commit (`chore: release X.Y.Z`) and tag the commit. **Do not push `main` yet.**
    ```sh

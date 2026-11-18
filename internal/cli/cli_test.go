@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"os"
 	"path/filepath"
 	"sort"
@@ -488,4 +489,71 @@ func TestMCPSetupWithExistingDocs(t *testing.T) {
 	if err != nil || len(cfg.Pages) != 1 || cfg.Pages[0] != "documentation/partners.md" {
 		t.Fatalf("setup did not set pages: %+v %v\n%s", cfg, err, out.String())
 	}
+}
+
+func TestMCPLogo(t *testing.T) {
+	r := newRepo(t)
+	r.write("app/main.py", appPy)
+	r.write("static/logo.svg", "<svg/>")
+	r.write("static/notes.txt", "x")
+	call := func(args map[string]any) (string, bool, map[string]any) {
+		t.Helper()
+		args["root"] = r.root
+		req, _ := json.Marshal(map[string]any{"jsonrpc": "2.0", "id": 1, "method": "tools/call",
+			"params": map[string]any{"name": args["tool"], "arguments": without(args, "tool")}})
+		var out bytes.Buffer
+		if err := mcpServer().Serve(bytes.NewReader(append(req, '\n')), &out); err != nil {
+			t.Fatal(err)
+		}
+		var resp struct {
+			Result struct {
+				Content []struct {
+					Text string `json:"text"`
+				} `json:"content"`
+				IsError           bool           `json:"isError"`
+				StructuredContent map[string]any `json:"structuredContent"`
+			} `json:"result"`
+		}
+		json.Unmarshal(out.Bytes(), &resp)
+		return resp.Result.Content[0].Text, resp.Result.IsError, resp.Result.StructuredContent
+	}
+
+	// First scan, before any page exists: the map is returned and lists the logo.
+	text, isErr, scan := call(map[string]any{"tool": "indoc_scan"})
+	if isErr || !strings.Contains(text, "No logo is set") || !strings.Contains(text, "landing page") {
+		t.Fatalf("first scan: %s", text)
+	}
+	m, _ := scan["map"].(map[string]any)
+	if m == nil || !strings.Contains(fmt.Sprint(m["logos"]), "static/logo.svg") {
+		t.Fatalf("first scan has no logo candidates: %v", scan)
+	}
+
+	for _, bad := range []string{"static/missing.svg", "static/notes.txt", "../outside.svg", "/etc/logo.svg"} {
+		if _, isErr, _ := call(map[string]any{"tool": "indoc_setup", "logo": bad}); !isErr {
+			t.Errorf("logo %q accepted", bad)
+		}
+	}
+	if text, isErr, _ := call(map[string]any{"tool": "indoc_setup", "logo": "static/logo.svg"}); isErr {
+		t.Fatalf("valid logo refused: %s", text)
+	}
+	cfg, _ := config.Load(r.cfg)
+	if cfg.Appearance == nil || cfg.Appearance.Logo != "static/logo.svg" {
+		t.Fatalf("logo not saved: %+v", cfg.Appearance)
+	}
+	if text, _, scan := call(map[string]any{"tool": "indoc_scan"}); strings.Contains(text, "No logo is set") || scan["logo"] != "static/logo.svg" {
+		t.Errorf("scan after setting the logo: %s", text)
+	}
+	if _, isErr, _ := call(map[string]any{"tool": "indoc_setup", "logo": "https://example.test/logo.png"}); isErr {
+		t.Error("URL logo refused")
+	}
+}
+
+func without(m map[string]any, key string) map[string]any {
+	out := map[string]any{}
+	for k, v := range m {
+		if k != key {
+			out[k] = v
+		}
+	}
+	return out
 }

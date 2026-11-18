@@ -9,6 +9,7 @@ import (
 	"strings"
 
 	"github.com/byabasaija/indoc/internal/config"
+	"github.com/byabasaija/indoc/internal/doc"
 	"github.com/byabasaija/indoc/internal/mcp"
 	"github.com/byabasaija/indoc/internal/version"
 	"github.com/spf13/cobra"
@@ -33,7 +34,7 @@ func init() {
 const mcpInstructions = `indoc keeps Markdown documentation tied to the code it describes.
 Start with indoc_scan: it sets the project up on first use and returns the pages, what needs updating, the routes/configuration/commands extracted from source, and a map of the project.
 If it reports that existing docs were found and nothing is published, ask the user which files to publish and call indoc_setup with those globs.
-Before writing new pages, propose the readers and an outline to the user. Pages are Markdown with frontmatter (title, order, sources globs, strict) and cite code as path::Symbol.
+Before writing new pages, ask the user which logo to use (map.logos lists candidates; set it with indoc_setup) and propose the readers and an outline, with the home page as a landing page (layout: landing, hero, features), to the user. Pages are Markdown with frontmatter (title, order, sources globs, strict) and cite code as path::Symbol.
 After writing, call indoc_bundle (it refuses broken citations), then indoc_check. After code changes, indoc_check lists stale pages with reasons; update them, or indoc_ack a page only after re-reading it against the code.`
 
 var rootSchema = map[string]any{
@@ -52,10 +53,13 @@ func mcpServer() *mcp.Server {
 		Tools: []mcp.Tool{
 			{
 				Name: "indoc_setup", Title: "Set up indoc",
-				Description: "Create .indoc/config.yaml for the project, or set which Markdown files are published (pages globs such as documentation/**/*.md). When the repository already has Markdown, nothing is published until pages are given: ask the user which files to publish.",
-				InputSchema: obj(map[string]any{"pages": pagesSchema}),
-				Idempotent:  true,
-				Handler:     toolSetup,
+				Description: "Create .indoc/config.yaml for the project, set which Markdown files are published (pages globs such as documentation/**/*.md), and set the site's logo. When the repository already has Markdown, nothing is published until pages are given: ask the user which files to publish. Set logo only to a file or URL the user chose.",
+				InputSchema: obj(map[string]any{
+					"pages": pagesSchema,
+					"logo":  map[string]any{"type": "string", "description": "The project's logo: an image path relative to the repository root (SVG or a square PNG works best), or an https URL. Shown in the header, as the favicon, and on a landing page."},
+				}),
+				Idempotent: true,
+				Handler:    toolSetup,
 			},
 			{
 				Name: "indoc_scan", Title: "Scan the project",
@@ -91,6 +95,7 @@ func mcpServer() *mcp.Server {
 type toolArgs struct {
 	Root   string   `json:"root"`
 	Pages  []string `json:"pages"`
+	Logo   string   `json:"logo"`
 	Strict bool     `json:"strict"`
 }
 
@@ -144,6 +149,8 @@ func setup(cfgPath string, pages []string) (string, bool, error) {
 	return out.String(), len(cfg.Pages) == 0, nil
 }
 
+const noLogo = "No logo is set. Ask the user which image to use: offer the candidates in map.logos (note any that are tall lockups with small text; a square mark or SVG suits the header and favicon), or ask them for a path or URL. Then call indoc_setup with logo. If they have none, continue without.\n"
+
 const choosePages = "\nNothing is published yet. Ask the user which of these files to publish (internal notes, reviews, and plans usually should not be), then call indoc_setup with their globs."
 
 func toolSetup(raw json.RawMessage) (string, any, bool) {
@@ -155,10 +162,45 @@ func toolSetup(raw json.RawMessage) (string, any, bool) {
 	if err != nil {
 		return failed(err)
 	}
+	if a.Logo != "" {
+		if err := setLogo(cfgPath, a.Logo); err != nil {
+			return failed(err)
+		}
+		text += "Logo set: " + a.Logo + "\n"
+	}
 	if needsChoice {
 		text += choosePages
 	}
 	return text, nil, false
+}
+
+var logoImageExts = map[string]bool{".svg": true, ".png": true, ".webp": true, ".jpg": true, ".jpeg": true, ".gif": true, ".ico": true}
+
+// setLogo records appearance.logo after checking the file exists and is an
+// image, so a typo is caught here rather than as a broken image on the site.
+func setLogo(cfgPath, logo string) error {
+	cfg, err := config.Load(cfgPath)
+	if err != nil {
+		return err
+	}
+	if !strings.HasPrefix(logo, "https://") && !strings.HasPrefix(logo, "http://") {
+		logo = filepath.ToSlash(filepath.Clean(logo))
+		if filepath.IsAbs(logo) || strings.HasPrefix(logo, "../") {
+			return fmt.Errorf("logo %q must be relative to the repository root, or a URL", logo)
+		}
+		if !logoImageExts[strings.ToLower(filepath.Ext(logo))] {
+			return fmt.Errorf("logo %q is not an image (use SVG, PNG, WebP, JPEG, GIF, or ICO)", logo)
+		}
+		root := config.Resolve(cfgPath).Root
+		if info, err := os.Stat(filepath.Join(root, filepath.FromSlash(logo))); err != nil || info.IsDir() {
+			return fmt.Errorf("logo %q does not exist in the repository", logo)
+		}
+	}
+	if cfg.Appearance == nil {
+		cfg.Appearance = &doc.Appearance{}
+	}
+	cfg.Appearance.Logo = logo
+	return cfg.Save(cfgPath)
 }
 
 func toolScan(raw json.RawMessage) (string, any, bool) {
@@ -179,10 +221,18 @@ func toolScan(raw json.RawMessage) (string, any, bool) {
 	}
 	var out bytes.Buffer
 	if err := runScan(cfgPath, &out, true); err != nil {
-		if strings.Contains(err.Error(), "matches no Markdown files") {
-			return prefix + err.Error() + "\nNo pages exist yet: propose readers and an outline to the user, then write the pages.", nil, false
-		}
 		return failed(err)
+	}
+	var head struct {
+		Pages []json.RawMessage `json:"pages"`
+		Logo  string            `json:"logo"`
+	}
+	json.Unmarshal(out.Bytes(), &head)
+	if len(head.Pages) == 0 {
+		prefix += "No pages exist yet: propose readers and an outline to the user, including a landing page, then write the pages.\n"
+	}
+	if head.Logo == "" {
+		prefix += noLogo
 	}
 	return jsonResult(prefix, out.Bytes())
 }

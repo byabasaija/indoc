@@ -19,12 +19,22 @@ type project struct {
 }
 
 func openProject(configPath string) (*project, error) {
+	return loadProject(configPath, false)
+}
+
+// openProjectForScan also accepts a project with no pages yet: on a first run
+// the project map is what the agent needs to propose an outline.
+func openProjectForScan(configPath string) (*project, error) {
+	return loadProject(configPath, true)
+}
+
+func loadProject(configPath string, allowNoPages bool) (*project, error) {
 	paths := config.Resolve(configPath)
 	cfg, err := config.Load(paths.Config)
 	if err != nil {
 		return nil, err
 	}
-	if len(cfg.Pages) == 0 {
+	if len(cfg.Pages) == 0 && !allowNoPages {
 		return nil, fmt.Errorf("no pages configured: add globs under `pages:` in %s (for example documentation/**/*.md)", paths.Config)
 	}
 	repo, err := drift.NewRepo(paths.Root, cfg.Exclude)
@@ -32,7 +42,7 @@ func openProject(configPath string) (*project, error) {
 		return nil, err
 	}
 	files := pages.Match(repo.Files, cfg.Pages)
-	if len(files) == 0 {
+	if len(files) == 0 && !allowNoPages {
 		return nil, fmt.Errorf("`pages:` in %s matches no Markdown files: %s", paths.Config, strings.Join(cfg.Pages, ", "))
 	}
 	ps, err := pages.Load(paths.Root, files)
