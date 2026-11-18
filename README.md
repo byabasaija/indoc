@@ -86,7 +86,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: byabasaija/indoc@v0.3.1
+      - uses: byabasaija/indoc@v0.4.0
         # with:
         #   mode: warn   # report without failing while you try it out
 ```

@@ -209,19 +209,19 @@
           "hasher": "bytes"
         },
         "plugin/bin/indoc": {
-          "body": "961632f7bc2be89c",
-          "raw": "961632f7bc2be89c",
+          "body": "687188f417690e15",
+          "raw": "687188f417690e15",
           "hasher": "bytes"
         },
         "plugin/skills/indoc/SKILL.md": {
-          "body": "be0d72de54fe3ddb",
-          "raw": "be0d72de54fe3ddb",
+          "body": "ae308bd76bd92ed3",
+          "raw": "ae308bd76bd92ed3",
           "hasher": "bytes"
         }
       }
     },
     "documentation/ci.md": {
-      "page": "856f1405078be36a",
+      "page": "e33df2b9e8a4c5ce",
       "citations": {
         "internal/cli/check.go::runCheck": {
           "surface": "4d82fe88e3e7a473",
