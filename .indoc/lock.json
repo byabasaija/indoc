@@ -1245,7 +1245,7 @@
           "hasher": "bytes"
         },
         "internal/site/assets/indoc.js": {
-          "body": "a14bdc2bc7a5e42c",
+          "body": "e0a28369d54b82d6",
           "symbols": {
             "copyText": "2156b8cd9c42e36d",
             "dark": "675dce303af63061",
@@ -1254,6 +1254,7 @@
             "highlight": "b2c5ed5ffdf6b5c7",
             "move": "38397f97c84d4b5e",
             "openChecked": "e3b0c44298fc1c14",
+            "pageHref": "86fa86dc12e1d06a",
             "renderDiagrams": "9467ce315d790704",
             "score": "5f3f70deaa2dddff",
             "search": "f092e115439a8aae",
@@ -1268,13 +1269,14 @@
             "highlight",
             "move",
             "openChecked",
+            "pageHref",
             "renderDiagrams",
             "score",
             "search",
             "show",
             "snippet"
           ],
-          "raw": "e82cae9da48dd261",
+          "raw": "0fb6472e24ee62c5",
           "hasher": "javascript/44c892e0be05/2"
         },
         "internal/site/site.go": {

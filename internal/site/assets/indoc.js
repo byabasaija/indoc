@@ -6,6 +6,23 @@
   var root = document.body.getAttribute("data-root") || "";
   var doc = document.documentElement;
 
+  // Page links point at folders (guides/setup/), which web servers resolve to
+  // their index.html. Opened from disk, a browser shows the folder instead,
+  // so point the links at index.html there.
+  var fromDisk = location.protocol === "file:";
+  function pageHref(href) {
+    if (!fromDisk || /^([a-z][a-z0-9+.-]*:|\/\/|#)/i.test(href)) return href;
+    var cut = href.search(/[?#]/);
+    var path = cut < 0 ? href : href.slice(0, cut);
+    var rest = cut < 0 ? "" : href.slice(cut);
+    return path === "" || /\/$/.test(path) ? path + "index.html" + rest : href;
+  }
+  if (fromDisk) {
+    document.querySelectorAll("a[href]").forEach(function (a) {
+      a.setAttribute("href", pageHref(a.getAttribute("href")));
+    });
+  }
+
   function dark() {
     var t = doc.dataset.theme;
     return t ? t === "dark" : window.matchMedia("(prefers-color-scheme: dark)").matches;
@@ -252,7 +269,7 @@
       results.innerHTML = '<div class="empty">No results for “' + escapeHTML(input.value.trim()) + "”</div>";
     } else {
       results.innerHTML = hits.map(function (h) {
-        return '<a role="option" href="' + escapeHTML(root + h.e.u) + '">' +
+        return '<a role="option" href="' + escapeHTML(pageHref(root + h.e.u)) + '">' +
           '<span class="r-title">' + highlight(h.e.t, terms) + "</span>" +
           (h.e.s ? ' <span class="r-section">· ' + escapeHTML(h.e.s) + "</span>" : "") +
           '<span class="r-snippet">' + highlight(snippet(h.e.x || "", terms), terms) + "</span></a>";
