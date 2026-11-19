@@ -99,11 +99,17 @@ A page is compared only while its content matches the lock. `drift.Ack` with no 
 
 `internal/site` renders Markdown at build time with `html/template`; every page is complete without JavaScript. URLs follow the page's path under the pages' common folder (`documentation/guides/setup.md` → `guides/setup/`), the first folder is the sidebar group, and all links are relative so the folder works from any path or from disk. Links to other pages' `.md` files are rewritten to page URLs; local images are copied under `assets/img/` with content-hashed names. Search is an index written as `assets/search-index.js` (a script, not JSON, so it loads from `file://`). The browser side is `indoc.js` plus vendored Prism; Mermaid is written only when a page uses it. A manifest (`.indoc-site`) lists the files indoc wrote, so later builds delete only those.
 
+**Theme.** The page template is split into parts (`templates/parts/`: header, sidebar, hero, features, footer). Each build clones the templates and replaces any part found in `.indoc/theme/`; `appearance:` settings become CSS variables. `indoc theme eject` copies a built-in part with a stamp (indoc version and a fingerprint of the built-in), so a build can warn when the built-in has changed since.
+
+**Hand edits.** The output manifest (`.indoc-site`) records a SHA-256 of every file written. A build first compares the output with it and refuses to overwrite files changed by hand (`site.EditedError`). `--keep-edits` builds a fresh copy in a temporary folder, appends CSS rules that are new or changed to `theme/custom.css`, and saves other edited files under `theme/edited/`.
+
+**Publishing.** `indoc publish` saves `publish:` and prints the steps for the target. For `app` it detects the framework and prints code that serves the site under a path; it writes only indoc's own files (the config, and the GitHub Pages workflow). `urls: files` makes every link name its `index.html`, for servers that do not resolve folders.
+
 `indoc preview` builds into a temporary directory, serves it on `127.0.0.1`, and rebuilds when pages or the config change. It never writes the lock or `output_dir`.
 
 ## Agents
 
-`indoc mcp` runs `internal/mcp`, a dependency-free MCP server on stdio (newline-delimited JSON-RPC). It speaks both protocol eras: the `initialize` handshake (2024-11-05 through 2025-11-25) and per-request `_meta` with `server/discover` (2026-07-28). Its five tools (`indoc_scan`, `indoc_setup`, `indoc_check`, `indoc_ack`, `indoc_bundle`) call the same functions as the commands.
+`indoc mcp` runs `internal/mcp`, a dependency-free MCP server on stdio (newline-delimited JSON-RPC). It speaks both protocol eras: the `initialize` handshake (2024-11-05 through 2025-11-25) and per-request `_meta` with `server/discover` (2026-07-28). Its six tools (`indoc_scan`, `indoc_setup`, `indoc_check`, `indoc_ack`, `indoc_bundle`, `indoc_publish`) call the same functions as the commands.
 
 `plugin/` is one plugin for Claude Code and Copilot CLI: a skill that tells the agent how to work (outline first, cite everything, never hand-write reference tables) and an MCP entry that starts `plugin/bin/indoc`. That launcher downloads the release binary matching the plugin version, verifies it against the release's `checksums.txt`, and caches it. The release workflow refuses a tag that differs from the plugin's pinned version.
 

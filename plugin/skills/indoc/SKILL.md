@@ -119,7 +119,18 @@ Call `indoc_check`. For each finding:
 2. Call `indoc_check`; `failing` must be 0.
 3. Tell the user where the site was written (default `.indoc/site/`) and that opening its `index.html` in a browser works without a server; with the `indoc` command installed, `indoc preview` serves it and rebuilds on every edit. `.indoc/config.yaml`, `.indoc/lock.json`, and the pages should be committed. Suggest adding `indoc check` to CI with the GitHub Action (`uses: byabasaija/indoc@v0.5.0`).
 
-## 6. Publish
+## 6. Change the look
+
+The output folder is rebuilt every time, so never edit it. When the user asks for a different look:
+
+- Colors, logo, fonts, corner radius, content width, default light or dark: `appearance:` in `.indoc/config.yaml`.
+- Anything else in CSS: `.indoc/theme/custom.css`, loaded after the built-in stylesheet. Theme colors are CSS variables such as `--brand`, `--bg`, `--fg`.
+- Analytics or web fonts: `.indoc/theme/head.html`.
+- The header, sidebar, landing hero, feature cards, or footer: run `indoc theme eject <part>`, then edit `.indoc/theme/<part>.html`.
+
+If `indoc_bundle` reports files in the output that were changed by hand, ask the user whether to keep them (`edits: keep` moves CSS rules into the theme and saves other files under `.indoc/theme/edited/`) or discard them. Never discard without asking. After keeping an HTML edit, move it into the theme part it belongs to.
+
+## 7. Publish
 
 If `publish` in the scan is empty, ask the user where the docs should live, then call `indoc_publish`:
 

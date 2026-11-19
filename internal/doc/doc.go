@@ -18,6 +18,17 @@ const (
 type Appearance struct {
 	Logo   string  `json:"logo" yaml:"logo"`
 	Colors *Colors `json:"colors,omitempty" yaml:"colors,omitempty"`
+	// Font and MonoFont are CSS font-family lists, such as
+	// "Inter, system-ui, sans-serif". Load web fonts in theme/head.html.
+	Font     string `json:"font,omitempty" yaml:"font,omitempty"`
+	MonoFont string `json:"mono_font,omitempty" yaml:"mono_font,omitempty"`
+	// Radius is the corner radius of cards and code blocks in pixels (0 to 32).
+	Radius *int `json:"radius,omitempty" yaml:"radius,omitempty"`
+	// ContentWidth is the reading column's maximum width in pixels (560 to 1200).
+	ContentWidth int `json:"content_width,omitempty" yaml:"content_width,omitempty"`
+	// Theme is the color scheme before a reader chooses: light, dark, or
+	// empty to follow the reader's system.
+	Theme string `json:"theme,omitempty" yaml:"theme,omitempty"`
 }
 
 // Colors defines the site's primary and secondary accent colors.

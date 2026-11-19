@@ -1,0 +1,12 @@
+{{define "features"}}
+<section class="features">
+  {{- range .Features}}
+  <article class="feature">
+    <svg class="sparkle" viewBox="0 0 16 16" aria-hidden="true"><path d="M8 0c.5 4.2 1.8 6.9 8 8-6.2 1.1-7.5 3.8-8 8-.5-4.2-1.8-6.9-8-8 6.2-1.1 7.5-3.8 8-8Z"/></svg>
+    <h2>{{.Title}}</h2>
+    {{- with .Details}}<p>{{inline .}}</p>{{end}}
+    {{- if .Href}}<a class="more" href="{{.Href}}">{{.LinkText}} <svg viewBox="0 0 16 16" aria-hidden="true"><path d="m6 4 4 4-4 4"/></svg></a>{{end}}
+  </article>
+  {{- end}}
+</section>
+{{end}}

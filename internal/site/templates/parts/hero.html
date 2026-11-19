@@ -1,0 +1,14 @@
+{{define "hero"}}
+<section class="hero">
+  {{- with .HeroImage}}<img class="hero-image" src="{{.}}" alt="">{{end}}
+  <h1>{{if .Hero.Title}}{{.Hero.Title}}{{else}}{{.Site.Name}}{{end}}</h1>
+  {{- with .Hero.Tagline}}<p class="tagline">{{inline .}}</p>{{end}}
+  {{- if .Actions}}
+  <div class="actions">
+    {{- range .Actions}}
+    <a class="button {{.Theme}}" href="{{.Href}}">{{.Text}}{{if eq .Theme "primary"}} <svg viewBox="0 0 16 16" aria-hidden="true"><path d="m6 4 4 4-4 4"/></svg>{{end}}</a>
+    {{- end}}
+  </div>
+  {{- end}}
+</section>
+{{end}}

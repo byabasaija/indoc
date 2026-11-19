@@ -91,6 +91,11 @@ func fingerprint(p *project) string {
 	stat(p.paths.Config)
 	stat(filepath.Join(filepath.Dir(p.paths.Config), "custom.css"))
 	stat(filepath.Join(filepath.Dir(p.paths.Config), "head.html"))
+	if entries, err := os.ReadDir(themeDir(p.paths)); err == nil {
+		for _, e := range entries {
+			stat(filepath.Join(themeDir(p.paths), e.Name()))
+		}
+	}
 	for _, pg := range p.pages {
 		stat(filepath.Join(p.paths.Root, filepath.FromSlash(pg.Path)))
 	}

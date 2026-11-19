@@ -113,6 +113,11 @@ appearance:
   colors:
     primary: "#0969da"           # links, active nav, focus
     accent: "#8250df"
+  font: Inter, system-ui, sans-serif   # load web fonts in theme/head.html
+  mono_font: JetBrains Mono, monospace
+  radius: 8                      # corner radius in pixels, 0 to 32
+  content_width: 820             # reading column in pixels, 560 to 1200
+  theme: dark                    # light or dark before the reader chooses; default follows the system
 links:                           # header links
   - text: Blog
     url: https://acme.dev/blog
@@ -125,10 +130,34 @@ show_authors: true               # "Last updated by Jane on …"
 allow_html: false                # raw HTML in pages is escaped unless true
 ```
 
-Two optional files next to the config change the theme without a fork:
+## Theme folder
 
-- `.indoc/custom.css` is loaded after the built-in stylesheet. Override the custom properties on `:root` and `[data-theme="dark"]`, such as `--brand`, `--bg`, and `--fg`.
-- `.indoc/head.html` is copied into every page's `<head>`, for analytics or fonts.
+The site folder is rebuilt on every `indoc bundle`, so changes made there do not last. Changes to the look belong in `.indoc/theme/`, which indoc reads and never overwrites (`internal/cli/theme.go::loadTheme`):
+
+| File | Effect |
+|---|---|
+| `custom.css` | Loaded after the built-in stylesheet. Theme colors are CSS variables on `:root` and `[data-theme="dark"]`, such as `--brand`, `--bg`, and `--fg`. |
+| `head.html` | Added to every page's `<head>`: analytics, web fonts. |
+| `header.html`, `sidebar.html`, `hero.html`, `features.html`, `footer.html` | Replaces that part of every page. |
+
+To change a part, copy the built-in one and edit the copy:
+
+```sh
+indoc theme                  # what is built in and what is yours
+indoc theme eject footer     # copies the built-in footer to .indoc/theme/footer.html
+indoc theme show footer      # prints the built-in, to compare
+```
+
+A copied part starts with a comment recording the indoc version and a fingerprint of the built-in it came from. When a later indoc changes that built-in, `indoc bundle` warns, so your copy can be updated rather than silently falling behind (`internal/site/theme.go::Outdated`). A file in the folder that is not a part, such as a misspelled `foter.html`, stops the build. `custom.css` and `head.html` directly in `.indoc/` are still read.
+
+## Edits to the output
+
+indoc records a fingerprint of every file it writes. If a file in the site folder was changed by hand since the last build, `indoc bundle` stops and lists it instead of overwriting it (`internal/site/site.go::Edited`):
+
+- `indoc bundle --keep-edits` moves the edits into the theme folder: new or changed CSS rules are appended to `theme/custom.css`, and other files are saved under `theme/edited/`, to copy into the theme part they belong in.
+- `indoc bundle --discard-edits` overwrites them.
+
+With the plugin, the agent asks you which.
 
 ## Page footer
 

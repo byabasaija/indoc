@@ -151,7 +151,7 @@ These rules were tuned by replaying 100 commits of a real production codebase: 8
 - Syntax highlighting and copy buttons on code blocks, Mermaid diagrams
 - A landing page with hero and feature cards, set in frontmatter
 - "Edit this page", "Last updated", GitHub stars, header links, footer
-- Your logo and colors, plus `custom.css` and `head.html` when you need more
+- Your logo, colors, fonts, and layout in config; a `.indoc/theme/` folder to replace the header, footer, or hero. Rebuilds never overwrite it, and hand edits to the output are caught instead of lost
 - Relative links: serve it from any host or path, or mount it in your app
 
 See [Customizing the site](documentation/site.md).

@@ -27,7 +27,7 @@ import (
 	"github.com/byabasaija/indoc/internal/render"
 )
 
-//go:embed templates/*.html assets/indoc.css assets/indoc.js assets/vendor/prism.js assets/vendor/mermaid.min.js.gz
+//go:embed templates/*.html templates/parts/*.html assets/indoc.css assets/indoc.js assets/vendor/prism.js assets/vendor/mermaid.min.js.gz
 var files embed.FS
 
 // Site is everything the site is built from.
@@ -35,6 +35,7 @@ type Site struct {
 	Name        string
 	Logo        string // http(s) URL, or a path relative to RepoRoot
 	Colors      *doc.Colors
+	Appearance  *doc.Appearance // fonts, radius, width, default theme
 	Links       []Link
 	Footer      string // Markdown
 	SiteURL     string
@@ -50,6 +51,12 @@ type Site struct {
 	// guides/setup/, for servers that do not resolve a folder to its
 	// index.html (Django's serve, S3, Next.js public/).
 	FileURLs bool
+	// Parts replace parts of the page template (see PartNames), keyed by
+	// part name, from the theme folder.
+	Parts map[string]string
+	// OverwriteEdits builds even when files in the output were edited by
+	// hand since the last build (see Edited).
+	OverwriteEdits bool
 }
 
 // Link is a header link.
@@ -112,8 +119,18 @@ func Build(s *Site, outDir string) error {
 	if err := os.MkdirAll(outDir, 0o755); err != nil {
 		return err
 	}
-	w := &writer{out: outDir, written: map[string]bool{}}
+	if !s.OverwriteEdits {
+		if edited := Edited(outDir); len(edited) > 0 {
+			return &EditedError{Dir: outDir, Files: edited}
+		}
+	}
+	w := &writer{out: outDir, written: map[string]string{}}
 	b := &builder{site: s, w: w}
+	t, err := b.templates()
+	if err != nil {
+		return err
+	}
+	b.tmpl = t
 	if err := b.plan(); err != nil {
 		return err
 	}
@@ -130,6 +147,7 @@ func Build(s *Site, outDir string) error {
 }
 
 type builder struct {
+	tmpl     *template.Template
 	site     *Site
 	w        *writer
 	pages    []*built // navigation order, home first
@@ -607,7 +625,12 @@ func refText(sec *doc.RefSection) string {
 // did not. It never deletes anything it did not write itself.
 type writer struct {
 	out     string
-	written map[string]bool
+	written map[string]string // site path -> content hash
+}
+
+func contentHash(data []byte) string {
+	sum := sha256.Sum256(data)
+	return hex.EncodeToString(sum[:])
 }
 
 func (w *writer) write(name string, data []byte) error {
@@ -618,15 +641,69 @@ func (w *writer) write(name string, data []byte) error {
 	if err := os.WriteFile(full, data, 0o644); err != nil {
 		return err
 	}
-	w.written[name] = true
+	w.written[name] = contentHash(data)
 	return nil
 }
 
+// readManifest returns the files the last build wrote, with their content
+// hashes ("" for manifests from before hashes were recorded).
+func readManifest(out string) (map[string]string, bool) {
+	data, err := os.ReadFile(filepath.Join(out, manifestName))
+	if err != nil {
+		return nil, false
+	}
+	files := map[string]string{}
+	for _, line := range strings.Split(string(data), "\n") {
+		hash, name, ok := strings.Cut(line, "  ")
+		if !ok {
+			hash, name = "", line
+		}
+		if name == "" || strings.Contains(name, "..") {
+			continue
+		}
+		files[name] = hash
+	}
+	return files, true
+}
+
+// Edited lists files in outDir that were changed by hand since indoc wrote
+// them, so a build does not silently overwrite someone's work.
+func Edited(outDir string) []string {
+	files, _ := readManifest(outDir)
+	var edited []string
+	for name, hash := range files {
+		if hash == "" {
+			continue
+		}
+		data, err := os.ReadFile(filepath.Join(outDir, filepath.FromSlash(name)))
+		if err != nil {
+			continue // deleted: rebuilt, nothing to lose
+		}
+		if contentHash(data) != hash {
+			edited = append(edited, name)
+		}
+	}
+	sort.Strings(edited)
+	return edited
+}
+
+// EditedError stops a build that would overwrite hand edits.
+type EditedError struct {
+	Dir   string
+	Files []string
+}
+
+func (e *EditedError) Error() string {
+	return fmt.Sprintf("%d file(s) in %s were changed by hand since the last build and would be overwritten:\n  %s\n"+
+		"The output is regenerated on every build, so keep changes in .indoc/theme/ instead.\n"+
+		"Run `indoc bundle --keep-edits` to move them there (CSS becomes rules in theme/custom.css; HTML is saved under theme/edited/ to copy into a theme part), or `indoc bundle --discard-edits` to overwrite them.",
+		len(e.Files), e.Dir, strings.Join(e.Files, "\n  "))
+}
+
 func (w *writer) finish() error {
-	manifest := filepath.Join(w.out, manifestName)
-	if prev, err := os.ReadFile(manifest); err == nil {
-		for _, name := range strings.Split(string(prev), "\n") {
-			if name == "" || w.written[name] || strings.Contains(name, "..") {
+	if prev, ok := readManifest(w.out); ok {
+		for name := range prev {
+			if _, ok := w.written[name]; ok {
 				continue
 			}
 			os.Remove(filepath.Join(w.out, filepath.FromSlash(name)))
@@ -636,7 +713,7 @@ func (w *writer) finish() error {
 		// Output of the single-page viewer indoc shipped before 0.1,
 		// recognized by its payload, so a user's own files are never touched.
 		for _, name := range []string{"docs.js", "app.js", "style.css"} {
-			if !w.written[name] {
+			if _, ok := w.written[name]; !ok {
 				os.Remove(filepath.Join(w.out, name))
 			}
 		}
@@ -646,5 +723,9 @@ func (w *writer) finish() error {
 		names = append(names, n)
 	}
 	sort.Strings(names)
-	return os.WriteFile(manifest, []byte(strings.Join(names, "\n")+"\n"), 0o644)
+	var b strings.Builder
+	for _, n := range names {
+		b.WriteString(w.written[n] + "  " + n + "\n")
+	}
+	return os.WriteFile(filepath.Join(w.out, manifestName), []byte(b.String()), 0o644)
 }

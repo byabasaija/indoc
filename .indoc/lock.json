@@ -100,24 +100,24 @@
       }
     },
     "documentation/agents.md": {
-      "page": "a2df19b55fdedc1e",
+      "page": "00b852ff4690c6b8",
       "citations": {
         "internal/cli/mcp.go::mcpServer": {
           "surface": "9a5340343b623d99",
-          "body": "f328662b6a09a1c9",
-          "raw": "e2a9301267833c80",
+          "body": "370242722f6a079c",
+          "raw": "1eb657a9ec1b875f",
           "hasher": "go/2"
         },
         "internal/cli/mcp.go::setLogo": {
           "surface": "b742c192766d29cd",
           "body": "cc967b6f6735bbf4",
-          "raw": "e2a9301267833c80",
+          "raw": "1eb657a9ec1b875f",
           "hasher": "go/2"
         },
         "internal/cli/mcp.go::setup": {
           "surface": "edddf1d25b166fce",
           "body": "0bfae943ab8f8106",
-          "raw": "e2a9301267833c80",
+          "raw": "1eb657a9ec1b875f",
           "hasher": "go/2"
         },
         "internal/mcp/mcp.go::Server.Serve": {
@@ -129,7 +129,7 @@
       },
       "sources": {
         "internal/cli/mcp.go": {
-          "body": "9ea24e400e65d912",
+          "body": "fc6f9931c16ab16c",
           "symbols": {
             "failed": "e2d8ad0f8686e095",
             "init": "c78f10468427bc77",
@@ -139,7 +139,7 @@
             "setLogo": "b742c192766d29cd",
             "setup": "edddf1d25b166fce",
             "toolAck": "42ce2831f7f94ddc",
-            "toolArgs": "74a1e9887b8142e9",
+            "toolArgs": "ccb9f2612cb98065",
             "toolBundle": "b7b189252a902197",
             "toolCheck": "520a6a0ff0e78eef",
             "toolPublish": "ccdba7360c9b8d59",
@@ -162,7 +162,7 @@
             "toolScan",
             "toolSetup"
           ],
-          "raw": "e2a9301267833c80",
+          "raw": "1eb657a9ec1b875f",
           "hasher": "go/2"
         },
         "internal/mcp/mcp.go": {
@@ -216,8 +216,8 @@
           "hasher": "bytes"
         },
         "plugin/skills/indoc/SKILL.md": {
-          "body": "65cb574ee5c73eb2",
-          "raw": "65cb574ee5c73eb2",
+          "body": "ff9c3405c089385b",
+          "raw": "ff9c3405c089385b",
           "hasher": "bytes"
         }
       }
@@ -369,12 +369,12 @@
       }
     },
     "documentation/getting-started.md": {
-      "page": "5301545255c5f549",
+      "page": "b94c900242652af8",
       "citations": {
         "internal/cli/bundle.go::runBundle": {
           "surface": "afbcb60d55daccfa",
-          "body": "4c33e356e3345660",
-          "raw": "8f9aba08f80864c1",
+          "body": "9e792aadd6c28d90",
+          "raw": "6682bf9282617ee4",
           "hasher": "go/2"
         },
         "internal/cli/init.go::runInit": {
@@ -386,15 +386,16 @@
         "internal/config/config.go::InferProjectName": {
           "surface": "665df7f08f982cfb",
           "body": "7b074de3acb70fe3",
-          "raw": "81780ef37cf9d73b",
+          "raw": "95a880fdc5c0701f",
           "hasher": "go/2"
         }
       },
       "sources": {
         "internal/cli/bundle.go": {
-          "body": "097a2727995bf47c",
+          "body": "896f92ca17002ac1",
           "symbols": {
             "buildSite": "a025c648708f8f48",
+            "buildSiteWith": "ce8afd13d70d1d73",
             "citationLink": "840bb03b38bba364",
             "citationTarget": "630f715f9c075a3b",
             "editLink": "7c023cbaf4f922aa",
@@ -403,12 +404,14 @@
             "init": "c78f10468427bc77",
             "linkSources": "3b41123d1bc8c90c",
             "runBundle": "afbcb60d55daccfa",
+            "runBundleEdits": "49aba542c8ae0bbf",
             "siteFor": "3a09b09748126992",
             "splitSource": "ebcb91591de95bdb",
             "verified": "ec88540c8a727204"
           },
           "private": [
             "buildSite",
+            "buildSiteWith",
             "citationLink",
             "citationTarget",
             "editLink",
@@ -417,11 +420,12 @@
             "init",
             "linkSources",
             "runBundle",
+            "runBundleEdits",
             "siteFor",
             "splitSource",
             "verified"
           ],
-          "raw": "8f9aba08f80864c1",
+          "raw": "6682bf9282617ee4",
           "hasher": "go/2"
         },
         "internal/cli/init.go": {
@@ -442,7 +446,7 @@
           "hasher": "go/2"
         },
         "internal/config/config.go": {
-          "body": "787ec1596bb0e6e3",
+          "body": "d415ecfee2273d29",
           "symbols": {
             "Config": "d06bba2c1bdad9a8",
             "Config.CitationStyle": "9967250f66762b25",
@@ -474,7 +478,7 @@
             "pyprojectName",
             "sourceTemplate"
           ],
-          "raw": "81780ef37cf9d73b",
+          "raw": "95a880fdc5c0701f",
           "hasher": "go/2"
         },
         "internal/config/config_test.go": {
@@ -1186,24 +1190,30 @@
       }
     },
     "documentation/site.md": {
-      "page": "751b2e663f286017",
+      "page": "b6701fcaaccf3c36",
       "citations": {
         "internal/cli/bundle.go::editLink": {
           "surface": "7c023cbaf4f922aa",
           "body": "5ab551982e7c7030",
-          "raw": "8f9aba08f80864c1",
+          "raw": "6682bf9282617ee4",
           "hasher": "go/2"
         },
         "internal/cli/bundle.go::gitLastChange": {
           "surface": "4c7a4daf2cb930a4",
           "body": "2dc4c2511680d66f",
-          "raw": "8f9aba08f80864c1",
+          "raw": "6682bf9282617ee4",
           "hasher": "go/2"
         },
         "internal/cli/bundle.go::siteFor": {
           "surface": "3a09b09748126992",
-          "body": "58d7c5e7ef582838",
-          "raw": "8f9aba08f80864c1",
+          "body": "116b872921c4ff07",
+          "raw": "6682bf9282617ee4",
+          "hasher": "go/2"
+        },
+        "internal/cli/theme.go::loadTheme": {
+          "surface": "ad68ff380717dc3d",
+          "body": "b899e6711bb57d5d",
+          "raw": "b0a3cb931a75ac78",
           "hasher": "go/2"
         },
         "internal/pages/pages.go::Hero": {
@@ -1220,16 +1230,29 @@
         },
         "internal/site/site.go::Build": {
           "surface": "b40cda3ec9f95359",
-          "body": "d8620248c3acc27f",
-          "raw": "80c8bf0262ae2c94",
+          "body": "b33d12e5510c42cc",
+          "raw": "e41b75a9a1c3adf6",
+          "hasher": "go/2"
+        },
+        "internal/site/site.go::Edited": {
+          "surface": "85d34bc16cc74109",
+          "body": "75f0a43570836e6e",
+          "raw": "e41b75a9a1c3adf6",
+          "hasher": "go/2"
+        },
+        "internal/site/theme.go::Outdated": {
+          "surface": "a74498958d04826b",
+          "body": "e758567c81815581",
+          "raw": "2a815dda47db7111",
           "hasher": "go/2"
         }
       },
       "sources": {
         "internal/cli/bundle.go": {
-          "body": "097a2727995bf47c",
+          "body": "896f92ca17002ac1",
           "symbols": {
             "buildSite": "a025c648708f8f48",
+            "buildSiteWith": "ce8afd13d70d1d73",
             "citationLink": "840bb03b38bba364",
             "citationTarget": "630f715f9c075a3b",
             "editLink": "7c023cbaf4f922aa",
@@ -1238,12 +1261,14 @@
             "init": "c78f10468427bc77",
             "linkSources": "3b41123d1bc8c90c",
             "runBundle": "afbcb60d55daccfa",
+            "runBundleEdits": "49aba542c8ae0bbf",
             "siteFor": "3a09b09748126992",
             "splitSource": "ebcb91591de95bdb",
             "verified": "ec88540c8a727204"
           },
           "private": [
             "buildSite",
+            "buildSiteWith",
             "citationLink",
             "citationTarget",
             "editLink",
@@ -1252,11 +1277,12 @@
             "init",
             "linkSources",
             "runBundle",
+            "runBundleEdits",
             "siteFor",
             "splitSource",
             "verified"
           ],
-          "raw": "8f9aba08f80864c1",
+          "raw": "6682bf9282617ee4",
           "hasher": "go/2"
         },
         "internal/pages/pages.go": {
@@ -1342,14 +1368,17 @@
           "hasher": "javascript/44c892e0be05/2"
         },
         "internal/site/site.go": {
-          "body": "88e0b4708079c247",
+          "body": "948ab2353136718a",
           "symbols": {
             "Build": "b40cda3ec9f95359",
+            "Edited": "85d34bc16cc74109",
+            "EditedError": "953714064361108c",
+            "EditedError.Error": "26a5a9b8f7a6f021",
             "Link": "d7c60ea0d7835f63",
             "Page": "0593cd73016047c0",
             "Ref": "eb6e62f39e57b8a2",
-            "Site": "107088b92171e40b",
-            "builder": "87e1504af65bd86b",
+            "Site": "1c6530f4ca4b6237",
+            "builder": "afa64eab8d730c5d",
             "builder.assets": "b4ec11e7fdd7703b",
             "builder.categoryRank": "ae8d547a37e17bc1",
             "builder.categoryTitle": "e9667abdc839591b",
@@ -1367,16 +1396,18 @@
             "builder.url": "9b3db7992be90541",
             "built": "aaaf7faedc67a308",
             "commonDir": "acbb3d0fb641a90f",
+            "contentHash": "a9c9e3518c6f7aaf",
             "humanize": "a8e40962f5500bfa",
             "logo": "f8f779128ec729b3",
             "pageLess": "b0681c15b476cd81",
             "rank": "475c17380f316fbf",
+            "readManifest": "2e39cfde13081fe2",
             "refText": "eb4d031f6f68518b",
             "rootPrefix": "748b4484d23b165a",
             "searchEntry": "8703558b8e9c913f",
             "section": "45bf258f622827cd",
             "slugPath": "cbd6507c802f6c4b",
-            "writer": "b9796fdf4c482343",
+            "writer": "8621b7b087b5a08f",
             "writer.finish": "5d267f2d478cfe6d",
             "writer.write": "cb9a3612c7be96f6"
           },
@@ -1399,10 +1430,12 @@
             "builder.url",
             "built",
             "commonDir",
+            "contentHash",
             "humanize",
             "logo",
             "pageLess",
             "rank",
+            "readManifest",
             "refText",
             "rootPrefix",
             "searchEntry",
@@ -1412,7 +1445,7 @@
             "writer.finish",
             "writer.write"
           ],
-          "raw": "80c8bf0262ae2c94",
+          "raw": "e41b75a9a1c3adf6",
           "hasher": "go/2"
         },
         "internal/site/site_test.go": {
@@ -1444,12 +1477,53 @@
           "hasher": "go/2"
         },
         "internal/site/templates/page.html": {
-          "body": "1fb602818443b07f",
-          "raw": "1fb602818443b07f",
+          "body": "86b54906632ec63b",
+          "raw": "86b54906632ec63b",
           "hasher": "bytes"
         },
+        "internal/site/templates/parts/features.html": {
+          "body": "6f869fa5006d002c",
+          "raw": "6f869fa5006d002c",
+          "hasher": "bytes"
+        },
+        "internal/site/templates/parts/footer.html": {
+          "body": "83fab95a605542e7",
+          "raw": "83fab95a605542e7",
+          "hasher": "bytes"
+        },
+        "internal/site/templates/parts/header.html": {
+          "body": "3d4500e22c069e82",
+          "raw": "3d4500e22c069e82",
+          "hasher": "bytes"
+        },
+        "internal/site/templates/parts/hero.html": {
+          "body": "ed5602dc8486536b",
+          "raw": "ed5602dc8486536b",
+          "hasher": "bytes"
+        },
+        "internal/site/templates/parts/sidebar.html": {
+          "body": "aa61c6dd84460432",
+          "raw": "aa61c6dd84460432",
+          "hasher": "bytes"
+        },
+        "internal/site/theme.go": {
+          "body": "d3322f74eec2d884",
+          "symbols": {
+            "BuiltinPart": "42f2e976ddcfeebb",
+            "IsPart": "3417081845ac6ef0",
+            "Outdated": "a74498958d04826b",
+            "PartHash": "2122317bc198cae8",
+            "Stamp": "cad67594407db05f",
+            "builder.templates": "3057fe340920a1a9"
+          },
+          "private": [
+            "builder.templates"
+          ],
+          "raw": "2a815dda47db7111",
+          "hasher": "go/2"
+        },
         "internal/site/write.go": {
-          "body": "3c4c37fbb3021239",
+          "body": "49ad1c2f4a42cbe2",
           "symbols": {
             "action": "7dbbf684e45c7f1e",
             "builder.execute": "e3d06716413fa76a",
@@ -1461,7 +1535,7 @@
             "feature": "92b02d70eb008f96",
             "navGroup": "0fb1bb38ceab36f6",
             "navItem": "e11e00936f210838",
-            "view": "3e639213db7700d6"
+            "view": "88b2e1127fee8330"
           },
           "private": [
             "action",
@@ -1476,7 +1550,7 @@
             "navItem",
             "view"
           ],
-          "raw": "f8a7e777ff6eeee0",
+          "raw": "ee81b862e0196d96",
           "hasher": "go/2"
         }
       }

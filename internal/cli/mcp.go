@@ -84,10 +84,12 @@ func mcpServer() *mcp.Server {
 			},
 			{
 				Name: "indoc_bundle", Title: "Build the docs site",
-				Description: "Build the static site into output_dir (default .indoc/site/). Refuses to build when a citation or sources glob is broken. Records new and edited pages.",
-				InputSchema: obj(map[string]any{}),
-				Idempotent:  true,
-				Handler:     toolBundle,
+				Description: "Build the static site into output_dir (default .indoc/site/). Refuses to build when a citation or sources glob is broken, or when files in the output were changed by hand since the last build: then ask the user whether to keep those edits (moved into .indoc/theme/) or discard them, and call again with edits. Records new and edited pages.",
+				InputSchema: obj(map[string]any{
+					"edits": map[string]any{"type": "string", "enum": []string{"keep", "discard"}, "description": "What to do with hand edits in the output; only after asking the user."},
+				}),
+				Idempotent: true,
+				Handler:    toolBundle,
 			},
 			{
 				Name: "indoc_publish", Title: "Choose where the docs are served",
@@ -107,6 +109,7 @@ type toolArgs struct {
 	Root   string   `json:"root"`
 	Pages  []string `json:"pages"`
 	Logo   string   `json:"logo"`
+	Edits  string   `json:"edits"`
 	Target string   `json:"target"`
 	Path   string   `json:"path"`
 	Access string   `json:"access"`
@@ -301,12 +304,15 @@ func toolAck(raw json.RawMessage) (string, any, bool) {
 }
 
 func toolBundle(raw json.RawMessage) (string, any, bool) {
-	_, cfgPath, err := parseArgs(raw)
+	a, cfgPath, err := parseArgs(raw)
 	if err != nil {
 		return failed(err)
 	}
+	if a.Edits != "" && a.Edits != "keep" && a.Edits != "discard" {
+		return failed(fmt.Errorf("edits must be keep or discard, got %q", a.Edits))
+	}
 	var out bytes.Buffer
-	if err := runBundle(cfgPath, "", &out); err != nil {
+	if err := runBundleEdits(cfgPath, "", a.Edits, &out); err != nil {
 		return out.String() + err.Error(), nil, true
 	}
 	return strings.Replace(out.String(), "Preview locally with: indoc preview", "The user can preview it with `indoc preview`.", 1), nil, false

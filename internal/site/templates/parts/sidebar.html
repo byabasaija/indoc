@@ -1,0 +1,16 @@
+{{define "sidebar"}}
+<aside class="sidebar" data-sidebar>
+  <nav aria-label="Documentation">
+    {{- range .Nav}}
+    <div class="nav-group">
+      {{- if .Title}}<p class="nav-title">{{.Title}}</p>{{end}}
+      <ul>
+        {{- range .Items}}
+        <li><a href="{{.Href}}"{{if .Active}} aria-current="page"{{end}}>{{.Title}}</a></li>
+        {{- end}}
+      </ul>
+    </div>
+    {{- end}}
+  </nav>
+</aside>
+{{end}}

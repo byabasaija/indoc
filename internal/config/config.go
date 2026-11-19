@@ -221,11 +221,8 @@ func Load(path string) (*Config, error) {
 	if err := yaml.Unmarshal(data, cfg); err != nil {
 		return nil, fmt.Errorf("parse %s: %w", path, err)
 	}
-	if err := cfg.validatePublishing(); err != nil {
+	if err := cfg.Validate(); err != nil {
 		return nil, fmt.Errorf("%s: %w", path, err)
-	}
-	if cfg.Citations != "" && !contains(CitationStyles, cfg.Citations) {
-		return nil, fmt.Errorf("%s: citations must be one of %s, got %q", path, strings.Join(CitationStyles, ", "), cfg.Citations)
 	}
 	if cfg.OutputDir == "" {
 		cfg.OutputDir = DefaultOutputDir
@@ -329,10 +326,28 @@ func contains(list []string, s string) bool {
 	return false
 }
 
+var fontList = regexp.MustCompile(`^[A-Za-z0-9 ,"'_.-]+$`)
+
 // Validate checks the settings that have a fixed set of values.
 func (c *Config) Validate() error {
 	if err := c.validatePublishing(); err != nil {
 		return err
+	}
+	if a := c.Appearance; a != nil {
+		for key, v := range map[string]string{"font": a.Font, "mono_font": a.MonoFont} {
+			if v != "" && !fontList.MatchString(v) {
+				return fmt.Errorf("appearance.%s must be a CSS font list such as \"Inter, sans-serif\", got %q", key, v)
+			}
+		}
+		if a.Radius != nil && (*a.Radius < 0 || *a.Radius > 32) {
+			return fmt.Errorf("appearance.radius must be between 0 and 32, got %d", *a.Radius)
+		}
+		if a.ContentWidth != 0 && (a.ContentWidth < 560 || a.ContentWidth > 1200) {
+			return fmt.Errorf("appearance.content_width must be between 560 and 1200, got %d", a.ContentWidth)
+		}
+		if a.Theme != "" && a.Theme != "light" && a.Theme != "dark" {
+			return fmt.Errorf("appearance.theme must be light or dark, got %q", a.Theme)
+		}
 	}
 	if c.Citations != "" && !contains(CitationStyles, c.Citations) {
 		return fmt.Errorf("citations must be one of %s, got %q", strings.Join(CitationStyles, ", "), c.Citations)

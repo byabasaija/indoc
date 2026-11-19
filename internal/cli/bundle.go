@@ -3,7 +3,6 @@ package cli
 import (
 	"fmt"
 	"io"
-	"os"
 	"os/exec"
 	"path/filepath"
 	"strconv"
@@ -17,7 +16,10 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var bundleOut string
+var (
+	bundleOut                 string
+	bundleKeep, bundleDiscard bool
+)
 
 var bundleCmd = &cobra.Command{
 	Use:   "bundle",
@@ -30,16 +32,34 @@ the site it records new and edited pages in .indoc/lock.json, exactly as
 ` + "`indoc ack`" + ` with no arguments would.`,
 	Args: cobra.NoArgs,
 	RunE: func(cmd *cobra.Command, args []string) error {
-		return runBundle(cfgFile, bundleOut, cmd.OutOrStdout())
+		edits := ""
+		switch {
+		case bundleKeep && bundleDiscard:
+			return fmt.Errorf("choose --keep-edits or --discard-edits, not both")
+		case bundleKeep:
+			edits = "keep"
+		case bundleDiscard:
+			edits = "discard"
+		}
+		return runBundleEdits(cfgFile, bundleOut, edits, cmd.OutOrStdout())
 	},
 }
 
 func init() {
 	bundleCmd.Flags().StringVarP(&bundleOut, "out", "o", "", "output directory (default: output_dir in .indoc/config.yaml)")
+	bundleCmd.Flags().BoolVar(&bundleKeep, "keep-edits", false, "move hand edits in the output into .indoc/theme/, then build")
+	bundleCmd.Flags().BoolVar(&bundleDiscard, "discard-edits", false, "overwrite hand edits in the output")
 	rootCmd.AddCommand(bundleCmd)
 }
 
 func runBundle(configPath, outDir string, out io.Writer) error {
+	return runBundleEdits(configPath, outDir, "", out)
+}
+
+// runBundleEdits builds the site. edits says what to do with files in the
+// output changed by hand since the last build: "" refuses to build, keep
+// moves them into the theme folder first, discard overwrites them.
+func runBundleEdits(configPath, outDir, edits string, out io.Writer) error {
 	p, err := openProject(configPath)
 	if err != nil {
 		return err
@@ -47,7 +67,12 @@ func runBundle(configPath, outDir string, out io.Writer) error {
 	if outDir == "" {
 		outDir = filepath.Join(p.paths.Root, p.cfg.OutputDir)
 	}
-	if err := buildSite(p, outDir); err != nil {
+	if edits == "keep" {
+		if err := keepEdits(p, outDir, out); err != nil {
+			return err
+		}
+	}
+	if err := buildSiteWith(p, outDir, edits != ""); err != nil {
 		return err
 	}
 	res, err := drift.Ack(p.repo, p.pages, p.lock, nil)
@@ -61,12 +86,17 @@ func runBundle(configPath, outDir string, out io.Writer) error {
 	if n := len(res.Stamped); n > 0 {
 		fmt.Fprintf(out, "Recorded %d new or edited pages in %s\n", n, p.paths.Lock)
 	}
+	for _, w := range loadTheme(p).warnings {
+		fmt.Fprintln(out, "warning: "+w)
+	}
 	fmt.Fprintln(out, "Preview locally with: indoc preview")
 	return nil
 }
 
 // buildSite writes the site without touching the lock.
-func buildSite(p *project, outDir string) error {
+func buildSite(p *project, outDir string) error { return buildSiteWith(p, outDir, false) }
+
+func buildSiteWith(p *project, outDir string, overwriteEdits bool) error {
 	var broken []string
 	for _, f := range drift.Check(p.repo, p.pages, p.lock) {
 		if f.Kind == drift.Broken {
@@ -82,7 +112,9 @@ func buildSite(p *project, outDir string) error {
 		return err
 	}
 	linkSources(p, ref.Sections)
-	return site.Build(siteFor(p, ref.Sections), outDir)
+	s := siteFor(p, ref.Sections)
+	s.OverwriteEdits = overwriteEdits
+	return site.Build(s, outDir)
 }
 
 // linkSources sets each reference entry's URL from source_url.
@@ -168,18 +200,13 @@ func siteFor(p *project, sections []doc.RefSection) *site.Site {
 		s.Name = "Documentation"
 	}
 	if a := p.cfg.Appearance; a != nil {
-		s.Logo, s.Colors = a.Logo, a.Colors
+		s.Logo, s.Colors, s.Appearance = a.Logo, a.Colors, a
 	}
 	for _, l := range p.cfg.Links {
 		s.Links = append(s.Links, site.Link{Text: l.Text, URL: l.URL})
 	}
-	dir := filepath.Dir(p.paths.Config)
-	if css, err := os.ReadFile(filepath.Join(dir, "custom.css")); err == nil {
-		s.CustomCSS = css
-	}
-	if head, err := os.ReadFile(filepath.Join(dir, "head.html")); err == nil {
-		s.HeadHTML = string(head)
-	}
+	th := loadTheme(p)
+	s.CustomCSS, s.HeadHTML, s.Parts = th.css, th.head, th.parts
 	editURL, editLabel := "", ""
 	for _, pg := range p.pages {
 		if p.cfg.SourceLinks {

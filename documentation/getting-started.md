@@ -57,7 +57,7 @@ Ask your coding agent to document the project. It runs `indoc scan --json`, writ
 indoc bundle
 ```
 
-`internal/cli/bundle.go::runBundle` refuses to build if any citation or `sources` glob is broken, extracts reference facts from source, writes the site to `output_dir` (default `.indoc/site/`, gitignored), and records new or edited pages in `.indoc/lock.json`.
+`internal/cli/bundle.go::runBundle` refuses to build if any citation or `sources` glob is broken, or if files in the site folder were edited by hand since the last build ([what to do](site.md#edits-to-the-output)), extracts reference facts from source, writes the site to `output_dir` (default `.indoc/site/`, gitignored), and records new or edited pages in `.indoc/lock.json`.
 
 Preview it with `indoc preview`, which serves on `http://127.0.0.1:4173` and rebuilds when a page changes.
 

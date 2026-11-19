@@ -58,6 +58,7 @@ type view struct {
 	Canonical string
 	Updated   string
 	NotFound  bool
+	Theme     string // light, dark, or "" for the reader's system
 }
 
 var funcs = template.FuncMap{
@@ -85,12 +86,26 @@ var funcs = template.FuncMap{
 	},
 }
 
-var tmpl = template.Must(template.New("").Funcs(funcs).ParseFS(files, "templates/*.html"))
+var tmpl = template.Must(template.New("").Funcs(funcs).ParseFS(files, "templates/*.html", "templates/parts/*.html"))
 
 var hexColor = regexp.MustCompile(`^#[0-9a-fA-F]{6}$`)
 
 func (b *builder) writePages() error {
 	brand := ""
+	if a := b.site.Appearance; a != nil {
+		if a.Font != "" {
+			brand += "--font:" + a.Font + ";"
+		}
+		if a.MonoFont != "" {
+			brand += "--mono:" + a.MonoFont + ";"
+		}
+		if a.Radius != nil {
+			brand += fmt.Sprintf("--radius:%dpx;", *a.Radius)
+		}
+		if a.ContentWidth != 0 {
+			brand += fmt.Sprintf("--content:%dpx;", a.ContentWidth)
+		}
+	}
 	if c := b.site.Colors; c != nil {
 		if hexColor.MatchString(c.Primary) {
 			brand += "--brand:" + c.Primary + ";"
@@ -125,7 +140,7 @@ func (b *builder) writePages() error {
 
 func (b *builder) execute(name string, v *view) error {
 	var buf bytes.Buffer
-	if err := tmpl.ExecuteTemplate(&buf, "page.html", v); err != nil {
+	if err := b.tmpl.ExecuteTemplate(&buf, "page.html", v); err != nil {
 		return fmt.Errorf("render %s: %w", name, err)
 	}
 	return b.w.write(strings.TrimPrefix(name, "/"), buf.Bytes())
@@ -138,6 +153,9 @@ func (b *builder) view(p *built, brand string) *view {
 		Home: b.rel(p.Slug, ""), Brand: template.CSS(brand),
 		Head: template.HTML(b.site.HeadHTML), CustomCSS: len(b.site.CustomCSS) > 0,
 		Mermaid: p.mermaid,
+	}
+	if a := b.site.Appearance; a != nil {
+		v.Theme = a.Theme
 	}
 	v.DocTitle = b.site.Name
 	if p.Slug != "" {

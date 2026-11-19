@@ -38,7 +38,8 @@ On first use the plugin's launcher downloads the indoc release matching the plug
 | `indoc_setup` | Creates `.indoc/config.yaml`, sets which Markdown files are published, the logo, and whether the site links to the code (`source_links`) | Yes |
 | `indoc_check` | Findings and the number that would fail CI | No |
 | `indoc_ack` | Records pages as verified | Yes |
-| `indoc_bundle` | Builds the site; refuses broken citations | Yes |
+| `indoc_bundle` | Builds the site; refuses broken citations, and hand edits in the output until you choose to keep or discard them | Yes |
+| `indoc_publish` | Saves where the docs are served and returns the steps, including code for your app | Yes |
 
 ## What the agent does on a first run
 
