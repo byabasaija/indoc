@@ -46,6 +46,10 @@ type Site struct {
 	Pages       []Page
 	Reference   []doc.RefSection
 	ShowAuthors bool
+	// FileURLs links to pages as guides/setup/index.html instead of
+	// guides/setup/, for servers that do not resolve a folder to its
+	// index.html (Django's serve, S3, Next.js public/).
+	FileURLs bool
 }
 
 // Link is a header link.
@@ -208,7 +212,7 @@ func (b *builder) checkCollisions() error {
 		if p.Reference != nil || prev.Reference != nil {
 			fix = "rename or move your page; generated reference pages live under reference/"
 		}
-		return fmt.Errorf("%s and %s would both be published at %s; %s", name(prev), name(p), "/"+urlOf(p.Slug), fix)
+		return fmt.Errorf("%s and %s would both be published at %s; %s", name(prev), name(p), "/"+b.url(p.Slug), fix)
 	}
 	return nil
 }
@@ -438,7 +442,7 @@ func (b *builder) resolveLink(from *built, dest string) string {
 	if !ok {
 		return ""
 	}
-	href := relURL(from.Slug, to.Slug)
+	href := b.rel(from.Slug, to.Slug)
 	if u.Fragment != "" {
 		href += "#" + u.Fragment
 	}
@@ -536,7 +540,7 @@ type searchEntry struct {
 func (b *builder) searchIndex() error {
 	var entries []searchEntry
 	for _, p := range b.pages {
-		e := searchEntry{Title: p.Title, URL: urlOf(p.Slug), Text: p.Text}
+		e := searchEntry{Title: p.Title, URL: b.url(p.Slug), Text: p.Text}
 		if p.Category != "" {
 			e.Section = b.categoryTitle(p.Category)
 		}
@@ -558,7 +562,15 @@ func (b *builder) searchIndex() error {
 }
 
 // urlOf is a page's URL relative to the site root.
-func urlOf(slug string) string {
+// url is a page's address relative to the site root: "guides/setup/", or
+// "guides/setup/index.html" when the site uses file URLs.
+func (b *builder) url(slug string) string {
+	if b.site.FileURLs {
+		if slug == "" {
+			return "index.html"
+		}
+		return slug + "/index.html"
+	}
 	if slug == "" {
 		return ""
 	}
@@ -574,8 +586,8 @@ func rootPrefix(slug string) string {
 }
 
 // relURL links from one page to another.
-func relURL(from, to string) string {
-	href := rootPrefix(from) + urlOf(to)
+func (b *builder) rel(from, to string) string {
+	href := rootPrefix(from) + b.url(to)
 	if href == "" {
 		return "./"
 	}

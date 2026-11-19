@@ -118,3 +118,14 @@ Call `indoc_check`. For each finding:
 1. Call `indoc_bundle`. Fix any broken citations it reports and call it again.
 2. Call `indoc_check`; `failing` must be 0.
 3. Tell the user where the site was written (default `.indoc/site/`) and that opening its `index.html` in a browser works without a server; with the `indoc` command installed, `indoc preview` serves it and rebuilds on every edit. `.indoc/config.yaml`, `.indoc/lock.json`, and the pages should be committed. Suggest adding `indoc check` to CI with the GitHub Action (`uses: byabasaija/indoc@v0.5.0`).
+
+## 6. Publish
+
+If `publish` in the scan is empty, ask the user where the docs should live, then call `indoc_publish`:
+
+- **GitHub Pages** (`target: pages`): indoc writes the deploy workflow. Tell the user the one setting to change on GitHub.
+- **A static host** (`target: host`): Netlify, Vercel, Cloudflare Pages, S3.
+- **Served by this app** (`target: app`): ask for the URL path (check the routes in the scan so it does not clash with an existing one, such as an API docs page at `/docs`) and who may read it: `public`, or `login` for internal docs such as runbooks. indoc returns code for the detected framework: add it to the app where it says, and add the build step it gives to the project's build or deploy (a justfile, Makefile, Dockerfile, or package.json script). Show the user what you changed.
+- **Nowhere yet** (`target: none`).
+
+indoc only writes its own files. Adding the returned code to the app is your job, so the user can review it like any other change.

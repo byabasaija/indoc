@@ -103,18 +103,18 @@ func (b *builder) writePages() error {
 		v := b.view(p, brand)
 		if i > 0 {
 			prev := b.pages[i-1]
-			v.Prev = &navItem{Title: prev.Title, Href: relURL(p.Slug, prev.Slug)}
+			v.Prev = &navItem{Title: prev.Title, Href: b.rel(p.Slug, prev.Slug)}
 		}
 		if i+1 < len(b.pages) {
 			next := b.pages[i+1]
-			v.Next = &navItem{Title: next.Title, Href: relURL(p.Slug, next.Slug)}
+			v.Next = &navItem{Title: next.Title, Href: b.rel(p.Slug, next.Slug)}
 		}
 		if err := b.execute(p.Slug+"/index.html", v); err != nil {
 			return err
 		}
 	}
 	notFound := &built{Page: &Page{Title: "Page not found"}, HTML: template.HTML(
-		`<h1>Page not found</h1><p>This page does not exist. Try the search above, or go to the <a href="./">home page</a>.</p>`)}
+		`<h1>Page not found</h1><p>This page does not exist. Try the search above, or go to the <a href="` + b.rel("", "") + `">home page</a>.</p>`)}
 	v := b.view(notFound, brand)
 	v.NotFound = true
 	if err := b.execute("404.html", v); err != nil {
@@ -135,7 +135,7 @@ func (b *builder) view(p *built, brand string) *view {
 	root := rootPrefix(p.Slug)
 	v := &view{
 		Site: b.site, Page: p, Root: root, Links: b.site.Links,
-		Home: relURL(p.Slug, ""), Brand: template.CSS(brand),
+		Home: b.rel(p.Slug, ""), Brand: template.CSS(brand),
 		Head: template.HTML(b.site.HeadHTML), CustomCSS: len(b.site.CustomCSS) > 0,
 		Mermaid: p.mermaid,
 	}
@@ -153,7 +153,7 @@ func (b *builder) view(p *built, brand string) *view {
 		v.Footer = template.HTML(render.Inline(b.site.Footer))
 	}
 	if b.site.SiteURL != "" && !v.NotFound {
-		v.Canonical = strings.TrimSuffix(b.site.SiteURL, "/") + "/" + urlOf(p.Slug)
+		v.Canonical = strings.TrimSuffix(b.site.SiteURL, "/") + "/" + b.url(p.Slug)
 	}
 	if p.Updated != "" {
 		v.Updated = p.Updated
@@ -185,7 +185,7 @@ func (b *builder) nav(current *built) []navGroup {
 			groups = append(groups, navGroup{Title: title})
 		}
 		g := &groups[len(groups)-1]
-		g.Items = append(g.Items, navItem{Title: p.Title, Href: relURL(current.Slug, p.Slug), Active: p == current})
+		g.Items = append(g.Items, navItem{Title: p.Title, Href: b.rel(current.Slug, p.Slug), Active: p == current})
 	}
 	return groups
 }
@@ -242,7 +242,7 @@ func (b *builder) sitemap() error {
 	var buf bytes.Buffer
 	buf.WriteString(`<?xml version="1.0" encoding="UTF-8"?>` + "\n" + `<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">` + "\n")
 	for _, p := range b.pages {
-		fmt.Fprintf(&buf, "  <url><loc>%s%s</loc>", template.HTMLEscapeString(base), template.HTMLEscapeString(urlOf(p.Slug)))
+		fmt.Fprintf(&buf, "  <url><loc>%s%s</loc>", template.HTMLEscapeString(base), template.HTMLEscapeString(b.url(p.Slug)))
 		if p.Updated != "" {
 			fmt.Fprintf(&buf, "<lastmod>%s</lastmod>", p.Updated)
 		}

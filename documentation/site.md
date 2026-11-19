@@ -120,6 +120,7 @@ footer: "© Acme. [Status](https://status.acme.dev)"   # Markdown
 site_url: https://docs.acme.dev  # adds canonical URLs and sitemap.xml
 source_links: true               # link to the code; only if readers can open the repository
 citations: short                 # short (default), full, or hidden
+urls: pretty                     # pretty (guides/setup/) or files (guides/setup/index.html)
 show_authors: true               # "Last updated by Jane on …"
 allow_html: false                # raw HTML in pages is escaped unless true
 ```
@@ -136,6 +137,10 @@ With `source_links: true` and a `source_url` on GitHub or GitLab, each page gets
 ## Code and diagrams
 
 Fenced code blocks get a copy button and syntax highlighting for common languages, including shell, JavaScript, TypeScript, Python, Go, SQL, YAML, JSON, and Dockerfile. A `mermaid` block becomes a diagram; the Mermaid library is written only when some page uses it, and only those pages load it.
+
+## Publishing
+
+Where the site is served, and how to serve it from your own app, is covered in [Publishing the site](publishing.md).
 
 ## Output folder
 

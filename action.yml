@@ -1,11 +1,17 @@
-name: indoc check
-description: Fail when documentation no longer matches the code.
+name: indoc
+description: Fail when documentation no longer matches the code, or build the docs site.
 author: byabasaija
 branding:
   icon: book-open
   color: blue
 
 inputs:
+  command:
+    description: "check (default) fails when docs no longer match the code; bundle builds the site."
+    default: check
+  out:
+    description: "bundle only: the folder to build the site into. Defaults to output_dir from the config."
+    default: ""
   mode:
     description: "default fails on stale, broken, and unrecorded pages; strict also fails on drift; warn reports without failing."
     default: default
@@ -50,12 +56,22 @@ runs:
         tar -xzf "$dir/$archive" -C "$dir" indoc
         echo "$dir" >> "$GITHUB_PATH"
 
-    - name: Check docs
+    - name: Run indoc
       shell: bash
       working-directory: ${{ inputs.working-directory }}
       env:
+        COMMAND: ${{ inputs.command }}
+        OUT: ${{ inputs.out }}
         MODE: ${{ inputs.mode }}
       run: |
+        if [ "$COMMAND" = bundle ]; then
+          if [ -n "$OUT" ]; then indoc bundle --out "$OUT"; else indoc bundle; fi
+          exit 0
+        fi
+        if [ "$COMMAND" != check ]; then
+          echo "indoc: command must be check or bundle, got $COMMAND" >&2
+          exit 1
+        fi
         case "$MODE" in
           strict) indoc check --strict ;;
           warn) indoc check --warn ;;

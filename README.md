@@ -105,6 +105,7 @@ The script verifies the download against the release checksums. Or use Go (`go i
 indoc init       # create .indoc/config.yaml
 indoc preview    # live site on localhost while you write
 indoc bundle     # build the site, record pages as verified
+indoc publish    # GitHub Pages, a static host, or served by your own app
 indoc check      # in CI: fail when docs no longer match the code
 ```
 
@@ -234,7 +235,7 @@ No. Only public signatures and cited symbols fail the check. Body changes are re
 indoc still tracks the files a page covers and reports any change as drift. Citations need a parser; open an issue with a real repository you'd like supported.
 
 **Where does the site go?**
-`.indoc/site/` by default, gitignored. Point `output_dir` at a folder your app or static host serves.
+Wherever you choose with `indoc publish`: GitHub Pages (it writes the deploy workflow), any static host, or your own app under a path like `/guide/`, public or login-only. For an app it prints tested code for Django, FastAPI, Flask, Express, NestJS, Next.js, Astro, or Go. See [Publishing the site](documentation/publishing.md).
 
 ## Contributing
 

@@ -55,6 +55,9 @@ type scanReport struct {
 	Map *projectmap.Map `json:"map"`
 	// Logo is appearance.logo from the config; empty when none is set.
 	Logo string `json:"logo"`
+	// Publish is the publish target (pages, host, app, none); empty when
+	// not chosen yet.
+	Publish string `json:"publish"`
 	// Files is the number of repository files; Parsed of those have a
 	// language parser and support path::Symbol citations.
 	Files  int `json:"files"`
@@ -83,6 +86,9 @@ func runScan(configPath string, out io.Writer, asJSON bool) error {
 	}
 	if a := p.cfg.Appearance; a != nil {
 		report.Logo = a.Logo
+	}
+	if p.cfg.Publish != nil {
+		report.Publish = p.cfg.Publish.Target
 	}
 	for _, f := range p.repo.Files {
 		if code.Parsable(f) {

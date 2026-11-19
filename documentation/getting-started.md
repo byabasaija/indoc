@@ -61,6 +61,14 @@ indoc bundle
 
 Preview it with `indoc preview`, which serves on `http://127.0.0.1:4173` and rebuilds when a page changes.
 
+## Publish
+
+```sh
+indoc publish --target pages            # or host, or app --path /guide/
+```
+
+saves where the docs are served and prints the steps: a GitHub Pages workflow, a static host's settings, or the code your web app needs. See [Publishing the site](publishing.md).
+
 ## Commit
 
 Commit `.indoc/config.yaml`, `.indoc/lock.json`, and your pages. The lock is what `indoc check` compares against in CI.

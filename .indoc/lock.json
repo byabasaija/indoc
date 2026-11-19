@@ -2,7 +2,7 @@
   "version": 1,
   "pages": {
     "documentation/accuracy.md": {
-      "page": "fe0f31e492aad7e1",
+      "page": "c62d6b8e12429c40",
       "citations": {
         "tools/replay/main.go::main": {
           "surface": "d9d99ddd4952251a",
@@ -100,24 +100,24 @@
       }
     },
     "documentation/agents.md": {
-      "page": "c08a7e1aae00c498",
+      "page": "a2df19b55fdedc1e",
       "citations": {
         "internal/cli/mcp.go::mcpServer": {
           "surface": "9a5340343b623d99",
-          "body": "1e9965d8e8e8f8dc",
-          "raw": "cacde6b5d8bf33e1",
+          "body": "f328662b6a09a1c9",
+          "raw": "e2a9301267833c80",
           "hasher": "go/2"
         },
         "internal/cli/mcp.go::setLogo": {
           "surface": "b742c192766d29cd",
           "body": "cc967b6f6735bbf4",
-          "raw": "cacde6b5d8bf33e1",
+          "raw": "e2a9301267833c80",
           "hasher": "go/2"
         },
         "internal/cli/mcp.go::setup": {
           "surface": "edddf1d25b166fce",
           "body": "0bfae943ab8f8106",
-          "raw": "cacde6b5d8bf33e1",
+          "raw": "e2a9301267833c80",
           "hasher": "go/2"
         },
         "internal/mcp/mcp.go::Server.Serve": {
@@ -129,7 +129,7 @@
       },
       "sources": {
         "internal/cli/mcp.go": {
-          "body": "e11b5cb363c24760",
+          "body": "9ea24e400e65d912",
           "symbols": {
             "failed": "e2d8ad0f8686e095",
             "init": "c78f10468427bc77",
@@ -139,9 +139,10 @@
             "setLogo": "b742c192766d29cd",
             "setup": "edddf1d25b166fce",
             "toolAck": "42ce2831f7f94ddc",
-            "toolArgs": "8935ed23eff2add2",
+            "toolArgs": "74a1e9887b8142e9",
             "toolBundle": "b7b189252a902197",
             "toolCheck": "520a6a0ff0e78eef",
+            "toolPublish": "ccdba7360c9b8d59",
             "toolScan": "8a5357d04f22f339",
             "toolSetup": "c8f8a8077adb524b"
           },
@@ -157,10 +158,11 @@
             "toolArgs",
             "toolBundle",
             "toolCheck",
+            "toolPublish",
             "toolScan",
             "toolSetup"
           ],
-          "raw": "cacde6b5d8bf33e1",
+          "raw": "e2a9301267833c80",
           "hasher": "go/2"
         },
         "internal/mcp/mcp.go": {
@@ -214,8 +216,8 @@
           "hasher": "bytes"
         },
         "plugin/skills/indoc/SKILL.md": {
-          "body": "cb671a78db1009de",
-          "raw": "cb671a78db1009de",
+          "body": "65cb574ee5c73eb2",
+          "raw": "65cb574ee5c73eb2",
           "hasher": "bytes"
         }
       }
@@ -367,12 +369,12 @@
       }
     },
     "documentation/getting-started.md": {
-      "page": "a5b4333b92310d8b",
+      "page": "5301545255c5f549",
       "citations": {
         "internal/cli/bundle.go::runBundle": {
           "surface": "afbcb60d55daccfa",
           "body": "4c33e356e3345660",
-          "raw": "20e8d94e23b604da",
+          "raw": "8f9aba08f80864c1",
           "hasher": "go/2"
         },
         "internal/cli/init.go::runInit": {
@@ -384,13 +386,13 @@
         "internal/config/config.go::InferProjectName": {
           "surface": "665df7f08f982cfb",
           "body": "7b074de3acb70fe3",
-          "raw": "a9ef6bcc93002419",
+          "raw": "81780ef37cf9d73b",
           "hasher": "go/2"
         }
       },
       "sources": {
         "internal/cli/bundle.go": {
-          "body": "f9bd410876607f8b",
+          "body": "097a2727995bf47c",
           "symbols": {
             "buildSite": "a025c648708f8f48",
             "citationLink": "840bb03b38bba364",
@@ -419,7 +421,7 @@
             "splitSource",
             "verified"
           ],
-          "raw": "20e8d94e23b604da",
+          "raw": "8f9aba08f80864c1",
           "hasher": "go/2"
         },
         "internal/cli/init.go": {
@@ -440,19 +442,23 @@
           "hasher": "go/2"
         },
         "internal/config/config.go": {
-          "body": "714276701a2cba3c",
+          "body": "787ec1596bb0e6e3",
           "symbols": {
-            "Config": "78d34c40eca4b5d4",
+            "Config": "d06bba2c1bdad9a8",
             "Config.CitationStyle": "9967250f66762b25",
+            "Config.FileURLs": "dee92f60cf4fc410",
             "Config.PublicLink": "32a14e389e082600",
             "Config.Save": "ab4c717e8f3c6e18",
             "Config.SourceLink": "d0269e979316b6e1",
+            "Config.Validate": "468add9a2e54c5af",
+            "Config.validatePublishing": "97609fe2ef7fe09a",
             "Default": "fcba8035c4318c9d",
             "InferProjectName": "665df7f08f982cfb",
             "InferSourceURL": "357e1bd6b502cadd",
             "Link": "9941900250d55bc4",
             "Load": "7988a8d596a72425",
             "Paths": "76140627bde13cc5",
+            "Publish": "2045874059627c18",
             "Resolve": "dbdc0ac20bbad50d",
             "contains": "ff1822e7196e7478",
             "goModuleName": "dafb094673af3a2d",
@@ -461,13 +467,14 @@
             "sourceTemplate": "16f7771317498873"
           },
           "private": [
+            "Config.validatePublishing",
             "contains",
             "goModuleName",
             "packageJSONName",
             "pyprojectName",
             "sourceTemplate"
           ],
-          "raw": "a9ef6bcc93002419",
+          "raw": "81780ef37cf9d73b",
           "hasher": "go/2"
         },
         "internal/config/config_test.go": {
@@ -602,6 +609,61 @@
             "newFixture"
           ],
           "raw": "8b21f526cf53a26f",
+          "hasher": "go/2"
+        }
+      }
+    },
+    "documentation/publishing.md": {
+      "page": "bb06b4800d3a95f3",
+      "citations": {
+        "internal/cli/publish.go::runPublish": {
+          "surface": "eacfb7bd4de6db52",
+          "body": "993b92b9cc739a55",
+          "raw": "070b488d9b28436d",
+          "hasher": "go/2"
+        }
+      },
+      "sources": {
+        "action.yml": {
+          "body": "843c45db2a112c0a",
+          "raw": "843c45db2a112c0a",
+          "hasher": "bytes"
+        },
+        "internal/cli/publish.go": {
+          "body": "c3167b27bfb8aa0c",
+          "symbols": {
+            "appFramework": "8f460b487a4432c2",
+            "appGlue": "598f1970bc2e9e80",
+            "defaultBranch": "5dca12b61f52168b",
+            "framework": "01b253e09d2ee42e",
+            "indent": "00d255c09d024030",
+            "init": "c78f10468427bc77",
+            "installLine": "91a0ec6dcb7445bb",
+            "normalizePath": "6e35bb15b7cc9e6f",
+            "pagesWorkflowYAML": "a78155f72309f4e7",
+            "publishApp": "75616ac0b9165544",
+            "publishHost": "b1595f75c8309ce8",
+            "publishPages": "982a234946741208",
+            "releaseTag": "8d260e69950a0434",
+            "runPublish": "eacfb7bd4de6db52"
+          },
+          "private": [
+            "appFramework",
+            "appGlue",
+            "defaultBranch",
+            "framework",
+            "indent",
+            "init",
+            "installLine",
+            "normalizePath",
+            "pagesWorkflowYAML",
+            "publishApp",
+            "publishHost",
+            "publishPages",
+            "releaseTag",
+            "runPublish"
+          ],
+          "raw": "070b488d9b28436d",
           "hasher": "go/2"
         }
       }
@@ -1124,24 +1186,24 @@
       }
     },
     "documentation/site.md": {
-      "page": "0e22d99bd59d4c3a",
+      "page": "751b2e663f286017",
       "citations": {
         "internal/cli/bundle.go::editLink": {
           "surface": "7c023cbaf4f922aa",
           "body": "5ab551982e7c7030",
-          "raw": "20e8d94e23b604da",
+          "raw": "8f9aba08f80864c1",
           "hasher": "go/2"
         },
         "internal/cli/bundle.go::gitLastChange": {
           "surface": "4c7a4daf2cb930a4",
           "body": "2dc4c2511680d66f",
-          "raw": "20e8d94e23b604da",
+          "raw": "8f9aba08f80864c1",
           "hasher": "go/2"
         },
         "internal/cli/bundle.go::siteFor": {
           "surface": "3a09b09748126992",
-          "body": "7c817bf379538660",
-          "raw": "20e8d94e23b604da",
+          "body": "58d7c5e7ef582838",
+          "raw": "8f9aba08f80864c1",
           "hasher": "go/2"
         },
         "internal/pages/pages.go::Hero": {
@@ -1159,13 +1221,13 @@
         "internal/site/site.go::Build": {
           "surface": "b40cda3ec9f95359",
           "body": "d8620248c3acc27f",
-          "raw": "f7d4b17dfa48f2da",
+          "raw": "80c8bf0262ae2c94",
           "hasher": "go/2"
         }
       },
       "sources": {
         "internal/cli/bundle.go": {
-          "body": "f9bd410876607f8b",
+          "body": "097a2727995bf47c",
           "symbols": {
             "buildSite": "a025c648708f8f48",
             "citationLink": "840bb03b38bba364",
@@ -1194,7 +1256,7 @@
             "splitSource",
             "verified"
           ],
-          "raw": "20e8d94e23b604da",
+          "raw": "8f9aba08f80864c1",
           "hasher": "go/2"
         },
         "internal/pages/pages.go": {
@@ -1280,13 +1342,13 @@
           "hasher": "javascript/44c892e0be05/2"
         },
         "internal/site/site.go": {
-          "body": "4952d2f17d127fcd",
+          "body": "88e0b4708079c247",
           "symbols": {
             "Build": "b40cda3ec9f95359",
             "Link": "d7c60ea0d7835f63",
             "Page": "0593cd73016047c0",
             "Ref": "eb6e62f39e57b8a2",
-            "Site": "6127c0a159b68927",
+            "Site": "107088b92171e40b",
             "builder": "87e1504af65bd86b",
             "builder.assets": "b4ec11e7fdd7703b",
             "builder.categoryRank": "ae8d547a37e17bc1",
@@ -1296,11 +1358,13 @@
             "builder.isFolder": "358eaf71304af29f",
             "builder.less": "72cd38f41843868f",
             "builder.plan": "968c7118e062ba41",
+            "builder.rel": "58893254868edefc",
             "builder.render": "bdd8cf3c89def1e3",
             "builder.renderSections": "893fd410d409f585",
             "builder.resolveImage": "9bd21065e7021313",
             "builder.resolveLink": "35658f81ca7efb9d",
             "builder.searchIndex": "b866e3a29a08428f",
+            "builder.url": "9b3db7992be90541",
             "built": "aaaf7faedc67a308",
             "commonDir": "acbb3d0fb641a90f",
             "humanize": "a8e40962f5500bfa",
@@ -1308,12 +1372,10 @@
             "pageLess": "b0681c15b476cd81",
             "rank": "475c17380f316fbf",
             "refText": "eb4d031f6f68518b",
-            "relURL": "28519d825dddf49d",
             "rootPrefix": "748b4484d23b165a",
             "searchEntry": "8703558b8e9c913f",
             "section": "45bf258f622827cd",
             "slugPath": "cbd6507c802f6c4b",
-            "urlOf": "d501530eafb4f60d",
             "writer": "b9796fdf4c482343",
             "writer.finish": "5d267f2d478cfe6d",
             "writer.write": "cb9a3612c7be96f6"
@@ -1328,11 +1390,13 @@
             "builder.isFolder",
             "builder.less",
             "builder.plan",
+            "builder.rel",
             "builder.render",
             "builder.renderSections",
             "builder.resolveImage",
             "builder.resolveLink",
             "builder.searchIndex",
+            "builder.url",
             "built",
             "commonDir",
             "humanize",
@@ -1340,22 +1404,21 @@
             "pageLess",
             "rank",
             "refText",
-            "relURL",
             "rootPrefix",
             "searchEntry",
             "section",
             "slugPath",
-            "urlOf",
             "writer",
             "writer.finish",
             "writer.write"
           ],
-          "raw": "f7d4b17dfa48f2da",
+          "raw": "80c8bf0262ae2c94",
           "hasher": "go/2"
         },
         "internal/site/site_test.go": {
-          "body": "9c07332d1c8400f5",
+          "body": "aa11a0bbd8713df7",
           "symbols": {
+            "TestFileURLs": "8f43e7080e6d9fd0",
             "TestLanding": "3c18404c6fab744f",
             "TestLandingSectionErrors": "06dd8fc4274b866e",
             "TestLandingSectionOrder": "a28d5ceb15496e83",
@@ -1377,7 +1440,7 @@
             "exists",
             "read"
           ],
-          "raw": "723ad5eccb7ad86f",
+          "raw": "8698044bed8c3488",
           "hasher": "go/2"
         },
         "internal/site/templates/page.html": {
@@ -1386,7 +1449,7 @@
           "hasher": "bytes"
         },
         "internal/site/write.go": {
-          "body": "194a219e4d0c152c",
+          "body": "3c4c37fbb3021239",
           "symbols": {
             "action": "7dbbf684e45c7f1e",
             "builder.execute": "e3d06716413fa76a",
@@ -1413,7 +1476,7 @@
             "navItem",
             "view"
           ],
-          "raw": "26590cc16f150bdc",
+          "raw": "f8a7e777ff6eeee0",
           "hasher": "go/2"
         }
       }

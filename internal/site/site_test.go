@@ -295,3 +295,21 @@ func TestURLCollisions(t *testing.T) {
 		t.Errorf("no collision: %v", err)
 	}
 }
+
+func TestFileURLs(t *testing.T) {
+	s := basicSite(t)
+	s.FileURLs = true
+	out := build(t, s)
+	setup := read(t, out, "guides/setup/index.html")
+	for _, want := range []string{`href="../../index.html"`, `href="../../faq/index.html"`} {
+		if !strings.Contains(setup, want) {
+			t.Errorf("file URL %s missing", want)
+		}
+	}
+	if !strings.Contains(read(t, out, "index.html"), `href="guides/setup/index.html#install"`) {
+		t.Error("markdown link not rewritten to a file URL")
+	}
+	if !strings.Contains(read(t, out, "assets/search-index.js"), `"guides/setup/index.html"`) {
+		t.Error("search index uses folder URLs")
+	}
+}

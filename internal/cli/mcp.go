@@ -89,14 +89,27 @@ func mcpServer() *mcp.Server {
 				Idempotent:  true,
 				Handler:     toolBundle,
 			},
+			{
+				Name: "indoc_publish", Title: "Choose where the docs are served",
+				Description: "Record where the docs site is served and return how to wire it up. target: pages (GitHub Pages; writes .github/workflows/indoc-pages.yml), host (Netlify, Vercel, Cloudflare Pages, S3), app (served by this project's web app at path, with access public or login; returns code for the detected framework for you to add to the app), or none. Ask the user before calling it. Without arguments, returns the instructions for the current target.",
+				InputSchema: obj(map[string]any{
+					"target": map[string]any{"type": "string", "enum": []string{"pages", "host", "app", "none"}},
+					"path":   map[string]any{"type": "string", "description": "app: URL path, such as /guide/. Avoid paths the app already uses."},
+					"access": map[string]any{"type": "string", "enum": []string{"public", "login"}, "description": "app: login serves the docs to signed-in users only (staff in Django)."},
+				}),
+				Handler: toolPublish,
+			},
 		},
 	}
 }
 
 type toolArgs struct {
-	Root  string   `json:"root"`
-	Pages []string `json:"pages"`
-	Logo  string   `json:"logo"`
+	Root   string   `json:"root"`
+	Pages  []string `json:"pages"`
+	Logo   string   `json:"logo"`
+	Target string   `json:"target"`
+	Path   string   `json:"path"`
+	Access string   `json:"access"`
 	// SourceLinks is a pointer so "not given" differs from false.
 	SourceLinks *bool `json:"source_links"`
 	Strict      bool  `json:"strict"`
@@ -215,6 +228,18 @@ func setLogo(cfgPath, logo string) error {
 	}
 	cfg.Appearance.Logo = logo
 	return cfg.Save(cfgPath)
+}
+
+func toolPublish(raw json.RawMessage) (string, any, bool) {
+	a, cfgPath, err := parseArgs(raw)
+	if err != nil {
+		return failed(err)
+	}
+	var out bytes.Buffer
+	if err := runPublish(cfgPath, &out, a.Target, a.Path, a.Access); err != nil {
+		return failed(err)
+	}
+	return out.String(), nil, false
 }
 
 func toolScan(raw json.RawMessage) (string, any, bool) {

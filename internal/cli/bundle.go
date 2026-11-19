@@ -157,6 +157,7 @@ func siteFor(p *project, sections []doc.RefSection) *site.Site {
 		SiteURL:     p.cfg.SiteURL,
 		AllowHTML:   p.cfg.AllowHTML,
 		ShowAuthors: p.cfg.ShowAuthors,
+		FileURLs:    p.cfg.FileURLs(),
 		RepoRoot:    p.paths.Root,
 		Reference:   sections,
 	}

@@ -58,7 +58,35 @@ type Config struct {
 	ShowAuthors bool `yaml:"show_authors,omitempty"`
 	// AllowHTML passes raw HTML in pages through. Off by default.
 	AllowHTML bool `yaml:"allow_html,omitempty"`
+	// URLs is how pages link to each other: pretty (guides/setup/, the
+	// default) needs a server that serves a folder's index.html; files
+	// (guides/setup/index.html) works on any server and from disk.
+	URLs string `yaml:"urls,omitempty"`
+	// Publish records where the site is served; see `indoc publish`.
+	Publish *Publish `yaml:"publish,omitempty"`
 }
+
+// Publish is where the docs live.
+type Publish struct {
+	// Target: pages (GitHub Pages), host (any static host), app (served by
+	// the project's own web app), or none.
+	Target string `yaml:"target"`
+	// Path is the URL path in the app, such as /guide/.
+	Path string `yaml:"path,omitempty"`
+	// Access in the app: public, or login (only signed-in users; staff
+	// users in Django).
+	Access string `yaml:"access,omitempty"`
+}
+
+// PublishTargets and PublishAccess are the valid values.
+var (
+	PublishTargets = []string{"pages", "host", "app", "none"}
+	PublishAccess  = []string{"public", "login"}
+	URLStyles      = []string{"pretty", "files"}
+)
+
+// FileURLs reports whether pages link as guides/setup/index.html.
+func (c *Config) FileURLs() bool { return c.URLs == "files" }
 
 // Link is a header link.
 type Link struct {
@@ -193,6 +221,9 @@ func Load(path string) (*Config, error) {
 	if err := yaml.Unmarshal(data, cfg); err != nil {
 		return nil, fmt.Errorf("parse %s: %w", path, err)
 	}
+	if err := cfg.validatePublishing(); err != nil {
+		return nil, fmt.Errorf("%s: %w", path, err)
+	}
 	if cfg.Citations != "" && !contains(CitationStyles, cfg.Citations) {
 		return nil, fmt.Errorf("%s: citations must be one of %s, got %q", path, strings.Join(CitationStyles, ", "), cfg.Citations)
 	}
@@ -296,4 +327,35 @@ func contains(list []string, s string) bool {
 		}
 	}
 	return false
+}
+
+// Validate checks the settings that have a fixed set of values.
+func (c *Config) Validate() error {
+	if err := c.validatePublishing(); err != nil {
+		return err
+	}
+	if c.Citations != "" && !contains(CitationStyles, c.Citations) {
+		return fmt.Errorf("citations must be one of %s, got %q", strings.Join(CitationStyles, ", "), c.Citations)
+	}
+	return nil
+}
+
+func (c *Config) validatePublishing() error {
+	if c.URLs != "" && !contains(URLStyles, c.URLs) {
+		return fmt.Errorf("urls must be one of %s, got %q", strings.Join(URLStyles, ", "), c.URLs)
+	}
+	p := c.Publish
+	if p == nil {
+		return nil
+	}
+	if !contains(PublishTargets, p.Target) {
+		return fmt.Errorf("publish.target must be one of %s, got %q", strings.Join(PublishTargets, ", "), p.Target)
+	}
+	if p.Access != "" && !contains(PublishAccess, p.Access) {
+		return fmt.Errorf("publish.access must be one of %s, got %q", strings.Join(PublishAccess, ", "), p.Access)
+	}
+	if p.Target == "app" && !strings.HasPrefix(p.Path, "/") {
+		return fmt.Errorf("publish.path must start with / (for example /guide/), got %q", p.Path)
+	}
+	return nil
 }

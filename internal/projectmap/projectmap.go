@@ -215,12 +215,21 @@ var dependencyMarkers = []struct{ dep, name string }{
 	{"djangorestframework", "Django REST framework"}, {"django", "Django"}, {"fastapi", "FastAPI"},
 	{"flask", "Flask"}, {"celery", "Celery"}, {"pydantic", "Pydantic"}, {"click", "Click"}, {"typer", "Typer"},
 	{"next", "Next.js"}, {"express", "Express"}, {"@nestjs/core", "NestJS"}, {"react", "React"},
-	{"vue", "Vue"}, {"svelte", "Svelte"},
+	{"vue", "Vue"}, {"svelte", "Svelte"}, {"astro", "Astro"},
 	{"github.com/spf13/cobra", "Cobra"}, {"github.com/gin-gonic/gin", "Gin"}, {"github.com/labstack/echo", "Echo"},
 	{"github.com/go-chi/chi", "chi"}, {"github.com/gofiber/fiber", "Fiber"},
 }
 
 var depToken = regexp.MustCompile(`[A-Za-z0-9_.@/-]+`)
+
+// Frameworks lists the frameworks a repository uses, most specific first.
+func Frameworks(root string, files []string) []string {
+	set := map[string]bool{}
+	for _, f := range files {
+		set[f] = true
+	}
+	return frameworks(root, set)
+}
 
 func frameworks(root string, files map[string]bool) []string {
 	deps := map[string]bool{}
