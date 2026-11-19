@@ -8,6 +8,7 @@ Want something here sooner? [Open an issue](https://github.com/byabasaija/indoc/
 
 | Version | What it added |
 |---|---|
+| **0.6** | `indoc publish`: GitHub Pages, static hosts, or served by your app with tested code for Django, FastAPI, Flask, Express, NestJS, Next.js, Astro, and Go; `.indoc/theme/` with replaceable parts; more `appearance:` settings; hand edits to the output are caught, not overwritten |
 | **0.5** | Citations show as symbol names with a "Checked against the code" box; `citations: short \| full \| hidden`; links to the code opt-in (`source_links`); pages at the same URL refused; outlines organized by purpose |
 | **0.4** | The agent asks which logo to use and proposes a landing page on the first run; ordered landing `sections:` with a contributors wall, a logos row, and full-width Markdown blocks |
 | **0.3** | New pages go in `documentation/`, so plans and agent notes in `docs/` are never mixed in or published; a `curl \| sh` installer (0.3.1) |

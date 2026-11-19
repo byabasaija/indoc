@@ -3,8 +3,11 @@ project_name: indoc
 pages:
     - documentation/**/*.md
 output_dir: .indoc/site
-source_url: https://github.com/byabasaija/indoc/blob/HEAD/{path}#L{line}
-source_links: true
 appearance:
     logo: design/logo.svg
+source_url: https://github.com/byabasaija/indoc/blob/HEAD/{path}#L{line}
+source_links: true
 footer: MIT licensed. Source on [GitHub](https://github.com/byabasaija/indoc).
+site_url: https://byabasaija.github.io/indoc/
+publish:
+    target: pages

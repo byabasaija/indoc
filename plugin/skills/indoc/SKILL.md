@@ -117,7 +117,7 @@ Call `indoc_check`. For each finding:
 
 1. Call `indoc_bundle`. Fix any broken citations it reports and call it again.
 2. Call `indoc_check`; `failing` must be 0.
-3. Tell the user where the site was written (default `.indoc/site/`) and that opening its `index.html` in a browser works without a server; with the `indoc` command installed, `indoc preview` serves it and rebuilds on every edit. `.indoc/config.yaml`, `.indoc/lock.json`, and the pages should be committed. Suggest adding `indoc check` to CI with the GitHub Action (`uses: byabasaija/indoc@v0.5.0`).
+3. Tell the user where the site was written (default `.indoc/site/`) and that opening its `index.html` in a browser works without a server; with the `indoc` command installed, `indoc preview` serves it and rebuilds on every edit. `.indoc/config.yaml`, `.indoc/lock.json`, and the pages should be committed. Suggest adding `indoc check` to CI with the GitHub Action (`uses: byabasaija/indoc@v0.6.0`).
 
 ## 6. Change the look
 

@@ -19,7 +19,7 @@
   <a href="#quick-start">Quick start</a> ·
   <a href="#how-it-works">How it works</a> ·
   <a href="#indoc-vs-docusaurus-and-mkdocs">Compared to Docusaurus</a> ·
-  <a href="documentation/getting-started.md">Docs</a> ·
+  <a href="https://byabasaija.github.io/indoc/">Docs</a> ·
   <a href="documentation/accuracy.md">Accuracy</a> ·
   <a href="ROADMAP.md">Roadmap</a>
 </p>
@@ -48,6 +48,8 @@ Error: docs do not match the code
 ```
 
 Your coding agent writes the pages. indoc checks them. indoc never calls an AI model and needs no API key.
+
+📖 **Documentation: [byabasaija.github.io/indoc](https://byabasaija.github.io/indoc/)**, built and checked by indoc itself.
 
 ## Why indoc
 
@@ -86,7 +88,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: byabasaija/indoc@v0.5.0
+      - uses: byabasaija/indoc@v0.6.0
         # with:
         #   mode: warn   # report without failing while you try it out
 ```
