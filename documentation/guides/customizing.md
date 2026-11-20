@@ -9,7 +9,7 @@ sources:
 
 # Customizing the site
 
-`indoc bundle` writes one pre-rendered HTML file per page (`internal/site/site.go::Build`). Pages read fine without JavaScript; scripts only add search, the theme toggle, copy buttons on code blocks, syntax highlighting, diagrams, and the GitHub star count. Links are relative, so the folder works from any path, any static host, or straight from disk.
+`indoc bundle` writes one pre-rendered HTML file per page (`internal/site/site.go::Build`). Pages read fine without JavaScript; scripts only add search, the theme toggle, copy buttons on code blocks, syntax highlighting, diagrams, and the GitHub repository card in the header (the repository name always shows; its latest release, stars, and forks load from GitHub in the reader's browser). Links are relative, so the folder works from any path, any static host, or straight from disk.
 
 ## Structure
 
@@ -105,7 +105,7 @@ sections:
 | `contributors` | The repository's contributors as avatars, linking to their profiles. `repo: owner/repo` defaults to the GitHub repository in `source_url`. |
 | `logos` | A row of logos, such as companies using the project, muted until hovered. |
 
-`contributors` loads from GitHub's API in the reader's browser, like the star count, so `bundle` stays offline and deterministic. Bots are left out. Without JavaScript, or when GitHub's rate limit is reached, the block still links to the contributors page. Mistakes such as an unknown block type or a missing logo image stop the build with the page and section named (`internal/site/site.go::Build`).
+`contributors` loads from GitHub's API in the reader's browser, like the repository card in the header, so `bundle` stays offline and deterministic. Bots are left out. Without JavaScript, or when GitHub's rate limit is reached, the block still links to the contributors page. Mistakes such as an unknown block type or a missing logo image stop the build with the page and section named (`internal/site/site.go::Build`).
 
 ### Recipes
 

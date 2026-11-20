@@ -1,6 +1,6 @@
 // indoc site behavior. Pages are complete without it; this adds the theme
 // toggle, mobile navigation, search, copy buttons, syntax highlighting,
-// diagrams, the active table-of-contents entry, and the GitHub star count.
+// diagrams, the active table-of-contents entry, and the GitHub repository card.
 (function () {
   "use strict";
   var root = document.body.getAttribute("data-root") || "";
@@ -154,26 +154,54 @@
     document.querySelectorAll(".prose h2[id], .prose h3[id]").forEach(function (h) { observer.observe(h); });
   }
 
-  // GitHub star count, cached for the session
+  // GitHub repository card: latest release, stars, forks. Fetched in the
+  // browser so builds stay offline, cached for the session (the API allows
+  // 60 anonymous requests an hour). Without JavaScript or GitHub, the card
+  // shows the repository name only.
   var gh = document.querySelector("[data-repo]");
   if (gh && window.fetch) {
     var repo = gh.getAttribute("data-repo");
-    var show = function (n) {
-      var el = gh.querySelector(".stars");
-      if (!el || typeof n !== "number" || !(n > 0)) return;
-      el.textContent = n >= 1000 ? (n / 1000).toFixed(n >= 10000 ? 0 : 1) + "k" : String(n);
-      el.hidden = false;
+    var key = "indoc-repo-" + repo;
+    var count = function (n) {
+      return n >= 1000 ? (n / 1000).toFixed(n >= 10000 ? 0 : 1).replace(/\.0$/, "") + "k" : String(n);
+    };
+    var show = function (d) {
+      var any = false;
+      var set = function (name, text) {
+        var el = gh.querySelector('[data-stat="' + name + '"]');
+        if (!el || !text) return;
+        el.lastChild.textContent = text;
+        el.hidden = false;
+        any = true;
+      };
+      set("version", d.version ? String(d.version).replace(/^v(?=\d)/, "") : "");
+      set("stars", d.stars > 0 ? count(d.stars) : "");
+      set("forks", d.forks > 0 ? count(d.forks) : "");
+      var stats = gh.querySelector(".repo-stats");
+      if (stats && any) stats.hidden = false;
+      var old = gh.querySelector(".stars"); // a header part ejected from an earlier version
+      if (old && d.stars > 0) { old.textContent = count(d.stars); old.hidden = false; }
+    };
+    var json = function (url) {
+      return fetch(url).then(function (r) { return r.ok ? r.json() : null; }).catch(function () { return null; });
     };
     var cached = null;
-    try { cached = sessionStorage.getItem("indoc-stars-" + repo); } catch (e) {}
-    if (cached !== null) {
-      show(Number(cached));
+    try { cached = JSON.parse(sessionStorage.getItem(key) || "null"); } catch (e) {}
+    if (cached) {
+      show(cached);
     } else {
-      fetch("https://api.github.com/repos/" + repo).then(function (r) { return r.ok ? r.json() : null; }).then(function (d) {
-        if (!d) return;
-        try { sessionStorage.setItem("indoc-stars-" + repo, d.stargazers_count); } catch (e) {}
-        show(d.stargazers_count);
-      }).catch(function () {});
+      var api = "https://api.github.com/repos/" + repo;
+      json(api).then(function (info) {
+        if (!info) return;
+        return json(api + "/releases/latest").then(function (rel) {
+          if (rel && rel.tag_name) return rel.tag_name;
+          return json(api + "/tags?per_page=1").then(function (tags) { return tags && tags[0] ? tags[0].name : ""; });
+        }).then(function (version) {
+          var d = { version: version, stars: info.stargazers_count, forks: info.forks_count };
+          try { sessionStorage.setItem(key, JSON.stringify(d)); } catch (e) {}
+          show(d);
+        });
+      });
     }
   }
 

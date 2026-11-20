@@ -2,7 +2,7 @@
 // file per page, readable without JavaScript, with relative links so it works
 // from any path, a static host, or file://. JavaScript only adds search, the
 // theme toggle, copy buttons, syntax highlighting, diagrams, and the GitHub
-// star count.
+// repository card.
 package site
 
 import (
@@ -39,7 +39,7 @@ type Site struct {
 	Links       []Link
 	Footer      string // Markdown
 	SiteURL     string
-	Repo        string // "owner/repo" on GitHub, for the star count
+	Repo        string // "owner/repo" on GitHub, for the header repository card
 	AllowHTML   bool
 	CustomCSS   []byte
 	HeadHTML    string

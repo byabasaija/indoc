@@ -370,3 +370,21 @@ func TestFileURLs(t *testing.T) {
 		t.Error("search index uses folder URLs")
 	}
 }
+
+func TestRepoCard(t *testing.T) {
+	s := basicSite(t)
+	s.Repo = "acme/shop"
+	home := read(t, build(t, s), "index.html")
+	for _, want := range []string{
+		`data-repo="acme/shop"`,
+		`<span class="repo-name">acme/shop</span>`, // readable without JavaScript
+		`data-stat="version"`, `data-stat="stars"`, `data-stat="forks"`,
+	} {
+		if !strings.Contains(home, want) {
+			t.Errorf("header lacks %q", want)
+		}
+	}
+	if strings.Contains(read(t, build(t, basicSite(t)), "index.html"), "repo-name") {
+		t.Error("repo card shown without a repository")
+	}
+}

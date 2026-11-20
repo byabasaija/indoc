@@ -99,7 +99,7 @@ img { max-width: 100%; }
   backdrop-filter: saturate(180%) blur(8px);
   border-bottom: 1px solid var(--border-muted);
 }
-.brand { display: flex; align-items: center; gap: 10px; color: var(--fg); font-weight: 600; font-size: 17px; white-space: nowrap; }
+.brand { flex: none; display: flex; align-items: center; gap: 10px; color: var(--fg); font-weight: 600; font-size: 17px; white-space: nowrap; }
 .brand:hover { text-decoration: none; }
 .brand img { height: 28px; width: auto; }
 .menu-toggle, .theme-toggle {
@@ -118,7 +118,7 @@ img { max-width: 100%; }
   :root:not([data-theme="light"]) .theme-toggle .moon { display: none; }
 }
 
-.search { position: relative; flex: 0 1 520px; margin: 0 auto; }
+.search { position: relative; flex: 0 1 520px; min-width: 0; margin: 0 auto; }
 .search input {
   width: 100%; height: 40px; padding: 0 40px 0 38px;
   border: 1px solid var(--border-muted); border-radius: 10px;
@@ -148,8 +148,16 @@ img { max-width: 100%; }
 .header-links { display: flex; align-items: center; gap: 18px; white-space: nowrap; }
 .header-links a { color: var(--fg-muted); font-size: 15px; }
 .header-links a:hover { color: var(--fg); text-decoration: none; }
-.github { display: inline-flex; align-items: center; gap: 6px; }
-.github svg { width: 20px; height: 20px; fill: currentColor; stroke: none; }
+.github { display: inline-flex; align-items: center; gap: 10px; }
+.github .github-mark { flex: none; width: 30px; height: 30px; fill: var(--fg); stroke: none; }
+.github svg { fill: currentColor; stroke: none; }
+.repo { display: flex; flex-direction: column; justify-content: center; min-height: 34px; line-height: 1.25; }
+.repo-name { color: var(--fg); font-size: 14px; font-weight: 500; }
+.repo-stats { display: flex; gap: 12px; margin-top: 2px; color: var(--fg-muted); font-size: 13px; font-variant-numeric: tabular-nums; }
+.repo-stats[hidden], .repo-stat[hidden] { display: none; }
+.repo-stat { display: inline-flex; align-items: center; gap: 4px; }
+.repo-stat svg { width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+.github:hover .repo-name { color: var(--brand); }
 .stars { font-size: 13px; padding: 1px 8px; border: 1px solid var(--border); border-radius: 999px; }
 
 /* Layout */
@@ -391,6 +399,9 @@ img { max-width: 100%; }
   .menu-toggle { display: inline-flex; }
   .brand span { display: none; }
   .header-links a:not(.github) { display: none; }
+  .github .repo { display: none; }
+  .github .github-mark { width: 24px; height: 24px; }
+  .header-links, .theme-toggle { flex: none; }
   .search kbd { display: none; }
   .shell { display: block; }
   .sidebar {

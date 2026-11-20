@@ -611,7 +611,7 @@
       }
     },
     "documentation/guides/customizing.md": {
-      "page": "999b2a417675226b",
+      "page": "9eb58cc3a9608e28",
       "citations": {
         "internal/cli/bundle.go::editLink": {
           "surface": "7c023cbaf4f922aa",
@@ -652,13 +652,13 @@
         "internal/site/site.go::Build": {
           "surface": "b40cda3ec9f95359",
           "body": "b33d12e5510c42cc",
-          "raw": "d4ea43daef1cee17",
+          "raw": "743f236b6ac05d04",
           "hasher": "go/2"
         },
         "internal/site/site.go::Edited": {
           "surface": "85d34bc16cc74109",
           "body": "75f0a43570836e6e",
-          "raw": "d4ea43daef1cee17",
+          "raw": "743f236b6ac05d04",
           "hasher": "go/2"
         },
         "internal/site/theme.go::Outdated": {
@@ -755,18 +755,20 @@
           "hasher": "go/2"
         },
         "internal/site/assets/indoc.css": {
-          "body": "fe26d0431e5fc0d6",
-          "raw": "fe26d0431e5fc0d6",
+          "body": "b42e22a625a03b4a",
+          "raw": "b42e22a625a03b4a",
           "hasher": "bytes"
         },
         "internal/site/assets/indoc.js": {
-          "body": "b572c3aee2521256",
+          "body": "674d8a81f638077b",
           "symbols": {
             "copyText": "2156b8cd9c42e36d",
+            "count": "e3b0c44298fc1c14",
             "dark": "675dce303af63061",
             "draw": "e3b0c44298fc1c14",
             "escapeHTML": "fc635dba7d931de8",
             "highlight": "b2c5ed5ffdf6b5c7",
+            "json": "e3b0c44298fc1c14",
             "move": "38397f97c84d4b5e",
             "openChecked": "e3b0c44298fc1c14",
             "pageHref": "86fa86dc12e1d06a",
@@ -774,14 +776,17 @@
             "score": "5f3f70deaa2dddff",
             "search": "f092e115439a8aae",
             "show": "e3b0c44298fc1c14",
+            "show.set": "e3b0c44298fc1c14",
             "snippet": "3b74ff3ffb1fed21"
           },
           "private": [
             "copyText",
+            "count",
             "dark",
             "draw",
             "escapeHTML",
             "highlight",
+            "json",
             "move",
             "openChecked",
             "pageHref",
@@ -789,9 +794,10 @@
             "score",
             "search",
             "show",
+            "show.set",
             "snippet"
           ],
-          "raw": "575cfedac5892418",
+          "raw": "0972179daf12a3fe",
           "hasher": "javascript/44c892e0be05/2"
         },
         "internal/site/site.go": {
@@ -864,11 +870,11 @@
             "writer.finish",
             "writer.write"
           ],
-          "raw": "d4ea43daef1cee17",
+          "raw": "743f236b6ac05d04",
           "hasher": "go/2"
         },
         "internal/site/site_test.go": {
-          "body": "e4484e46aab611cc",
+          "body": "79e37b782c2bb145",
           "symbols": {
             "TestFileURLs": "8f43e7080e6d9fd0",
             "TestLanding": "3c18404c6fab744f",
@@ -880,6 +886,7 @@
             "TestMermaidOnlyWhenUsed": "cd62c00a1da3567b",
             "TestNestedSections": "cddbeb90943a8d37",
             "TestReferenceTables": "ae59f9f109f5a7e9",
+            "TestRepoCard": "57da9572a00b81ec",
             "TestStaleFilesRemoved": "4823141262fe41dd",
             "TestURLCollisions": "8e8f2ff211de670e",
             "basicSite": "31a2e0164be82723",
@@ -893,7 +900,7 @@
             "exists",
             "read"
           ],
-          "raw": "b0a3326cbb9502c5",
+          "raw": "c032dd9198ea66a2",
           "hasher": "go/2"
         },
         "internal/site/templates/nav.html": {
@@ -917,8 +924,8 @@
           "hasher": "bytes"
         },
         "internal/site/templates/parts/header.html": {
-          "body": "3d4500e22c069e82",
-          "raw": "3d4500e22c069e82",
+          "body": "3a1393dc22dd55ee",
+          "raw": "3a1393dc22dd55ee",
           "hasher": "bytes"
         },
         "internal/site/templates/parts/hero.html": {
