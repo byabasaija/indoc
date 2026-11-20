@@ -380,8 +380,8 @@ func firstNonEmpty(values ...string) string {
 // Citation styles: how citations appear in the published page. Checking is
 // the same in every style.
 const (
-	CitationsShort  = "short"  // the symbol name, `Dispatcher.dispatch` (default)
-	CitationsFull   = "full"   // as written, `app/checkout/dispatcher.py::Dispatcher.dispatch`
+	CitationsShort  = "short"  // the symbol name, `CheckoutService.charge` (default)
+	CitationsFull   = "full"   // as written, `shop/checkout/service.py::CheckoutService.charge`
 	CitationsHidden = "hidden" // removed when in parentheses, otherwise the symbol name, unlinked
 )
 

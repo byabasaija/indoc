@@ -12,7 +12,7 @@ indoc never calls an AI model.
 
 ```
 cmd/indoc                 entry point
-internal/cli              commands: init, scan, check, ack, bundle, preview, mcp, version
+internal/cli              commands: init, scan, check, ack, bundle, preview, publish, theme, mcp, version
         │
         ├── internal/mcp        Model Context Protocol server (stdio) for coding agents
         ├── internal/projectmap frameworks, entry points, tasks, hot files: the agent's map
@@ -75,7 +75,7 @@ Pages are Markdown files selected by `pages:` globs in `.indoc/config.yaml`. Pub
 | No sources and no citations | unanchored | `--strict` |
 | Citation into a language without a parser | unverified | `--strict` |
 
-A page is compared only while its content matches the lock. `drift.Ack` with no targets records only new and edited pages; an unchanged stale page is re-recorded only when named explicitly. `drift.Stamp` refuses pages with broken citations. `check` is read-only.
+A change to a symbol the page cites is reported once, on the citation, not again for its file. A page is compared only while its content matches the lock. `drift.Ack` with no targets records only new and edited pages; an unchanged stale page is re-recorded only when named explicitly. `drift.Stamp` refuses pages with broken citations. `check` is read-only.
 
 ## Reference extraction
 
@@ -97,7 +97,7 @@ A page is compared only while its content matches the lock. `drift.Ack` with no 
 
 `indoc bundle` refuses broken citations, runs `internal/reference` over non-test source files, and hands pages, reference sections, and config to `internal/site`, which writes one HTML file per page to `output_dir` (default `.indoc/site/`, gitignored). It then records new and edited pages, as `ack` would.
 
-`internal/site` renders Markdown at build time with `html/template`; every page is complete without JavaScript. URLs follow the page's path under the pages' common folder (`documentation/guides/setup.md` → `guides/setup/`), the first folder is the sidebar group, and all links are relative so the folder works from any path or from disk. Links to other pages' `.md` files are rewritten to page URLs; local images are copied under `assets/img/` with content-hashed names. Search is an index written as `assets/search-index.js` (a script, not JSON, so it loads from `file://`). The browser side is `indoc.js` plus vendored Prism; Mermaid is written only when a page uses it. A manifest (`.indoc-site`) lists the files indoc wrote, so later builds delete only those.
+`internal/site` renders Markdown at build time with `html/template`; every page is complete without JavaScript. URLs follow the page's path under the pages' common folder (`documentation/guides/setup.md` → `guides/setup/`), folders become sidebar sections, nested as deep as the folders go (`tree.go`), and all links are relative so the folder works from any path or from disk. Links to other pages' `.md` files are rewritten to page URLs; local images are copied under `assets/img/` with content-hashed names. Search is an index written as `assets/search-index.js` (a script, not JSON, so it loads from `file://`). Sections sort by their `index.md`'s `order`, else the lowest `order` inside them; previous and next follow the sidebar, and generated reference pages join the `reference/` section. A page without its own `# heading` shows its frontmatter title. The browser side is `indoc.js` (search, theme toggle, copy buttons, the GitHub repository card, the contributors wall) plus vendored Prism; Mermaid is written only when a page uses it. A manifest (`.indoc-site`) lists the files indoc wrote, so later builds delete only those.
 
 **Theme.** The page template is split into parts (`templates/parts/`: header, sidebar, hero, features, footer). Each build clones the templates and replaces any part found in `.indoc/theme/`; `appearance:` settings become CSS variables. `indoc theme eject` copies a built-in part with a stamp (indoc version and a fingerprint of the built-in), so a build can warn when the built-in has changed since.
 
@@ -111,7 +111,7 @@ A page is compared only while its content matches the lock. `drift.Ack` with no 
 
 `indoc mcp` runs `internal/mcp`, a dependency-free MCP server on stdio (newline-delimited JSON-RPC). It speaks both protocol eras: the `initialize` handshake (2024-11-05 through 2025-11-25) and per-request `_meta` with `server/discover` (2026-07-28). Its six tools (`indoc_scan`, `indoc_setup`, `indoc_check`, `indoc_ack`, `indoc_bundle`, `indoc_publish`) call the same functions as the commands.
 
-`plugin/` is one plugin for Claude Code and Copilot CLI: a skill that tells the agent how to work (outline first, cite everything, never hand-write reference tables) and an MCP entry that starts `plugin/bin/indoc`. That launcher downloads the release binary matching the plugin version, verifies it against the release's `checksums.txt`, and caches it. The release workflow refuses a tag that differs from the plugin's pinned version.
+`plugin/` is one plugin for Claude Code and Copilot CLI: a skill that tells the agent how to work (outline in section folders first, cite everything, never hand-write reference tables) and how to ask: one decision per question, with what is being approved inside the question's preview, because Claude Code shortens the text an agent writes just before a question and an MCP entry that starts `plugin/bin/indoc`. That launcher downloads the release binary matching the plugin version, verifies it against the release's `checksums.txt`, and caches it. The release workflow refuses a tag that differs from the plugin's pinned version.
 
 ## Decisions
 

@@ -39,9 +39,9 @@ Saying no keeps indoc small enough to be excellent at one thing.
 | Calling an AI model | The agent you already use writes. indoc checks. No API keys, no billing, nothing to leak. |
 | Running or importing your code | It would need your dependencies, database, and secrets, and is unsafe in CI. Analysis is static. |
 | Page templates or fixed outlines | Templates are why docs sites all read the same. Your agent proposes an outline from your code; you approve it. |
-| Plugins, MDX, React components | Every extension point is maintenance forever. `custom.css`, `head.html`, and `allow_html` cover styling and embeds. If you need interactive widgets in docs, Docusaurus is the right tool. |
+| Plugins, MDX, React components | Every extension point is maintenance forever. `appearance:`, `.indoc/theme/` (CSS, head tags, and replaceable parts), and `allow_html` cover styling and embeds. If you need interactive widgets in docs, Docusaurus is the right tool. |
 | Translations | Translated pages go stale twice as fast. Possible later, anchored to code like any other page. |
 | Publishing a folder by default | Publishing is opt-in, per glob. Internal notes sit next to user docs in most repositories. |
-| Network access during a build | Builds are deterministic and work offline. Live data such as star counts loads in the browser. |
+| Network access during a build | Builds are deterministic and work offline. Live data such as the GitHub card's stars and release loads in the browser. |
 | Replacing OpenAPI or Swagger | drf-spectacular and FastAPI already produce exact schemas. indoc links to them. |
 | Hosting | The output is static files. Any host works. |

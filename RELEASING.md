@@ -9,11 +9,14 @@ So `main` must never pin a version whose release doesn't exist yet, or every plu
 
 ## Steps
 
-1. Bump the version in all four places (the release workflow refuses a tag that doesn't match the plugin):
+1. Bump the version everywhere it is pinned (the release workflow refuses a tag that doesn't match the plugin):
    - `plugin/bin/indoc`: `VERSION="X.Y.Z"`
    - `plugin/.claude-plugin/plugin.json`: `"version": "X.Y.Z"`
    - `internal/version/version.go`: `Version = "X.Y.Z-dev"`
    - The `byabasaija/indoc@vX.Y.Z` examples in `README.md`, `documentation/guides/ci.md`, and `plugin/skills/indoc/SKILL.md`
+   - `.github/workflows/indoc-pages.yml` (builds indoc's own docs) and the `sh -s -- vX.Y.Z` example in `documentation/get-started/quick-start.md`
+
+   Searching for the old version (`grep -rn "0\.8\.2" --exclude-dir=.git .`, with your previous version) finds any that were missed.
 2. Run `indoc bundle`, then `indoc check --strict`, and `go test ./...`. The launcher change drifts `documentation/guides/agents.md`; `indoc ack` it once you've confirmed it's still right.
 3. If `indoc check`'s output changed, re-record `design/demo-check.gif` with `design/record-demo.sh` (needs `brew install vhs`) and look at the GIF before committing.
 4. If the release changes behavior users rely on, write `.github/release-notes/vX.Y.Z.md` with an **Upgrading** section; the workflow uses it instead of generated notes.
