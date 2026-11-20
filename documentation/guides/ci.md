@@ -18,7 +18,7 @@ sources:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: byabasaija/indoc@v0.8.1
+      - uses: byabasaija/indoc@v0.8.2
 ```
 
 The action downloads the matching indoc release, verifies its checksum, and runs `indoc check` in the repository root. Inputs:
