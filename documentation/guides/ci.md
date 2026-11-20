@@ -1,6 +1,6 @@
 ---
 title: Checking docs in CI
-order: 3
+order: 10
 sources:
   - internal/cli/check.go
   - internal/cli/ack.go
@@ -18,7 +18,7 @@ sources:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: byabasaija/indoc@v0.6.0
+      - uses: byabasaija/indoc@v0.7.0
 ```
 
 The action downloads the matching indoc release, verifies its checksum, and runs `indoc check` in the repository root. Inputs:

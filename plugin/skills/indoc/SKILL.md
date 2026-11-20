@@ -51,6 +51,19 @@ Give every page one purpose (the Diátaxis framework), and label each page in th
 
 Each audience needs at least one how-to for its most common task, not only explanation. An outline that is all explanation reads well and helps nobody get anything done. Most projects need one tutorial (getting started), not several.
 
+**Lay the pages out in section folders**, never as a flat list: the sidebar shows each folder as a section that folds open, like any documentation site. Use the reader's journey, and only the sections the project needs:
+
+```text
+documentation/
+  index.md          landing page
+  get-started/      the tutorial, installation, first steps
+  guides/           how-tos; sub-folders by area once there are more than about six (guides/payments/, guides/deploy/)
+  reference/        hand-written reference only; indoc adds its generated pages here
+  concepts/         explanation: architecture, design decisions
+```
+
+Number `order:` across the whole site (1, 2 in get-started; 10, 11 in guides; 20 in reference; 30 in concepts): a section sorts by the lowest order inside it. Show the folder tree in the outline. A small project with three or four pages may skip folders; ask.
+
 Include the **home page as a landing page** in the outline: a one-line tagline, two buttons (where to start, and the most important next page), and three or four feature cards, each a real capability you found in the code and linking to the page that explains it. Show the user the tagline and card titles with the outline. A project whose readers only want reference material can skip it; ask.
 
 ## 3. Write pages
@@ -74,7 +87,7 @@ sources:
 - Add `strict: true` to pages whose readers depend on exact behavior: a partner or public API, webhooks, a CLI's output.
 - Use real commands from `map.tasks` and real request/response or CLI examples.
 - Do not write route, environment-variable, or command tables. indoc generates them.
-- No page per source file. `index.md` at the top of the docs folder is the overview.
+- No page per source file. `index.md` at the top of the docs folder is the overview; every other page goes in its section folder from the outline.
 
 The landing page is the overview's frontmatter; the Markdown body follows the cards:
 
@@ -117,7 +130,7 @@ Call `indoc_check`. For each finding:
 
 1. Call `indoc_bundle`. Fix any broken citations it reports and call it again.
 2. Call `indoc_check`; `failing` must be 0.
-3. Tell the user where the site was written (default `.indoc/site/`) and that opening its `index.html` in a browser works without a server; with the `indoc` command installed, `indoc preview` serves it and rebuilds on every edit. `.indoc/config.yaml`, `.indoc/lock.json`, and the pages should be committed. Suggest adding `indoc check` to CI with the GitHub Action (`uses: byabasaija/indoc@v0.6.0`).
+3. Tell the user where the site was written (default `.indoc/site/`) and that opening its `index.html` in a browser works without a server; with the `indoc` command installed, `indoc preview` serves it and rebuilds on every edit. `.indoc/config.yaml`, `.indoc/lock.json`, and the pages should be committed. Suggest adding `indoc check` to CI with the GitHub Action (`uses: byabasaija/indoc@v0.7.0`).
 
 ## 6. Change the look
 

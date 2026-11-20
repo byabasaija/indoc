@@ -1,11 +1,11 @@
 ---
-title: Reference extraction
-order: 4
+title: How reference is extracted
+order: 20
 sources:
   - internal/reference/**
 ---
 
-# Reference extraction
+# How reference is extracted
 
 `indoc bundle` adds reference pages built from source, so routes, environment variables, and commands are never copied by hand. `internal/reference/reference.go::Extract` runs every extractor that applies and returns the sections plus a `internal/reference/reference.go::Coverage` report for each one.
 

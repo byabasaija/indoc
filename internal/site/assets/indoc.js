@@ -48,6 +48,14 @@
     });
   }
 
+  // Keep the current page visible in a long sidebar.
+  var current = document.querySelector('[data-sidebar] [aria-current="page"]');
+  var sidebar = document.querySelector("[data-sidebar]");
+  if (current && sidebar) {
+    var top = current.getBoundingClientRect().top - sidebar.getBoundingClientRect().top;
+    if (top > sidebar.clientHeight - 60) sidebar.scrollTop = top - sidebar.clientHeight / 3;
+  }
+
   // Copy buttons on code blocks
   var copyIcon = '<svg viewBox="0 0 16 16" aria-hidden="true"><rect x="5" y="5" width="9" height="9" rx="2"/><path d="M11 5V3.5A1.5 1.5 0 0 0 9.5 2h-6A1.5 1.5 0 0 0 2 3.5v6A1.5 1.5 0 0 0 3.5 11H5"/></svg>';
   var checkIcon = '<svg viewBox="0 0 16 16" aria-hidden="true"><path d="m3 8.5 3 3 7-7"/></svg>';

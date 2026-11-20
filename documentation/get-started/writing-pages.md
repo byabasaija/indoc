@@ -34,7 +34,7 @@ Every order is charged by
 | `strict` | `true` makes body changes to cited symbols fail the check. |
 | `citations` | `short`, `full`, or `hidden`: how this page shows citations (see below). |
 | `description` | One line for search results and link previews. |
-| `layout` | `landing` on the home page adds a hero, feature cards, and optional `sections:` such as a contributors wall; see [Customizing the site](site.md). |
+| `layout` | `landing` on the home page adds a hero, feature cards, and optional `sections:` such as a contributors wall; see [Customizing the site](../guides/customizing.md). |
 
 Docusaurus keys `sidebar_label` and `sidebar_position` are read too, so an existing Docusaurus docs folder works unchanged.
 

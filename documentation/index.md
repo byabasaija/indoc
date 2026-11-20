@@ -7,22 +7,22 @@ hero:
   tagline: Documentation that fails CI when it stops matching the code.
   actions:
     - text: Get started
-      link: getting-started.md
+      link: get-started/quick-start.md
     - text: Use it from your agent
-      link: agents.md
+      link: guides/agents.md
 features:
   - title: Docs that can't silently rot
     details: Pages cite code as `path::Symbol`. Change a cited signature and `indoc check` fails in CI, naming the page and what changed.
-    link: ci.md
+    link: guides/ci.md
   - title: Reference from the source
     details: Routes, environment variables, and commands are extracted from Django, FastAPI, Express, Next.js, NestJS, Astro, and Cobra. Nobody copies them by hand.
-    link: reference.md
+    link: reference/extraction.md
   - title: Your agent writes, indoc checks
     details: Install the plugin for Claude Code or Copilot CLI and ask for docs. No API keys; indoc never calls a model.
-    link: agents.md
+    link: guides/agents.md
   - title: A static site, anywhere
     details: One HTML file per page, relative links, no server. Mount it in your app, publish it, or open it from disk.
-    link: getting-started.md
+    link: get-started/quick-start.md
 sections:
   - hero
   - features
@@ -31,9 +31,9 @@ sections:
   - body
 featured:
   - text: Writing pages
-    link: writing-pages.md
+    link: get-started/writing-pages.md
   - text: Checking docs in CI
-    link: ci.md
+    link: guides/ci.md
 sources:
   - internal/drift/**
   - cmd/indoc/**

@@ -12,15 +12,15 @@ import (
 	"github.com/byabasaija/indoc/internal/render"
 )
 
+// navItem is a sidebar entry: a page, or a section (a folder) with
+// children. A section's Href is its own page, when it has one.
 type navItem struct {
-	Title  string
-	Href   string
-	Active bool
-}
-
-type navGroup struct {
-	Title string
-	Items []navItem
+	Title    string
+	Href     string
+	Active   bool
+	Section  bool
+	Open     bool // a section holding the current page
+	Children []navItem
 }
 
 type action struct {
@@ -38,7 +38,8 @@ type view struct {
 	DocTitle  string
 	Logo      string
 	Home      string
-	Nav       []navGroup
+	Nav       []navItem
+	Crumbs    []navItem // sections above the page
 	Links     []Link
 	TOC       []doc.Heading
 	Prev      *navItem
@@ -182,30 +183,11 @@ func (b *builder) view(p *built, brand string) *view {
 		}
 	}
 	v.Nav = b.nav(p)
+	v.Crumbs = b.crumbs(p)
 	if p.Layout == "landing" {
 		b.landing(p, v)
 	}
 	return v
-}
-
-// nav builds the sidebar: top-level pages, then one group per category.
-func (b *builder) nav(current *built) []navGroup {
-	var groups []navGroup
-	for _, p := range b.pages {
-		if p.Slug == "" {
-			continue // the home page is the brand link
-		}
-		title := ""
-		if p.Category != "" {
-			title = b.categoryTitle(p.Category)
-		}
-		if len(groups) == 0 || groups[len(groups)-1].Title != title {
-			groups = append(groups, navGroup{Title: title})
-		}
-		g := &groups[len(groups)-1]
-		g.Items = append(g.Items, navItem{Title: p.Title, Href: b.rel(current.Slug, p.Slug), Active: p == current})
-	}
-	return groups
 }
 
 func (b *builder) landing(p *built, v *view) {

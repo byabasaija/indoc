@@ -1,6 +1,6 @@
 ---
 title: Publishing the site
-order: 6
+order: 12
 description: Serve the docs on GitHub Pages, a static host, or from your own web app.
 sources:
   - internal/cli/publish.go

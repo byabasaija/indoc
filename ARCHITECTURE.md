@@ -1,6 +1,6 @@
 # Architecture
 
-How indoc is put together, for contributors. What's planned is in [ROADMAP.md](ROADMAP.md); how each part was measured is in [documentation/accuracy.md](documentation/accuracy.md).
+How indoc is put together, for contributors. What's planned is in [ROADMAP.md](ROADMAP.md); how each part was measured is in [documentation/concepts/accuracy.md](documentation/concepts/accuracy.md).
 
 ## Purpose
 
@@ -115,7 +115,7 @@ A page is compared only while its content matches the lock. `drift.Ack` with no 
 
 ## Decisions
 
-**Symbols, not files.** In a measured production codebase 87% of commits touched source and two thirds of changes were function bodies only. File-level staleness would fail nearly every commit and teach developers to acknowledge blindly. Signatures fail; bodies drift; comments, docstrings, logging, and formatting are ignored. The rules were tuned by replaying history ([accuracy](documentation/accuracy.md)).
+**Symbols, not files.** In a measured production codebase 87% of commits touched source and two thirds of changes were function bodies only. File-level staleness would fail nearly every commit and teach developers to acknowledge blindly. Signatures fail; bodies drift; comments, docstrings, logging, and formatting are ignored. The rules were tuned by replaying history ([accuracy](documentation/concepts/accuracy.md)).
 
 **Citations name symbols, not lines.** Line numbers rot on every edit above them. A symbol breaks only when renamed, which is exactly when the page should be checked. Links resolve the current line at build time.
 

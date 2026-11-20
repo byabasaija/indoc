@@ -20,7 +20,7 @@
   <a href="#how-it-works">How it works</a> ·
   <a href="#indoc-vs-docusaurus-and-mkdocs">Compared to Docusaurus</a> ·
   <a href="https://byabasaija.github.io/indoc/">Docs</a> ·
-  <a href="documentation/accuracy.md">Accuracy</a> ·
+  <a href="documentation/concepts/accuracy.md">Accuracy</a> ·
   <a href="ROADMAP.md">Roadmap</a>
 </p>
 
@@ -88,7 +88,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: byabasaija/indoc@v0.6.0
+      - uses: byabasaija/indoc@v0.7.0
         # with:
         #   mode: warn   # report without failing while you try it out
 ```
@@ -138,7 +138,7 @@ which picks a payment provider for the customer's country.
 
 Fix the page, or run `indoc ack <page>` to confirm it is still correct. Either way, the review is recorded in git.
 
-These rules were tuned by replaying 100 commits of a real production codebase: 85% of sampled flags were real problems, and about 3–4% of commits would have failed CI with nothing wrong in the docs. [How it was measured](documentation/accuracy.md).
+These rules were tuned by replaying 100 commits of a real production codebase: 85% of sampled flags were real problems, and about 3–4% of commits would have failed CI with nothing wrong in the docs. [How it was measured](documentation/concepts/accuracy.md).
 
 ## What you get
 
@@ -156,7 +156,7 @@ These rules were tuned by replaying 100 commits of a real production codebase: 8
 - Your logo, colors, fonts, and layout in config; a `.indoc/theme/` folder to replace the header, footer, or hero. Rebuilds never overwrite it, and hand edits to the output are caught instead of lost
 - Relative links: serve it from any host or path, or mount it in your app
 
-See [Customizing the site](documentation/site.md).
+See [Customizing the site](documentation/guides/customizing.md).
 
 **Reference pages, extracted.** Routes with HTTP methods and handlers, environment variables with defaults (secrets redacted), and CLI commands with flags, each linking to its source line.
 
@@ -237,7 +237,7 @@ No. Only public signatures and cited symbols fail the check. Body changes are re
 indoc still tracks the files a page covers and reports any change as drift. Citations need a parser; open an issue with a real repository you'd like supported.
 
 **Where does the site go?**
-Wherever you choose with `indoc publish`: GitHub Pages (it writes the deploy workflow), any static host, or your own app under a path like `/guide/`, public or login-only. For an app it prints tested code for Django, FastAPI, Flask, Express, NestJS, Next.js, Astro, or Go. See [Publishing the site](documentation/publishing.md).
+Wherever you choose with `indoc publish`: GitHub Pages (it writes the deploy workflow), any static host, or your own app under a path like `/guide/`, public or login-only. For an app it prints tested code for Django, FastAPI, Flask, Express, NestJS, Next.js, Astro, or Go. See [Publishing the site](documentation/guides/publishing.md).
 
 ## Contributing
 
@@ -250,7 +250,7 @@ make grammars                              # rebuild tree-sitter grammars (Docke
 make vendor                                # refresh Prism and Mermaid
 ```
 
-[ARCHITECTURE.md](ARCHITECTURE.md) explains how the pieces fit and why, [RELEASING.md](RELEASING.md) how to cut a release, [documentation/accuracy.md](documentation/accuracy.md) how each part is tested against the real tools, and [ROADMAP.md](ROADMAP.md) what's next and what indoc won't do.
+[ARCHITECTURE.md](ARCHITECTURE.md) explains how the pieces fit and why, [RELEASING.md](RELEASING.md) how to cut a release, [documentation/concepts/accuracy.md](documentation/concepts/accuracy.md) how each part is tested against the real tools, and [ROADMAP.md](ROADMAP.md) what's next and what indoc won't do.
 
 ## License
 

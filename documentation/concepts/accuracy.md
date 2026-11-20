@@ -1,6 +1,6 @@
 ---
 title: How accurate is indoc?
-order: 8
+order: 30
 description: How indoc's staleness rules, parsers, and extractors were measured against real code and the tools they imitate.
 sources:
   - tools/replay/**

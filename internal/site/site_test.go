@@ -3,6 +3,7 @@ package site
 import (
 	"os"
 	"path/filepath"
+	"sort"
 	"strings"
 	"testing"
 
@@ -69,7 +70,8 @@ func TestLayoutAndLinks(t *testing.T) {
 		`<h2 id="install">`,
 		`class="language-sh"`,
 		`assets/img/flow-`,
-		`<p class="nav-title">Guides</p>`, // folder index names the category
+		`<details open>`, // the section holding this page is open
+		`<a href="../../guides/">Guides</a><span class="crumb-sep"`, // breadcrumb to the section page
 	} {
 		if !strings.Contains(setup, want) {
 			t.Errorf("setup page lacks %q", want)
@@ -90,6 +92,61 @@ func TestLayoutAndLinks(t *testing.T) {
 	idx := read(t, out, "assets/search-index.js")
 	if !strings.HasPrefix(idx, "window.INDOC_SEARCH") || !strings.Contains(idx, `"guides/setup/"`) {
 		t.Errorf("search index: %.200s", idx)
+	}
+}
+
+func TestNestedSections(t *testing.T) {
+	s := &Site{
+		Name:     "demo",
+		RepoRoot: t.TempDir(),
+		Pages: []Page{
+			{Source: "docs/index.md", Title: "Home", Markdown: "# Home\n"},
+			{Source: "docs/intro.md", Title: "Intro", Markdown: "# Intro\n"},
+			{Source: "docs/reference/extraction.md", Title: "Extraction", Markdown: "# Extraction\n"},
+			{Source: "docs/guides/deploy/docker.md", Title: "Docker", Order: 1, HasOrder: true, Markdown: "# Docker\n"},
+			{Source: "docs/guides/ci.md", Title: "CI", Order: 2, HasOrder: true, Markdown: "# CI\n"},
+			{Source: "docs/get-started/install.md", Title: "Install", Order: 1, HasOrder: true, Markdown: "# Install\n"},
+		},
+		Reference: []doc.RefSection{{ID: "routes", Title: "Routes"}},
+	}
+	out := build(t, s)
+	docker := read(t, out, "guides/deploy/docker/index.html")
+	nav := docker[strings.Index(docker, `class="sidebar"`):strings.Index(docker, "</aside>")]
+
+	// Loose pages, then sections by their lowest order, then unordered ones;
+	// inside a section its pages come before its sub-sections.
+	var at []int
+	for _, name := range []string{">Intro<", ">Get started<", ">Install<", ">Guides<", ">CI<", ">Deploy<", ">Docker<", ">Reference<", ">Extraction<", ">Routes<"} {
+		i := strings.Index(nav, name)
+		if i < 0 {
+			t.Fatalf("nav lacks %s:\n%s", name, nav)
+		}
+		at = append(at, i)
+	}
+	if !sort.IntsAreSorted(at) {
+		t.Errorf("nav order wrong %v:\n%s", at, nav)
+	}
+	if n := strings.Count(nav, "<details open>"); n != 2 {
+		t.Errorf("want Guides and Deploy open, got %d open sections:\n%s", n, nav)
+	}
+	if !strings.Contains(docker, `<span>Guides</span><span class="crumb-sep" aria-hidden="true">›</span><span>Deploy</span>`) {
+		t.Errorf("breadcrumbs missing:\n%s", docker)
+	}
+	// Generated reference pages join the user's reference folder.
+	if !exists(out, "reference/routes/index.html") || !exists(out, "reference/extraction/index.html") {
+		t.Error("reference pages missing")
+	}
+	// The home page opens the top-level sections only.
+	if home := read(t, out, "index.html"); strings.Count(home, "<details open>") != 3 {
+		t.Errorf("home page should open Get started, Guides, Reference; got %d", strings.Count(home, "<details open>"))
+	}
+	idx := read(t, out, "assets/search-index.js")
+	if !strings.Contains(idx, `"s":"Guides › Deploy"`) {
+		t.Errorf("search section trail missing: %.400s", idx)
+	}
+	// Previous/next follows the sidebar.
+	if !strings.Contains(docker, `class="prev"`) || !strings.Contains(read(t, out, "guides/ci/index.html"), "Docker") {
+		t.Error("pager does not follow the sidebar order")
 	}
 }
 

@@ -1,8 +1,8 @@
 {
   "version": 1,
   "pages": {
-    "documentation/accuracy.md": {
-      "page": "c62d6b8e12429c40",
+    "documentation/concepts/accuracy.md": {
+      "page": "fb15fae3822a7d22",
       "citations": {
         "tools/replay/main.go::main": {
           "surface": "d9d99ddd4952251a",
@@ -99,8 +99,250 @@
         }
       }
     },
-    "documentation/agents.md": {
-      "page": "00b852ff4690c6b8",
+    "documentation/get-started/quick-start.md": {
+      "page": "bb30fc40b3279b65",
+      "citations": {
+        "internal/cli/bundle.go::runBundle": {
+          "surface": "afbcb60d55daccfa",
+          "body": "9e792aadd6c28d90",
+          "raw": "6682bf9282617ee4",
+          "hasher": "go/2"
+        },
+        "internal/cli/init.go::runInit": {
+          "surface": "08c0804721543100",
+          "body": "4846ea07fd204b67",
+          "raw": "711d1f6a88108397",
+          "hasher": "go/2"
+        },
+        "internal/config/config.go::InferProjectName": {
+          "surface": "665df7f08f982cfb",
+          "body": "7b074de3acb70fe3",
+          "raw": "95a880fdc5c0701f",
+          "hasher": "go/2"
+        }
+      },
+      "sources": {
+        "internal/cli/bundle.go": {
+          "body": "896f92ca17002ac1",
+          "symbols": {
+            "buildSite": "a025c648708f8f48",
+            "buildSiteWith": "ce8afd13d70d1d73",
+            "citationLink": "840bb03b38bba364",
+            "citationTarget": "630f715f9c075a3b",
+            "editLink": "7c023cbaf4f922aa",
+            "gitLastChange": "4c7a4daf2cb930a4",
+            "githubRepo": "cf15e64fa201c261",
+            "init": "c78f10468427bc77",
+            "linkSources": "3b41123d1bc8c90c",
+            "runBundle": "afbcb60d55daccfa",
+            "runBundleEdits": "49aba542c8ae0bbf",
+            "siteFor": "3a09b09748126992",
+            "splitSource": "ebcb91591de95bdb",
+            "verified": "ec88540c8a727204"
+          },
+          "private": [
+            "buildSite",
+            "buildSiteWith",
+            "citationLink",
+            "citationTarget",
+            "editLink",
+            "gitLastChange",
+            "githubRepo",
+            "init",
+            "linkSources",
+            "runBundle",
+            "runBundleEdits",
+            "siteFor",
+            "splitSource",
+            "verified"
+          ],
+          "raw": "6682bf9282617ee4",
+          "hasher": "go/2"
+        },
+        "internal/cli/init.go": {
+          "body": "ca156e135fd34628",
+          "symbols": {
+            "hasAny": "b6d1a7c0ec76e5ea",
+            "init": "c78f10468427bc77",
+            "matchesAny": "57c346473f9585b7",
+            "runInit": "08c0804721543100"
+          },
+          "private": [
+            "hasAny",
+            "init",
+            "matchesAny",
+            "runInit"
+          ],
+          "raw": "711d1f6a88108397",
+          "hasher": "go/2"
+        },
+        "internal/config/config.go": {
+          "body": "d415ecfee2273d29",
+          "symbols": {
+            "Config": "d06bba2c1bdad9a8",
+            "Config.CitationStyle": "9967250f66762b25",
+            "Config.FileURLs": "dee92f60cf4fc410",
+            "Config.PublicLink": "32a14e389e082600",
+            "Config.Save": "ab4c717e8f3c6e18",
+            "Config.SourceLink": "d0269e979316b6e1",
+            "Config.Validate": "468add9a2e54c5af",
+            "Config.validatePublishing": "97609fe2ef7fe09a",
+            "Default": "fcba8035c4318c9d",
+            "InferProjectName": "665df7f08f982cfb",
+            "InferSourceURL": "357e1bd6b502cadd",
+            "Link": "9941900250d55bc4",
+            "Load": "7988a8d596a72425",
+            "Paths": "76140627bde13cc5",
+            "Publish": "2045874059627c18",
+            "Resolve": "dbdc0ac20bbad50d",
+            "contains": "ff1822e7196e7478",
+            "goModuleName": "dafb094673af3a2d",
+            "packageJSONName": "32172c9075e6be3a",
+            "pyprojectName": "44d439eb4064fd49",
+            "sourceTemplate": "16f7771317498873"
+          },
+          "private": [
+            "Config.validatePublishing",
+            "contains",
+            "goModuleName",
+            "packageJSONName",
+            "pyprojectName",
+            "sourceTemplate"
+          ],
+          "raw": "95a880fdc5c0701f",
+          "hasher": "go/2"
+        },
+        "internal/config/config_test.go": {
+          "body": "c4d81899cad64e1b",
+          "symbols": {
+            "TestInferProjectName": "4a4371ac59b9b6c3",
+            "TestLoadDefaultsOutputDir": "21eb196bb3e3702d",
+            "TestLoadMissing": "cf080fa1593dad73",
+            "TestResolve": "1e0c2aa40c46b1ab",
+            "TestSaveLoadRoundTrip": "59775ecd4338fc38",
+            "TestSourceURL": "292d1d4604b5f38c"
+          },
+          "raw": "f8c8ff3e35d777c0",
+          "hasher": "go/2"
+        }
+      }
+    },
+    "documentation/get-started/writing-pages.md": {
+      "page": "f1daac2800525344",
+      "citations": {
+        "internal/code/code.go::Analyze": {
+          "surface": "498b2762e77d0628",
+          "body": "999448245764a731",
+          "raw": "37531f43588cdc7a",
+          "hasher": "go/2"
+        },
+        "internal/drift/drift.go::Finding.Fails": {
+          "surface": "7c6f4d383dc2bc4e",
+          "body": "cbcb7de0f5756098",
+          "raw": "f022796b08cb3cbc",
+          "hasher": "go/2"
+        },
+        "internal/drift/drift.go::Stamp": {
+          "surface": "8df7959ee83484b4",
+          "body": "a9d4bcad15e37f8e",
+          "raw": "f022796b08cb3cbc",
+          "hasher": "go/2"
+        },
+        "internal/pages/pages.go::Parse": {
+          "surface": "21d7718c70908c49",
+          "body": "00aad095aaf4bac6",
+          "raw": "cb489405a5bd086f",
+          "hasher": "go/2"
+        },
+        "internal/pages/pages.go::RenderCitations": {
+          "surface": "c678000e1af2f366",
+          "body": "55046ff7776bd59c",
+          "raw": "cb489405a5bd086f",
+          "hasher": "go/2"
+        }
+      },
+      "sources": {
+        "internal/code/code.go": {
+          "body": "977252489edf546a",
+          "symbols": {
+            "Analyze": "498b2762e77d0628",
+            "File": "dae3fc20928c2e14",
+            "File.Lookup": "548418227fcfb633",
+            "File.Private": "cd5018fa1ea28f10",
+            "File.Surfaces": "7c6e4c8a2651c3e0",
+            "HasherFor": "02041b0f90a28590",
+            "IsTest": "ac381bf5d8c73c92",
+            "ListFiles": "4ae8ae2ed76bdf67",
+            "Parsable": "ad7f83aeb7fc246d",
+            "analyze": "9263e64a0262bd09",
+            "isVirtualenv": "1f9359d24de35af2"
+          },
+          "private": [
+            "analyze",
+            "isVirtualenv"
+          ],
+          "raw": "37531f43588cdc7a",
+          "hasher": "go/2"
+        },
+        "internal/pages/pages.go": {
+          "body": "0f761459957e228c",
+          "symbols": {
+            "Action": "75dfe11cbbcd9aa6",
+            "Citation": "4ff1d172532f8877",
+            "Citation.Ref": "d428f6f2d2b262be",
+            "Feature": "a5cf0a84e0b6a327",
+            "Hero": "93665241ccacfd85",
+            "Load": "92343c81f51a3dd1",
+            "LogoItem": "60e8655655887672",
+            "Match": "b6ece7cdf64077ba",
+            "Page": "5bacc7eaae3a2c7d",
+            "Page.Anchored": "91797e9211489847",
+            "Parse": "21d7718c70908c49",
+            "RenderCitations": "c678000e1af2f366",
+            "Section": "37cb2bc17070df9b",
+            "Section.UnmarshalYAML": "79d04d262972b3d1",
+            "ValidCitationStyle": "1b26e25eef32b638",
+            "fenceMarker": "da58d0423dfd6529",
+            "findCitations": "a7fd3bcc744cf263",
+            "firstHeading": "a09462356d2e5c85",
+            "firstNonEmpty": "a4fc998c56dbd5b9",
+            "frontmatter": "ed75b05804a47046",
+            "renderCitationLine": "e53000942a6a87c7",
+            "splitFrontmatter": "392c5658a5874645",
+            "titleFromPath": "0ccab65379cf0320",
+            "validSections": "25136085ec5ab234"
+          },
+          "private": [
+            "fenceMarker",
+            "findCitations",
+            "firstHeading",
+            "firstNonEmpty",
+            "frontmatter",
+            "renderCitationLine",
+            "splitFrontmatter",
+            "titleFromPath",
+            "validSections"
+          ],
+          "raw": "cb489405a5bd086f",
+          "hasher": "go/2"
+        },
+        "internal/pages/pages_test.go": {
+          "body": "e54543a159649a13",
+          "symbols": {
+            "TestLandingSections": "73973a9ed7c767d7",
+            "TestMatch": "ace37652a65aedac",
+            "TestParseDocusaurusKeysAndFallbackTitles": "469c2144a116974d",
+            "TestParseFrontmatterAndCitations": "d463991d1ab22c96",
+            "TestParseRejectsBadFrontmatter": "7213cdfdef0417c9",
+            "TestRenderCitations": "abf3e28455d4a7f9"
+          },
+          "raw": "713395927251ad73",
+          "hasher": "go/2"
+        }
+      }
+    },
+    "documentation/guides/agents.md": {
+      "page": "e36424b4ab245c6f",
       "citations": {
         "internal/cli/mcp.go::mcpServer": {
           "surface": "9a5340343b623d99",
@@ -211,19 +453,19 @@
           "hasher": "bytes"
         },
         "plugin/bin/indoc": {
-          "body": "4508ced52dd1c2de",
-          "raw": "4508ced52dd1c2de",
+          "body": "f7d35c7d34fa3070",
+          "raw": "f7d35c7d34fa3070",
           "hasher": "bytes"
         },
         "plugin/skills/indoc/SKILL.md": {
-          "body": "a5b39c9635ac72e4",
-          "raw": "a5b39c9635ac72e4",
+          "body": "bcba34a3765f126e",
+          "raw": "bcba34a3765f126e",
           "hasher": "bytes"
         }
       }
     },
-    "documentation/ci.md": {
-      "page": "7c08a540dc23b98c",
+    "documentation/guides/ci.md": {
+      "page": "5caee4e644898d07",
       "citations": {
         "internal/cli/check.go::runCheck": {
           "surface": "4d82fe88e3e7a473",
@@ -368,25 +610,67 @@
         }
       }
     },
-    "documentation/getting-started.md": {
-      "page": "37ffa993e7d8e5ad",
+    "documentation/guides/customizing.md": {
+      "page": "999b2a417675226b",
       "citations": {
-        "internal/cli/bundle.go::runBundle": {
-          "surface": "afbcb60d55daccfa",
-          "body": "9e792aadd6c28d90",
+        "internal/cli/bundle.go::editLink": {
+          "surface": "7c023cbaf4f922aa",
+          "body": "5ab551982e7c7030",
           "raw": "6682bf9282617ee4",
           "hasher": "go/2"
         },
-        "internal/cli/init.go::runInit": {
-          "surface": "08c0804721543100",
-          "body": "4846ea07fd204b67",
-          "raw": "711d1f6a88108397",
+        "internal/cli/bundle.go::gitLastChange": {
+          "surface": "4c7a4daf2cb930a4",
+          "body": "2dc4c2511680d66f",
+          "raw": "6682bf9282617ee4",
           "hasher": "go/2"
         },
-        "internal/config/config.go::InferProjectName": {
-          "surface": "665df7f08f982cfb",
-          "body": "7b074de3acb70fe3",
-          "raw": "95a880fdc5c0701f",
+        "internal/cli/bundle.go::siteFor": {
+          "surface": "3a09b09748126992",
+          "body": "116b872921c4ff07",
+          "raw": "6682bf9282617ee4",
+          "hasher": "go/2"
+        },
+        "internal/cli/theme.go::loadTheme": {
+          "surface": "ad68ff380717dc3d",
+          "body": "b899e6711bb57d5d",
+          "raw": "b0a3cb931a75ac78",
+          "hasher": "go/2"
+        },
+        "internal/pages/pages.go::Hero": {
+          "surface": "93665241ccacfd85",
+          "body": "",
+          "raw": "cb489405a5bd086f",
+          "hasher": "go/2"
+        },
+        "internal/pages/pages.go::Section": {
+          "surface": "37cb2bc17070df9b",
+          "body": "",
+          "raw": "cb489405a5bd086f",
+          "hasher": "go/2"
+        },
+        "internal/site/site.go::Build": {
+          "surface": "b40cda3ec9f95359",
+          "body": "b33d12e5510c42cc",
+          "raw": "d4ea43daef1cee17",
+          "hasher": "go/2"
+        },
+        "internal/site/site.go::Edited": {
+          "surface": "85d34bc16cc74109",
+          "body": "75f0a43570836e6e",
+          "raw": "d4ea43daef1cee17",
+          "hasher": "go/2"
+        },
+        "internal/site/theme.go::Outdated": {
+          "surface": "a74498958d04826b",
+          "body": "e758567c81815581",
+          "raw": "2a815dda47db7111",
+          "hasher": "go/2"
+        },
+        "internal/site/tree.go::builder.nav": {
+          "surface": "a0bc33d545322476",
+          "body": "663bf4cad96efda8",
+          "raw": "9d5a94d72115b382",
           "hasher": "go/2"
         }
       },
@@ -428,76 +712,360 @@
           "raw": "6682bf9282617ee4",
           "hasher": "go/2"
         },
-        "internal/cli/init.go": {
-          "body": "ca156e135fd34628",
+        "internal/pages/pages.go": {
+          "body": "0f761459957e228c",
           "symbols": {
-            "hasAny": "b6d1a7c0ec76e5ea",
+            "Action": "75dfe11cbbcd9aa6",
+            "Citation": "4ff1d172532f8877",
+            "Citation.Ref": "d428f6f2d2b262be",
+            "Feature": "a5cf0a84e0b6a327",
+            "Hero": "93665241ccacfd85",
+            "Load": "92343c81f51a3dd1",
+            "LogoItem": "60e8655655887672",
+            "Match": "b6ece7cdf64077ba",
+            "Page": "5bacc7eaae3a2c7d",
+            "Page.Anchored": "91797e9211489847",
+            "Parse": "21d7718c70908c49",
+            "RenderCitations": "c678000e1af2f366",
+            "Section": "37cb2bc17070df9b",
+            "Section.UnmarshalYAML": "79d04d262972b3d1",
+            "ValidCitationStyle": "1b26e25eef32b638",
+            "fenceMarker": "da58d0423dfd6529",
+            "findCitations": "a7fd3bcc744cf263",
+            "firstHeading": "a09462356d2e5c85",
+            "firstNonEmpty": "a4fc998c56dbd5b9",
+            "frontmatter": "ed75b05804a47046",
+            "renderCitationLine": "e53000942a6a87c7",
+            "splitFrontmatter": "392c5658a5874645",
+            "titleFromPath": "0ccab65379cf0320",
+            "validSections": "25136085ec5ab234"
+          },
+          "private": [
+            "fenceMarker",
+            "findCitations",
+            "firstHeading",
+            "firstNonEmpty",
+            "frontmatter",
+            "renderCitationLine",
+            "splitFrontmatter",
+            "titleFromPath",
+            "validSections"
+          ],
+          "raw": "cb489405a5bd086f",
+          "hasher": "go/2"
+        },
+        "internal/site/assets/indoc.css": {
+          "body": "fe26d0431e5fc0d6",
+          "raw": "fe26d0431e5fc0d6",
+          "hasher": "bytes"
+        },
+        "internal/site/assets/indoc.js": {
+          "body": "b572c3aee2521256",
+          "symbols": {
+            "copyText": "2156b8cd9c42e36d",
+            "dark": "675dce303af63061",
+            "draw": "e3b0c44298fc1c14",
+            "escapeHTML": "fc635dba7d931de8",
+            "highlight": "b2c5ed5ffdf6b5c7",
+            "move": "38397f97c84d4b5e",
+            "openChecked": "e3b0c44298fc1c14",
+            "pageHref": "86fa86dc12e1d06a",
+            "renderDiagrams": "9467ce315d790704",
+            "score": "5f3f70deaa2dddff",
+            "search": "f092e115439a8aae",
+            "show": "e3b0c44298fc1c14",
+            "snippet": "3b74ff3ffb1fed21"
+          },
+          "private": [
+            "copyText",
+            "dark",
+            "draw",
+            "escapeHTML",
+            "highlight",
+            "move",
+            "openChecked",
+            "pageHref",
+            "renderDiagrams",
+            "score",
+            "search",
+            "show",
+            "snippet"
+          ],
+          "raw": "575cfedac5892418",
+          "hasher": "javascript/44c892e0be05/2"
+        },
+        "internal/site/site.go": {
+          "body": "5cea0b6b0f5df201",
+          "symbols": {
+            "Build": "b40cda3ec9f95359",
+            "Edited": "85d34bc16cc74109",
+            "EditedError": "953714064361108c",
+            "EditedError.Error": "26a5a9b8f7a6f021",
+            "Link": "d7c60ea0d7835f63",
+            "Page": "0593cd73016047c0",
+            "Ref": "eb6e62f39e57b8a2",
+            "Site": "1c6530f4ca4b6237",
+            "builder": "b489db03c29570f3",
+            "builder.assets": "b4ec11e7fdd7703b",
+            "builder.checkCollisions": "1a4c9037f3bcc3d7",
+            "builder.copyFile": "461572243aa470eb",
+            "builder.isFolder": "358eaf71304af29f",
+            "builder.plan": "968c7118e062ba41",
+            "builder.rel": "58893254868edefc",
+            "builder.render": "bdd8cf3c89def1e3",
+            "builder.renderSections": "893fd410d409f585",
+            "builder.resolveImage": "9bd21065e7021313",
+            "builder.resolveLink": "35658f81ca7efb9d",
+            "builder.searchIndex": "b866e3a29a08428f",
+            "builder.url": "9b3db7992be90541",
+            "built": "5c06c1d5edac5c61",
+            "commonDir": "acbb3d0fb641a90f",
+            "contentHash": "a9c9e3518c6f7aaf",
+            "humanize": "a8e40962f5500bfa",
+            "logo": "f8f779128ec729b3",
+            "pageLess": "b0681c15b476cd81",
+            "readManifest": "2e39cfde13081fe2",
+            "refText": "eb4d031f6f68518b",
+            "rootPrefix": "748b4484d23b165a",
+            "searchEntry": "8703558b8e9c913f",
+            "section": "45bf258f622827cd",
+            "slugPath": "cbd6507c802f6c4b",
+            "writer": "8621b7b087b5a08f",
+            "writer.finish": "5d267f2d478cfe6d",
+            "writer.write": "cb9a3612c7be96f6"
+          },
+          "private": [
+            "builder",
+            "builder.assets",
+            "builder.checkCollisions",
+            "builder.copyFile",
+            "builder.isFolder",
+            "builder.plan",
+            "builder.rel",
+            "builder.render",
+            "builder.renderSections",
+            "builder.resolveImage",
+            "builder.resolveLink",
+            "builder.searchIndex",
+            "builder.url",
+            "built",
+            "commonDir",
+            "contentHash",
+            "humanize",
+            "logo",
+            "pageLess",
+            "readManifest",
+            "refText",
+            "rootPrefix",
+            "searchEntry",
+            "section",
+            "slugPath",
+            "writer",
+            "writer.finish",
+            "writer.write"
+          ],
+          "raw": "d4ea43daef1cee17",
+          "hasher": "go/2"
+        },
+        "internal/site/site_test.go": {
+          "body": "e4484e46aab611cc",
+          "symbols": {
+            "TestFileURLs": "8f43e7080e6d9fd0",
+            "TestLanding": "3c18404c6fab744f",
+            "TestLandingSectionErrors": "06dd8fc4274b866e",
+            "TestLandingSectionOrder": "a28d5ceb15496e83",
+            "TestLayoutAndLinks": "20c522e3db29fb83",
+            "TestLegacyViewerRemoved": "7187d912e7d8be91",
+            "TestLogoIsFavicon": "eae28e96b0cf0133",
+            "TestMermaidOnlyWhenUsed": "cd62c00a1da3567b",
+            "TestNestedSections": "cddbeb90943a8d37",
+            "TestReferenceTables": "ae59f9f109f5a7e9",
+            "TestStaleFilesRemoved": "4823141262fe41dd",
+            "TestURLCollisions": "8e8f2ff211de670e",
+            "basicSite": "31a2e0164be82723",
+            "build": "227a27ce1384a0c5",
+            "exists": "adc92eea098ab63c",
+            "read": "92008ed0428d7e03"
+          },
+          "private": [
+            "basicSite",
+            "build",
+            "exists",
+            "read"
+          ],
+          "raw": "b0a3326cbb9502c5",
+          "hasher": "go/2"
+        },
+        "internal/site/templates/nav.html": {
+          "body": "23a9e10a04be07d5",
+          "raw": "23a9e10a04be07d5",
+          "hasher": "bytes"
+        },
+        "internal/site/templates/page.html": {
+          "body": "3dc35b4ae89d4382",
+          "raw": "3dc35b4ae89d4382",
+          "hasher": "bytes"
+        },
+        "internal/site/templates/parts/features.html": {
+          "body": "6f869fa5006d002c",
+          "raw": "6f869fa5006d002c",
+          "hasher": "bytes"
+        },
+        "internal/site/templates/parts/footer.html": {
+          "body": "83fab95a605542e7",
+          "raw": "83fab95a605542e7",
+          "hasher": "bytes"
+        },
+        "internal/site/templates/parts/header.html": {
+          "body": "3d4500e22c069e82",
+          "raw": "3d4500e22c069e82",
+          "hasher": "bytes"
+        },
+        "internal/site/templates/parts/hero.html": {
+          "body": "ed5602dc8486536b",
+          "raw": "ed5602dc8486536b",
+          "hasher": "bytes"
+        },
+        "internal/site/templates/parts/sidebar.html": {
+          "body": "fda86ac44ddca5cc",
+          "raw": "fda86ac44ddca5cc",
+          "hasher": "bytes"
+        },
+        "internal/site/theme.go": {
+          "body": "d3322f74eec2d884",
+          "symbols": {
+            "BuiltinPart": "42f2e976ddcfeebb",
+            "IsPart": "3417081845ac6ef0",
+            "Outdated": "a74498958d04826b",
+            "PartHash": "2122317bc198cae8",
+            "Stamp": "cad67594407db05f",
+            "builder.templates": "3057fe340920a1a9"
+          },
+          "private": [
+            "builder.templates"
+          ],
+          "raw": "2a815dda47db7111",
+          "hasher": "go/2"
+        },
+        "internal/site/tree.go": {
+          "body": "8c7895dcc5cc8df0",
+          "symbols": {
+            "builder.crumbs": "d27c31a9754c0d4e",
+            "builder.nav": "a0bc33d545322476",
+            "builder.navItems": "854422d770ab0e29",
+            "builder.sectionsOf": "cf2898c889b2ffd4",
+            "folder": "b7021895fb5b735c",
+            "folder.at": "8bf64e5f502b8583",
+            "folder.child": "6075ed1839e980d5",
+            "folder.contains": "a06ff2c5618eb5b6",
+            "folder.flatten": "461c7129ac2f0485",
+            "folder.rank": "80634df38c60feff",
+            "folder.sort": "b1b4c2126bde62cf",
+            "folder.title": "a6d32dd6a44ec778"
+          },
+          "private": [
+            "builder.crumbs",
+            "builder.nav",
+            "builder.navItems",
+            "builder.sectionsOf",
+            "folder",
+            "folder.at",
+            "folder.child",
+            "folder.contains",
+            "folder.flatten",
+            "folder.rank",
+            "folder.sort",
+            "folder.title"
+          ],
+          "raw": "9d5a94d72115b382",
+          "hasher": "go/2"
+        },
+        "internal/site/write.go": {
+          "body": "98152f65b62e4812",
+          "symbols": {
+            "action": "7dbbf684e45c7f1e",
+            "builder.execute": "e3d06716413fa76a",
+            "builder.landing": "be1f234b460e302b",
+            "builder.sitemap": "644c59ed76ff6618",
+            "builder.view": "bb2b804166e107ef",
+            "builder.writePages": "ec5c723d601b074f",
+            "feature": "92b02d70eb008f96",
+            "navItem": "f0d460ca6cdefeef",
+            "view": "e5797ed6d5af68bd"
+          },
+          "private": [
+            "action",
+            "builder.execute",
+            "builder.landing",
+            "builder.sitemap",
+            "builder.view",
+            "builder.writePages",
+            "feature",
+            "navItem",
+            "view"
+          ],
+          "raw": "e0e52d2162d5adbb",
+          "hasher": "go/2"
+        }
+      }
+    },
+    "documentation/guides/publishing.md": {
+      "page": "a2e632753bb24d36",
+      "citations": {
+        "internal/cli/publish.go::runPublish": {
+          "surface": "eacfb7bd4de6db52",
+          "body": "993b92b9cc739a55",
+          "raw": "070b488d9b28436d",
+          "hasher": "go/2"
+        }
+      },
+      "sources": {
+        "action.yml": {
+          "body": "843c45db2a112c0a",
+          "raw": "843c45db2a112c0a",
+          "hasher": "bytes"
+        },
+        "internal/cli/publish.go": {
+          "body": "c3167b27bfb8aa0c",
+          "symbols": {
+            "appFramework": "8f460b487a4432c2",
+            "appGlue": "598f1970bc2e9e80",
+            "defaultBranch": "5dca12b61f52168b",
+            "framework": "01b253e09d2ee42e",
+            "indent": "00d255c09d024030",
             "init": "c78f10468427bc77",
-            "matchesAny": "57c346473f9585b7",
-            "runInit": "08c0804721543100"
+            "installLine": "91a0ec6dcb7445bb",
+            "normalizePath": "6e35bb15b7cc9e6f",
+            "pagesWorkflowYAML": "a78155f72309f4e7",
+            "publishApp": "75616ac0b9165544",
+            "publishHost": "b1595f75c8309ce8",
+            "publishPages": "982a234946741208",
+            "releaseTag": "8d260e69950a0434",
+            "runPublish": "eacfb7bd4de6db52"
           },
           "private": [
-            "hasAny",
+            "appFramework",
+            "appGlue",
+            "defaultBranch",
+            "framework",
+            "indent",
             "init",
-            "matchesAny",
-            "runInit"
+            "installLine",
+            "normalizePath",
+            "pagesWorkflowYAML",
+            "publishApp",
+            "publishHost",
+            "publishPages",
+            "releaseTag",
+            "runPublish"
           ],
-          "raw": "711d1f6a88108397",
-          "hasher": "go/2"
-        },
-        "internal/config/config.go": {
-          "body": "d415ecfee2273d29",
-          "symbols": {
-            "Config": "d06bba2c1bdad9a8",
-            "Config.CitationStyle": "9967250f66762b25",
-            "Config.FileURLs": "dee92f60cf4fc410",
-            "Config.PublicLink": "32a14e389e082600",
-            "Config.Save": "ab4c717e8f3c6e18",
-            "Config.SourceLink": "d0269e979316b6e1",
-            "Config.Validate": "468add9a2e54c5af",
-            "Config.validatePublishing": "97609fe2ef7fe09a",
-            "Default": "fcba8035c4318c9d",
-            "InferProjectName": "665df7f08f982cfb",
-            "InferSourceURL": "357e1bd6b502cadd",
-            "Link": "9941900250d55bc4",
-            "Load": "7988a8d596a72425",
-            "Paths": "76140627bde13cc5",
-            "Publish": "2045874059627c18",
-            "Resolve": "dbdc0ac20bbad50d",
-            "contains": "ff1822e7196e7478",
-            "goModuleName": "dafb094673af3a2d",
-            "packageJSONName": "32172c9075e6be3a",
-            "pyprojectName": "44d439eb4064fd49",
-            "sourceTemplate": "16f7771317498873"
-          },
-          "private": [
-            "Config.validatePublishing",
-            "contains",
-            "goModuleName",
-            "packageJSONName",
-            "pyprojectName",
-            "sourceTemplate"
-          ],
-          "raw": "95a880fdc5c0701f",
-          "hasher": "go/2"
-        },
-        "internal/config/config_test.go": {
-          "body": "c4d81899cad64e1b",
-          "symbols": {
-            "TestInferProjectName": "4a4371ac59b9b6c3",
-            "TestLoadDefaultsOutputDir": "21eb196bb3e3702d",
-            "TestLoadMissing": "cf080fa1593dad73",
-            "TestResolve": "1e0c2aa40c46b1ab",
-            "TestSaveLoadRoundTrip": "59775ecd4338fc38",
-            "TestSourceURL": "292d1d4604b5f38c"
-          },
-          "raw": "f8c8ff3e35d777c0",
+          "raw": "070b488d9b28436d",
           "hasher": "go/2"
         }
       }
     },
     "documentation/index.md": {
-      "page": "979a21fb223f5418",
+      "page": "d1dbf17e76a171b5",
       "citations": {
         "internal/code/code.go::Analyze": {
           "surface": "498b2762e77d0628",
@@ -617,63 +1185,8 @@
         }
       }
     },
-    "documentation/publishing.md": {
-      "page": "bb06b4800d3a95f3",
-      "citations": {
-        "internal/cli/publish.go::runPublish": {
-          "surface": "eacfb7bd4de6db52",
-          "body": "993b92b9cc739a55",
-          "raw": "070b488d9b28436d",
-          "hasher": "go/2"
-        }
-      },
-      "sources": {
-        "action.yml": {
-          "body": "843c45db2a112c0a",
-          "raw": "843c45db2a112c0a",
-          "hasher": "bytes"
-        },
-        "internal/cli/publish.go": {
-          "body": "c3167b27bfb8aa0c",
-          "symbols": {
-            "appFramework": "8f460b487a4432c2",
-            "appGlue": "598f1970bc2e9e80",
-            "defaultBranch": "5dca12b61f52168b",
-            "framework": "01b253e09d2ee42e",
-            "indent": "00d255c09d024030",
-            "init": "c78f10468427bc77",
-            "installLine": "91a0ec6dcb7445bb",
-            "normalizePath": "6e35bb15b7cc9e6f",
-            "pagesWorkflowYAML": "a78155f72309f4e7",
-            "publishApp": "75616ac0b9165544",
-            "publishHost": "b1595f75c8309ce8",
-            "publishPages": "982a234946741208",
-            "releaseTag": "8d260e69950a0434",
-            "runPublish": "eacfb7bd4de6db52"
-          },
-          "private": [
-            "appFramework",
-            "appGlue",
-            "defaultBranch",
-            "framework",
-            "indent",
-            "init",
-            "installLine",
-            "normalizePath",
-            "pagesWorkflowYAML",
-            "publishApp",
-            "publishHost",
-            "publishPages",
-            "releaseTag",
-            "runPublish"
-          ],
-          "raw": "070b488d9b28436d",
-          "hasher": "go/2"
-        }
-      }
-    },
-    "documentation/reference.md": {
-      "page": "27003eb7b1a08e91",
+    "documentation/reference/extraction.md": {
+      "page": "421d16c43afecc1f",
       "citations": {
         "internal/reference/reference.go::Coverage": {
           "surface": "a4c40678d4643931",
@@ -1186,486 +1699,6 @@
           "body": "bd7e4eafd3cdef07",
           "raw": "36e82953271d2fd3",
           "hasher": "javascript/44c892e0be05/2"
-        }
-      }
-    },
-    "documentation/site.md": {
-      "page": "b6701fcaaccf3c36",
-      "citations": {
-        "internal/cli/bundle.go::editLink": {
-          "surface": "7c023cbaf4f922aa",
-          "body": "5ab551982e7c7030",
-          "raw": "6682bf9282617ee4",
-          "hasher": "go/2"
-        },
-        "internal/cli/bundle.go::gitLastChange": {
-          "surface": "4c7a4daf2cb930a4",
-          "body": "2dc4c2511680d66f",
-          "raw": "6682bf9282617ee4",
-          "hasher": "go/2"
-        },
-        "internal/cli/bundle.go::siteFor": {
-          "surface": "3a09b09748126992",
-          "body": "116b872921c4ff07",
-          "raw": "6682bf9282617ee4",
-          "hasher": "go/2"
-        },
-        "internal/cli/theme.go::loadTheme": {
-          "surface": "ad68ff380717dc3d",
-          "body": "b899e6711bb57d5d",
-          "raw": "b0a3cb931a75ac78",
-          "hasher": "go/2"
-        },
-        "internal/pages/pages.go::Hero": {
-          "surface": "93665241ccacfd85",
-          "body": "",
-          "raw": "cb489405a5bd086f",
-          "hasher": "go/2"
-        },
-        "internal/pages/pages.go::Section": {
-          "surface": "37cb2bc17070df9b",
-          "body": "",
-          "raw": "cb489405a5bd086f",
-          "hasher": "go/2"
-        },
-        "internal/site/site.go::Build": {
-          "surface": "b40cda3ec9f95359",
-          "body": "b33d12e5510c42cc",
-          "raw": "e41b75a9a1c3adf6",
-          "hasher": "go/2"
-        },
-        "internal/site/site.go::Edited": {
-          "surface": "85d34bc16cc74109",
-          "body": "75f0a43570836e6e",
-          "raw": "e41b75a9a1c3adf6",
-          "hasher": "go/2"
-        },
-        "internal/site/theme.go::Outdated": {
-          "surface": "a74498958d04826b",
-          "body": "e758567c81815581",
-          "raw": "2a815dda47db7111",
-          "hasher": "go/2"
-        }
-      },
-      "sources": {
-        "internal/cli/bundle.go": {
-          "body": "896f92ca17002ac1",
-          "symbols": {
-            "buildSite": "a025c648708f8f48",
-            "buildSiteWith": "ce8afd13d70d1d73",
-            "citationLink": "840bb03b38bba364",
-            "citationTarget": "630f715f9c075a3b",
-            "editLink": "7c023cbaf4f922aa",
-            "gitLastChange": "4c7a4daf2cb930a4",
-            "githubRepo": "cf15e64fa201c261",
-            "init": "c78f10468427bc77",
-            "linkSources": "3b41123d1bc8c90c",
-            "runBundle": "afbcb60d55daccfa",
-            "runBundleEdits": "49aba542c8ae0bbf",
-            "siteFor": "3a09b09748126992",
-            "splitSource": "ebcb91591de95bdb",
-            "verified": "ec88540c8a727204"
-          },
-          "private": [
-            "buildSite",
-            "buildSiteWith",
-            "citationLink",
-            "citationTarget",
-            "editLink",
-            "gitLastChange",
-            "githubRepo",
-            "init",
-            "linkSources",
-            "runBundle",
-            "runBundleEdits",
-            "siteFor",
-            "splitSource",
-            "verified"
-          ],
-          "raw": "6682bf9282617ee4",
-          "hasher": "go/2"
-        },
-        "internal/pages/pages.go": {
-          "body": "0f761459957e228c",
-          "symbols": {
-            "Action": "75dfe11cbbcd9aa6",
-            "Citation": "4ff1d172532f8877",
-            "Citation.Ref": "d428f6f2d2b262be",
-            "Feature": "a5cf0a84e0b6a327",
-            "Hero": "93665241ccacfd85",
-            "Load": "92343c81f51a3dd1",
-            "LogoItem": "60e8655655887672",
-            "Match": "b6ece7cdf64077ba",
-            "Page": "5bacc7eaae3a2c7d",
-            "Page.Anchored": "91797e9211489847",
-            "Parse": "21d7718c70908c49",
-            "RenderCitations": "c678000e1af2f366",
-            "Section": "37cb2bc17070df9b",
-            "Section.UnmarshalYAML": "79d04d262972b3d1",
-            "ValidCitationStyle": "1b26e25eef32b638",
-            "fenceMarker": "da58d0423dfd6529",
-            "findCitations": "a7fd3bcc744cf263",
-            "firstHeading": "a09462356d2e5c85",
-            "firstNonEmpty": "a4fc998c56dbd5b9",
-            "frontmatter": "ed75b05804a47046",
-            "renderCitationLine": "e53000942a6a87c7",
-            "splitFrontmatter": "392c5658a5874645",
-            "titleFromPath": "0ccab65379cf0320",
-            "validSections": "25136085ec5ab234"
-          },
-          "private": [
-            "fenceMarker",
-            "findCitations",
-            "firstHeading",
-            "firstNonEmpty",
-            "frontmatter",
-            "renderCitationLine",
-            "splitFrontmatter",
-            "titleFromPath",
-            "validSections"
-          ],
-          "raw": "cb489405a5bd086f",
-          "hasher": "go/2"
-        },
-        "internal/site/assets/indoc.css": {
-          "body": "2fca2f9e8417458e",
-          "raw": "2fca2f9e8417458e",
-          "hasher": "bytes"
-        },
-        "internal/site/assets/indoc.js": {
-          "body": "e0a28369d54b82d6",
-          "symbols": {
-            "copyText": "2156b8cd9c42e36d",
-            "dark": "675dce303af63061",
-            "draw": "e3b0c44298fc1c14",
-            "escapeHTML": "fc635dba7d931de8",
-            "highlight": "b2c5ed5ffdf6b5c7",
-            "move": "38397f97c84d4b5e",
-            "openChecked": "e3b0c44298fc1c14",
-            "pageHref": "86fa86dc12e1d06a",
-            "renderDiagrams": "9467ce315d790704",
-            "score": "5f3f70deaa2dddff",
-            "search": "f092e115439a8aae",
-            "show": "e3b0c44298fc1c14",
-            "snippet": "3b74ff3ffb1fed21"
-          },
-          "private": [
-            "copyText",
-            "dark",
-            "draw",
-            "escapeHTML",
-            "highlight",
-            "move",
-            "openChecked",
-            "pageHref",
-            "renderDiagrams",
-            "score",
-            "search",
-            "show",
-            "snippet"
-          ],
-          "raw": "0fb6472e24ee62c5",
-          "hasher": "javascript/44c892e0be05/2"
-        },
-        "internal/site/site.go": {
-          "body": "948ab2353136718a",
-          "symbols": {
-            "Build": "b40cda3ec9f95359",
-            "Edited": "85d34bc16cc74109",
-            "EditedError": "953714064361108c",
-            "EditedError.Error": "26a5a9b8f7a6f021",
-            "Link": "d7c60ea0d7835f63",
-            "Page": "0593cd73016047c0",
-            "Ref": "eb6e62f39e57b8a2",
-            "Site": "1c6530f4ca4b6237",
-            "builder": "afa64eab8d730c5d",
-            "builder.assets": "b4ec11e7fdd7703b",
-            "builder.categoryRank": "ae8d547a37e17bc1",
-            "builder.categoryTitle": "e9667abdc839591b",
-            "builder.checkCollisions": "1a4c9037f3bcc3d7",
-            "builder.copyFile": "461572243aa470eb",
-            "builder.isFolder": "358eaf71304af29f",
-            "builder.less": "72cd38f41843868f",
-            "builder.plan": "968c7118e062ba41",
-            "builder.rel": "58893254868edefc",
-            "builder.render": "bdd8cf3c89def1e3",
-            "builder.renderSections": "893fd410d409f585",
-            "builder.resolveImage": "9bd21065e7021313",
-            "builder.resolveLink": "35658f81ca7efb9d",
-            "builder.searchIndex": "b866e3a29a08428f",
-            "builder.url": "9b3db7992be90541",
-            "built": "aaaf7faedc67a308",
-            "commonDir": "acbb3d0fb641a90f",
-            "contentHash": "a9c9e3518c6f7aaf",
-            "humanize": "a8e40962f5500bfa",
-            "logo": "f8f779128ec729b3",
-            "pageLess": "b0681c15b476cd81",
-            "rank": "475c17380f316fbf",
-            "readManifest": "2e39cfde13081fe2",
-            "refText": "eb4d031f6f68518b",
-            "rootPrefix": "748b4484d23b165a",
-            "searchEntry": "8703558b8e9c913f",
-            "section": "45bf258f622827cd",
-            "slugPath": "cbd6507c802f6c4b",
-            "writer": "8621b7b087b5a08f",
-            "writer.finish": "5d267f2d478cfe6d",
-            "writer.write": "cb9a3612c7be96f6"
-          },
-          "private": [
-            "builder",
-            "builder.assets",
-            "builder.categoryRank",
-            "builder.categoryTitle",
-            "builder.checkCollisions",
-            "builder.copyFile",
-            "builder.isFolder",
-            "builder.less",
-            "builder.plan",
-            "builder.rel",
-            "builder.render",
-            "builder.renderSections",
-            "builder.resolveImage",
-            "builder.resolveLink",
-            "builder.searchIndex",
-            "builder.url",
-            "built",
-            "commonDir",
-            "contentHash",
-            "humanize",
-            "logo",
-            "pageLess",
-            "rank",
-            "readManifest",
-            "refText",
-            "rootPrefix",
-            "searchEntry",
-            "section",
-            "slugPath",
-            "writer",
-            "writer.finish",
-            "writer.write"
-          ],
-          "raw": "e41b75a9a1c3adf6",
-          "hasher": "go/2"
-        },
-        "internal/site/site_test.go": {
-          "body": "aa11a0bbd8713df7",
-          "symbols": {
-            "TestFileURLs": "8f43e7080e6d9fd0",
-            "TestLanding": "3c18404c6fab744f",
-            "TestLandingSectionErrors": "06dd8fc4274b866e",
-            "TestLandingSectionOrder": "a28d5ceb15496e83",
-            "TestLayoutAndLinks": "20c522e3db29fb83",
-            "TestLegacyViewerRemoved": "7187d912e7d8be91",
-            "TestLogoIsFavicon": "eae28e96b0cf0133",
-            "TestMermaidOnlyWhenUsed": "cd62c00a1da3567b",
-            "TestReferenceTables": "ae59f9f109f5a7e9",
-            "TestStaleFilesRemoved": "4823141262fe41dd",
-            "TestURLCollisions": "8e8f2ff211de670e",
-            "basicSite": "31a2e0164be82723",
-            "build": "227a27ce1384a0c5",
-            "exists": "adc92eea098ab63c",
-            "read": "92008ed0428d7e03"
-          },
-          "private": [
-            "basicSite",
-            "build",
-            "exists",
-            "read"
-          ],
-          "raw": "8698044bed8c3488",
-          "hasher": "go/2"
-        },
-        "internal/site/templates/page.html": {
-          "body": "86b54906632ec63b",
-          "raw": "86b54906632ec63b",
-          "hasher": "bytes"
-        },
-        "internal/site/templates/parts/features.html": {
-          "body": "6f869fa5006d002c",
-          "raw": "6f869fa5006d002c",
-          "hasher": "bytes"
-        },
-        "internal/site/templates/parts/footer.html": {
-          "body": "83fab95a605542e7",
-          "raw": "83fab95a605542e7",
-          "hasher": "bytes"
-        },
-        "internal/site/templates/parts/header.html": {
-          "body": "3d4500e22c069e82",
-          "raw": "3d4500e22c069e82",
-          "hasher": "bytes"
-        },
-        "internal/site/templates/parts/hero.html": {
-          "body": "ed5602dc8486536b",
-          "raw": "ed5602dc8486536b",
-          "hasher": "bytes"
-        },
-        "internal/site/templates/parts/sidebar.html": {
-          "body": "aa61c6dd84460432",
-          "raw": "aa61c6dd84460432",
-          "hasher": "bytes"
-        },
-        "internal/site/theme.go": {
-          "body": "d3322f74eec2d884",
-          "symbols": {
-            "BuiltinPart": "42f2e976ddcfeebb",
-            "IsPart": "3417081845ac6ef0",
-            "Outdated": "a74498958d04826b",
-            "PartHash": "2122317bc198cae8",
-            "Stamp": "cad67594407db05f",
-            "builder.templates": "3057fe340920a1a9"
-          },
-          "private": [
-            "builder.templates"
-          ],
-          "raw": "2a815dda47db7111",
-          "hasher": "go/2"
-        },
-        "internal/site/write.go": {
-          "body": "49ad1c2f4a42cbe2",
-          "symbols": {
-            "action": "7dbbf684e45c7f1e",
-            "builder.execute": "e3d06716413fa76a",
-            "builder.landing": "be1f234b460e302b",
-            "builder.nav": "0f97abc234241bab",
-            "builder.sitemap": "644c59ed76ff6618",
-            "builder.view": "bb2b804166e107ef",
-            "builder.writePages": "ec5c723d601b074f",
-            "feature": "92b02d70eb008f96",
-            "navGroup": "0fb1bb38ceab36f6",
-            "navItem": "e11e00936f210838",
-            "view": "88b2e1127fee8330"
-          },
-          "private": [
-            "action",
-            "builder.execute",
-            "builder.landing",
-            "builder.nav",
-            "builder.sitemap",
-            "builder.view",
-            "builder.writePages",
-            "feature",
-            "navGroup",
-            "navItem",
-            "view"
-          ],
-          "raw": "ee81b862e0196d96",
-          "hasher": "go/2"
-        }
-      }
-    },
-    "documentation/writing-pages.md": {
-      "page": "09e46ff53148a25c",
-      "citations": {
-        "internal/code/code.go::Analyze": {
-          "surface": "498b2762e77d0628",
-          "body": "999448245764a731",
-          "raw": "37531f43588cdc7a",
-          "hasher": "go/2"
-        },
-        "internal/drift/drift.go::Finding.Fails": {
-          "surface": "7c6f4d383dc2bc4e",
-          "body": "cbcb7de0f5756098",
-          "raw": "f022796b08cb3cbc",
-          "hasher": "go/2"
-        },
-        "internal/drift/drift.go::Stamp": {
-          "surface": "8df7959ee83484b4",
-          "body": "a9d4bcad15e37f8e",
-          "raw": "f022796b08cb3cbc",
-          "hasher": "go/2"
-        },
-        "internal/pages/pages.go::Parse": {
-          "surface": "21d7718c70908c49",
-          "body": "00aad095aaf4bac6",
-          "raw": "cb489405a5bd086f",
-          "hasher": "go/2"
-        },
-        "internal/pages/pages.go::RenderCitations": {
-          "surface": "c678000e1af2f366",
-          "body": "55046ff7776bd59c",
-          "raw": "cb489405a5bd086f",
-          "hasher": "go/2"
-        }
-      },
-      "sources": {
-        "internal/code/code.go": {
-          "body": "977252489edf546a",
-          "symbols": {
-            "Analyze": "498b2762e77d0628",
-            "File": "dae3fc20928c2e14",
-            "File.Lookup": "548418227fcfb633",
-            "File.Private": "cd5018fa1ea28f10",
-            "File.Surfaces": "7c6e4c8a2651c3e0",
-            "HasherFor": "02041b0f90a28590",
-            "IsTest": "ac381bf5d8c73c92",
-            "ListFiles": "4ae8ae2ed76bdf67",
-            "Parsable": "ad7f83aeb7fc246d",
-            "analyze": "9263e64a0262bd09",
-            "isVirtualenv": "1f9359d24de35af2"
-          },
-          "private": [
-            "analyze",
-            "isVirtualenv"
-          ],
-          "raw": "37531f43588cdc7a",
-          "hasher": "go/2"
-        },
-        "internal/pages/pages.go": {
-          "body": "0f761459957e228c",
-          "symbols": {
-            "Action": "75dfe11cbbcd9aa6",
-            "Citation": "4ff1d172532f8877",
-            "Citation.Ref": "d428f6f2d2b262be",
-            "Feature": "a5cf0a84e0b6a327",
-            "Hero": "93665241ccacfd85",
-            "Load": "92343c81f51a3dd1",
-            "LogoItem": "60e8655655887672",
-            "Match": "b6ece7cdf64077ba",
-            "Page": "5bacc7eaae3a2c7d",
-            "Page.Anchored": "91797e9211489847",
-            "Parse": "21d7718c70908c49",
-            "RenderCitations": "c678000e1af2f366",
-            "Section": "37cb2bc17070df9b",
-            "Section.UnmarshalYAML": "79d04d262972b3d1",
-            "ValidCitationStyle": "1b26e25eef32b638",
-            "fenceMarker": "da58d0423dfd6529",
-            "findCitations": "a7fd3bcc744cf263",
-            "firstHeading": "a09462356d2e5c85",
-            "firstNonEmpty": "a4fc998c56dbd5b9",
-            "frontmatter": "ed75b05804a47046",
-            "renderCitationLine": "e53000942a6a87c7",
-            "splitFrontmatter": "392c5658a5874645",
-            "titleFromPath": "0ccab65379cf0320",
-            "validSections": "25136085ec5ab234"
-          },
-          "private": [
-            "fenceMarker",
-            "findCitations",
-            "firstHeading",
-            "firstNonEmpty",
-            "frontmatter",
-            "renderCitationLine",
-            "splitFrontmatter",
-            "titleFromPath",
-            "validSections"
-          ],
-          "raw": "cb489405a5bd086f",
-          "hasher": "go/2"
-        },
-        "internal/pages/pages_test.go": {
-          "body": "e54543a159649a13",
-          "symbols": {
-            "TestLandingSections": "73973a9ed7c767d7",
-            "TestMatch": "ace37652a65aedac",
-            "TestParseDocusaurusKeysAndFallbackTitles": "469c2144a116974d",
-            "TestParseFrontmatterAndCitations": "d463991d1ab22c96",
-            "TestParseRejectsBadFrontmatter": "7213cdfdef0417c9",
-            "TestRenderCitations": "abf3e28455d4a7f9"
-          },
-          "raw": "713395927251ad73",
-          "hasher": "go/2"
         }
       }
     }

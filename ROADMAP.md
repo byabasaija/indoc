@@ -8,6 +8,7 @@ Want something here sooner? [Open an issue](https://github.com/byabasaija/indoc/
 
 | Version | What it added |
 |---|---|
+| **0.7** | A standard docs layout: folders become sidebar sections that fold open, nested as deep as the folders go, with breadcrumbs; the agent lays new docs out in sections (get started, guides, reference, concepts) |
 | **0.6** | `indoc publish`: GitHub Pages, static hosts, or served by your app with tested code for Django, FastAPI, Flask, Express, NestJS, Next.js, Astro, and Go; `.indoc/theme/` with replaceable parts; more `appearance:` settings; hand edits to the output are caught, not overwritten |
 | **0.5** | Citations show as symbol names with a "Checked against the code" box; `citations: short \| full \| hidden`; links to the code opt-in (`source_links`); pages at the same URL refused; outlines organized by purpose |
 | **0.4** | The agent asks which logo to use and proposes a landing page on the first run; ordered landing `sections:` with a contributors wall, a logos row, and full-width Markdown blocks |
@@ -18,7 +19,7 @@ Want something here sooner? [Open an issue](https://github.com/byabasaija/indoc/
 ## Next
 
 - **Pull request comments.** The GitHub Action posts which pages went stale and why, instead of only failing.
-- **More frameworks:** Flask blueprints, Rails, Laravel, Spring. Each lands with a test against the framework's own route table, like the others ([how extractors are verified](documentation/accuracy.md#extractors-are-routes-complete)).
+- **More frameworks:** Flask blueprints, Rails, Laravel, Spring. Each lands with a test against the framework's own route table, like the others ([how extractors are verified](documentation/concepts/accuracy.md#extractors-are-routes-complete)).
 - **OpenAPI.** Read a committed OpenAPI schema to add request and response details to route pages.
 - **Descriptions for reference entries.** An optional `.indoc/reference.yaml` to describe routes and variables in your own words, with entries that no longer exist reported.
 - **Command checks.** Fail when a page tells readers to run `make x` or `npm run x` and that target no longer exists.

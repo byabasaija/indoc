@@ -91,7 +91,7 @@ type Page struct {
 type built struct {
 	*Page
 	Slug      string // "" for home, "dev/checkout" otherwise
-	Category  string
+	Dir       string // the section folder the page belongs to; a folder's own page belongs to that folder
 	HTML      template.HTML
 	Headings  []doc.Heading
 	Text      string
@@ -152,6 +152,7 @@ type builder struct {
 	w        *writer
 	pages    []*built // navigation order, home first
 	bySource map[string]*built
+	tree     *folder           // sections, for the sidebar and breadcrumbs
 	images   map[string]string // repo path -> site path
 	logo     string            // site-relative logo path or absolute URL
 	mermaid  bool
@@ -174,10 +175,10 @@ func (b *builder) plan() error {
 			rel = strings.TrimSuffix(path.Dir(rel), ".")
 		}
 		bp := &built{Page: p, Slug: slugPath(rel)}
-		if i := strings.Index(bp.Slug, "/"); i > 0 {
-			bp.Category = bp.Slug[:i]
-		} else if bp.Slug != "" && b.isFolder(bp.Slug, base) {
-			bp.Category = bp.Slug
+		if bp.Slug != "" && b.isFolder(bp.Slug, base) {
+			bp.Dir = bp.Slug
+		} else if d := path.Dir(bp.Slug); d != "." {
+			bp.Dir = d
 		}
 		if bp.Slug == "" && home == nil {
 			home = bp
@@ -185,27 +186,38 @@ func (b *builder) plan() error {
 		b.bySource[p.Source] = bp
 		b.pages = append(b.pages, bp)
 	}
-	sort.SliceStable(b.pages, func(i, j int) bool { return b.less(b.pages[i], b.pages[j]) })
 	if home == nil {
+		sort.SliceStable(b.pages, func(i, j int) bool { return pageLess(b.pages[i].Page, b.pages[j].Page) })
 		home = b.pages[0] // no index.md: the first page is the home page
-		home.Slug, home.Category = "", ""
+		home.Slug, home.Dir = "", ""
 	}
-	ordered := []*built{home}
+	b.tree = &folder{}
 	for _, p := range b.pages {
-		if p != home {
-			ordered = append(ordered, p)
+		if p == home {
+			continue
 		}
+		f := b.tree.at(p.Dir)
+		if p.Slug == p.Dir && f.index == nil {
+			f.index = p
+		} else {
+			f.pages = append(f.pages, p)
+		}
+	}
+	ref := b.tree
+	if len(b.site.Reference) > 0 {
+		ref = b.tree.at("reference")
 	}
 	for i := range b.site.Reference {
 		sec := &b.site.Reference[i]
-		ordered = append(ordered, &built{
+		ref.generated = append(ref.generated, &built{
 			Page:      &Page{Title: sec.Title, Source: ""},
 			Slug:      "reference/" + doc.Slug(sec.ID),
-			Category:  "reference",
+			Dir:       "reference",
 			Reference: sec,
 		})
 	}
-	b.pages = ordered
+	b.tree.sort()
+	b.pages = b.tree.flatten([]*built{home})
 	return b.checkCollisions()
 }
 
@@ -242,59 +254,6 @@ func (b *builder) isFolder(slug, base string) bool {
 		}
 	}
 	return false
-}
-
-// less orders pages: top level first, then categories, each by order then title.
-func (b *builder) less(x, y *built) bool {
-	cx, cy := b.categoryRank(x.Category), b.categoryRank(y.Category)
-	if x.Category != y.Category {
-		if cx.order != cy.order {
-			return cx.order < cy.order
-		}
-		return cx.title < cy.title
-	}
-	// The folder's own index comes first in its category.
-	if (x.Slug == x.Category) != (y.Slug == y.Category) {
-		return x.Slug == x.Category
-	}
-	return pageLess(x.Page, y.Page)
-}
-
-type rank struct {
-	order int
-	title string
-}
-
-func (b *builder) categoryRank(cat string) rank {
-	if cat == "" {
-		return rank{order: -1 << 30}
-	}
-	r := rank{order: 1 << 30, title: b.categoryTitle(cat)}
-	for _, p := range b.site.Pages {
-		bp := b.bySource[p.Source]
-		if bp == nil || bp.Category != cat || !p.HasOrder {
-			continue
-		}
-		if bp.Slug == cat {
-			return rank{order: p.Order, title: r.title}
-		}
-		if p.Order < r.order {
-			r.order = p.Order
-		}
-	}
-	return r
-}
-
-func (b *builder) categoryTitle(cat string) string {
-	if cat == "reference" {
-		return "Reference"
-	}
-	for _, bp := range b.bySource {
-		if bp.Slug == cat {
-			return bp.Title
-		}
-	}
-	return humanize(cat)
 }
 
 func pageLess(a, c *Page) bool {
@@ -559,9 +518,11 @@ func (b *builder) searchIndex() error {
 	var entries []searchEntry
 	for _, p := range b.pages {
 		e := searchEntry{Title: p.Title, URL: b.url(p.Slug), Text: p.Text}
-		if p.Category != "" {
-			e.Section = b.categoryTitle(p.Category)
+		var trail []string
+		for _, s := range b.sectionsOf(p) {
+			trail = append(trail, s.title())
 		}
+		e.Section = strings.Join(trail, " › ")
 		for _, h := range p.Headings {
 			if h.Level > 1 {
 				e.Headings = append(e.Headings, h.Text)

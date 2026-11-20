@@ -1,0 +1,20 @@
+{{- /* nav-tree renders sidebar items: pages, and sections that fold open. */ -}}
+{{define "nav-tree"}}
+<ul class="nav-list">
+  {{- range .}}
+  {{- if .Section}}
+  <li class="nav-section">
+    <details{{if .Open}} open{{end}}>
+      <summary>
+        {{- if .Href}}<a href="{{.Href}}"{{if .Active}} aria-current="page"{{end}}>{{.Title}}</a>{{else}}<span class="nav-label">{{.Title}}</span>{{end}}
+        <span class="nav-caret" aria-hidden="true"></span>
+      </summary>
+      {{- template "nav-tree" .Children}}
+    </details>
+  </li>
+  {{- else}}
+  <li><a href="{{.Href}}"{{if .Active}} aria-current="page"{{end}}>{{.Title}}</a></li>
+  {{- end}}
+  {{- end}}
+</ul>
+{{end}}

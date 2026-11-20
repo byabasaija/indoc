@@ -148,6 +148,14 @@
 {{- end}}
 
 {{- define "body"}}
+    {{- if .Crumbs}}
+    <nav class="crumbs" aria-label="Breadcrumb">
+      {{- range .Crumbs}}
+      {{- if .Href}}<a href="{{.Href}}">{{.Title}}</a>{{else}}<span>{{.Title}}</span>{{end}}<span class="crumb-sep" aria-hidden="true">›</span>
+      {{- end}}
+      <span aria-current="page">{{.Page.Title}}</span>
+    </nav>
+    {{- end}}
     <article class="prose">
       {{- if .Page.Reference}}
       <h1>{{.Page.Title}}</h1>

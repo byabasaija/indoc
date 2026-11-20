@@ -1,5 +1,5 @@
 ---
-title: Getting started
+title: Quick start
 order: 1
 sources:
   - internal/cli/init.go
@@ -7,11 +7,11 @@ sources:
   - internal/config/**
 ---
 
-# Getting started
+# Quick start
 
 ## Install
 
-The easiest way is the plugin for your coding agent, which needs nothing else installed; see [Using indoc from a coding agent](agents.md). The agent then runs the steps below for you.
+The easiest way is the plugin for your coding agent, which needs nothing else installed; see [Using indoc from a coding agent](../guides/agents.md). The agent then runs the steps below for you.
 
 For the command itself, on macOS or Linux:
 
@@ -19,7 +19,7 @@ For the command itself, on macOS or Linux:
 curl -fsSL https://github.com/byabasaija/indoc/releases/latest/download/install.sh | sh
 ```
 
-It installs to `/usr/local/bin` when writable, otherwise `~/.local/bin`, after verifying the download against the release's checksums. Pin a version with `| sh -s -- v0.6.0`, or choose the folder with `INDOC_INSTALL_DIR`. Alternatively, `go install github.com/byabasaija/indoc/cmd/indoc@latest`, or download a binary (including Windows) from the GitHub releases page.
+It installs to `/usr/local/bin` when writable, otherwise `~/.local/bin`, after verifying the download against the release's checksums. Pin a version with `| sh -s -- v0.7.0`, or choose the folder with `INDOC_INSTALL_DIR`. Alternatively, `go install github.com/byabasaija/indoc/cmd/indoc@latest`, or download a binary (including Windows) from the GitHub releases page.
 
 ## Initialize
 
@@ -57,7 +57,7 @@ Ask your coding agent to document the project. It runs `indoc scan --json`, writ
 indoc bundle
 ```
 
-`internal/cli/bundle.go::runBundle` refuses to build if any citation or `sources` glob is broken, or if files in the site folder were edited by hand since the last build ([what to do](site.md#edits-to-the-output)), extracts reference facts from source, writes the site to `output_dir` (default `.indoc/site/`, gitignored), and records new or edited pages in `.indoc/lock.json`.
+`internal/cli/bundle.go::runBundle` refuses to build if any citation or `sources` glob is broken, or if files in the site folder were edited by hand since the last build ([what to do](../guides/customizing.md#edits-to-the-output)), extracts reference facts from source, writes the site to `output_dir` (default `.indoc/site/`, gitignored), and records new or edited pages in `.indoc/lock.json`.
 
 Preview it with `indoc preview`, which serves on `http://127.0.0.1:4173` and rebuilds when a page changes.
 
@@ -67,7 +67,7 @@ Preview it with `indoc preview`, which serves on `http://127.0.0.1:4173` and reb
 indoc publish --target pages            # or host, or app --path /guide/
 ```
 
-saves where the docs are served and prints the steps: a GitHub Pages workflow, a static host's settings, or the code your web app needs. See [Publishing the site](publishing.md).
+saves where the docs are served and prints the steps: a GitHub Pages workflow, a static host's settings, or the code your web app needs. See [Publishing the site](../guides/publishing.md).
 
 ## Commit
 

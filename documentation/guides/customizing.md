@@ -1,6 +1,6 @@
 ---
 title: Customizing the site
-order: 5
+order: 11
 sources:
   - internal/site/**
   - internal/cli/bundle.go
@@ -13,16 +13,34 @@ sources:
 
 ## Structure
 
-The sidebar mirrors the folders your pages live in:
+The sidebar is built from your folders, the way readers expect from any documentation site: each folder becomes a section that folds open, and a folder inside a folder becomes a sub-section (`internal/site/tree.go::builder.nav`). The sections holding the current page start open (on the home page, the top-level ones), the page itself is highlighted, and a breadcrumb trail above its title links back up.
 
-| File | URL | In the sidebar |
-|---|---|---|
-| `documentation/index.md` | `/` | The home page, linked from the logo |
-| `documentation/faq.md` | `/faq/` | Top level |
-| `documentation/guides/index.md` | `/guides/` | Names the "Guides" group and comes first in it |
-| `documentation/guides/setup.md` | `/guides/setup/` | In the "Guides" group |
+Group pages by what the reader came to do:
 
-Pages sort by `order`, then title. A group sorts by its `index.md`'s `order`, or the lowest `order` inside it. Reference pages go last, under "Reference". Links between Markdown files (`[setup](guides/setup.md#install)`) become links between pages, and local images are copied into the site. Two pages that would land at the same URL, such as `guides.md` next to `guides/index.md`, or a page at `reference/routes.md` next to the generated Routes page, stop the build with both named, instead of one silently replacing the other.
+```text
+documentation/
+  index.md                  /                         the home page, linked from the logo
+  get-started/
+    quick-start.md          /get-started/quick-start/
+    writing-pages.md
+  guides/
+    index.md                /guides/                  optional: names the section and opens on click
+    deploy/                                           a sub-section
+      docker.md             /guides/deploy/docker/
+  reference/
+    configuration.md                                  generated reference pages join this section
+  concepts/
+    how-it-works.md
+```
+
+| Question | Answer |
+|---|---|
+| What is a section called? | Its `index.md` title, or the folder name humanized: `get-started` becomes "Get started". |
+| In what order? | Loose pages first, then sections. Pages sort by `order`, then title. A section sorts by its `index.md`'s `order`, else the lowest `order` inside it, so numbering pages across the whole site (1, 2 in Get started; 10, 11 in Guides) orders the sections too. |
+| Where does reference go? | indoc's generated reference pages join the `reference/` section, after your own pages there. |
+| Previous and next? | They follow the sidebar from top to bottom. |
+
+Links between Markdown files (`[setup](guides/setup.md#install)`) become links between pages, and local images are copied into the site. Two pages that would land at the same URL, such as `guides.md` next to `guides/index.md`, or a page at `reference/routes.md` next to the generated Routes page, stop the build with both named, instead of one silently replacing the other.
 
 ## Landing page
 
@@ -38,7 +56,7 @@ hero:
   image: images/hero.svg        # defaults to the logo
   actions:
     - text: Get started          # the first action is primary
-      link: getting-started.md
+      link: get-started/quick-start.md
     - text: API reference
       link: reference/api.md
 features:
