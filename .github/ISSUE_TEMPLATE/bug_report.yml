@@ -21,7 +21,6 @@ body:
       options:
         - Command line
         - Claude Code plugin
-        - Copilot CLI plugin
         - GitHub Action
         - Other
     validations:

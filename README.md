@@ -44,7 +44,7 @@ Docs rot quietly. A function gets a new parameter, a route moves, and the guide 
 /plugin install indoc@indoc
 ```
 
-or in GitHub Copilot CLI: `copilot plugin install byabasaija/indoc:plugin`. Then ask *"document this project"*, and later *"update the stale docs"*. The plugin downloads and verifies the indoc binary itself.
+Then ask *"document this project"*, and later *"update the stale docs"*. The plugin downloads and verifies the indoc binary itself. Plugins for other agents (Copilot CLI, Cursor, Codex, Gemini CLI) are [next on the roadmap](ROADMAP.md#next).
 
 **In CI**, add one step to a workflow:
 

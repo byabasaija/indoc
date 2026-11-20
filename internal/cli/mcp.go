@@ -19,8 +19,8 @@ var mcpCmd = &cobra.Command{
 	Use:   "mcp",
 	Short: "Run the MCP server on stdio (for coding agents)",
 	Long: `mcp serves indoc's operations to a coding agent over the Model Context
-Protocol on stdin/stdout: indoc_setup, indoc_scan, indoc_check, indoc_ack, and
-indoc_bundle. Plugins for Claude Code and GitHub Copilot CLI start it for you.`,
+Protocol on stdin/stdout: indoc_scan, indoc_setup, indoc_check, indoc_ack,
+indoc_bundle, and indoc_publish. The Claude Code plugin starts it for you.`,
 	Args: cobra.NoArgs,
 	RunE: func(cmd *cobra.Command, args []string) error {
 		return mcpServer().Serve(cmd.InOrStdin(), cmd.OutOrStdout())

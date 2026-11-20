@@ -18,7 +18,7 @@ features:
     details: Routes, environment variables, and commands are extracted from Django, FastAPI, Express, Next.js, NestJS, Astro, and Cobra. Nobody copies them by hand.
     link: reference/extraction.md
   - title: Your agent writes, indoc checks
-    details: Install the plugin for Claude Code or Copilot CLI and ask for docs. No API keys; indoc never calls a model.
+    details: Install the plugin for Claude Code and ask for docs. No API keys; indoc never calls a model.
     link: guides/agents.md
   - title: A static site, anywhere
     details: One HTML file per page, relative links, no server. Mount it in your app, publish it, or open it from disk.

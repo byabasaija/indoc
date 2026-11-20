@@ -15,10 +15,11 @@ Want something here sooner? [Open an issue](https://github.com/byabasaija/indoc/
 | **0.4** | The agent asks which logo to use and proposes a landing page on the first run; ordered landing `sections:` with a contributors wall, a logos row, and full-width Markdown blocks |
 | **0.3** | New pages go in `documentation/`, so plans and agent notes in `docs/` are never mixed in or published; a `curl \| sh` installer (0.3.1) |
 | **0.2** | A pre-rendered docs site: search, dark mode, highlighting, copy buttons, Mermaid, landing page, edit links |
-| **0.1** | `check` and the lock; `path::Symbol` citations; Python, JavaScript/TypeScript, and Go parsers; routes, env vars, and commands from Django, DRF, FastAPI, Express, Next.js, NestJS, Astro, and Cobra; MCP server and plugin for Claude Code and Copilot CLI; GitHub Action |
+| **0.1** | `check` and the lock; `path::Symbol` citations; Python, JavaScript/TypeScript, and Go parsers; routes, env vars, and commands from Django, DRF, FastAPI, Express, Next.js, NestJS, Astro, and Cobra; MCP server and Claude Code plugin; GitHub Action |
 
 ## Next
 
+- **More coding agents.** Plugins for GitHub Copilot CLI, Cursor, OpenAI Codex, and Gemini CLI. indoc's MCP server (`indoc mcp`) already works with any MCP client; each plugin ships once the whole flow (scan, questions, outline, writing, building) is tested end to end on that agent, as it is on Claude Code.
 - **Pull request comments.** The GitHub Action posts which pages went stale and why, instead of only failing.
 - **More frameworks:** Flask blueprints, Rails, Laravel, Spring. Each lands with a test against the framework's own route table, like the others ([how extractors are verified](documentation/concepts/accuracy.md#extractors-are-routes-complete)).
 - **OpenAPI.** Read a committed OpenAPI schema to add request and response details to route pages.

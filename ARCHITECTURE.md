@@ -111,7 +111,7 @@ A change to a symbol the page cites is reported once, on the citation, not again
 
 `indoc mcp` runs `internal/mcp`, a dependency-free MCP server on stdio (newline-delimited JSON-RPC). It speaks both protocol eras: the `initialize` handshake (2024-11-05 through 2025-11-25) and per-request `_meta` with `server/discover` (2026-07-28). Its six tools (`indoc_scan`, `indoc_setup`, `indoc_check`, `indoc_ack`, `indoc_bundle`, `indoc_publish`) call the same functions as the commands.
 
-`plugin/` is one plugin for Claude Code and Copilot CLI: a skill that tells the agent how to work (outline in section folders first, cite everything, never hand-write reference tables) and how to ask: one decision per question, with what is being approved inside the question's preview, because Claude Code shortens the text an agent writes just before a question and an MCP entry that starts `plugin/bin/indoc`. That launcher downloads the release binary matching the plugin version, verifies it against the release's `checksums.txt`, and caches it. The release workflow refuses a tag that differs from the plugin's pinned version.
+`plugin/` is the Claude Code plugin: a skill that tells the agent how to work (outline in section folders first, cite everything, never hand-write reference tables) and how to ask: one decision per question, with what is being approved inside the question's preview, because Claude Code shortens the text an agent writes just before a question and an MCP entry that starts `plugin/bin/indoc`. That launcher downloads the release binary matching the plugin version, verifies it against the release's `checksums.txt`, and caches it. The release workflow refuses a tag that differs from the plugin's pinned version.
 
 ## Decisions
 

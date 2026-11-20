@@ -471,24 +471,24 @@
       }
     },
     "documentation/guides/agents.md": {
-      "page": "66a1ea5969465a3f",
+      "page": "60724a3986023276",
       "citations": {
         "internal/cli/mcp.go::mcpServer": {
           "surface": "9a5340343b623d99",
           "body": "370242722f6a079c",
-          "raw": "1eb657a9ec1b875f",
+          "raw": "bd16b72ca33e5e35",
           "hasher": "go/2"
         },
         "internal/cli/mcp.go::setLogo": {
           "surface": "b742c192766d29cd",
           "body": "cc967b6f6735bbf4",
-          "raw": "1eb657a9ec1b875f",
+          "raw": "bd16b72ca33e5e35",
           "hasher": "go/2"
         },
         "internal/cli/mcp.go::setup": {
           "surface": "edddf1d25b166fce",
           "body": "0bfae943ab8f8106",
-          "raw": "1eb657a9ec1b875f",
+          "raw": "bd16b72ca33e5e35",
           "hasher": "go/2"
         },
         "internal/mcp/mcp.go::Server.Serve": {
@@ -500,7 +500,7 @@
       },
       "sources": {
         "internal/cli/mcp.go": {
-          "body": "fc6f9931c16ab16c",
+          "body": "3e3cfae24c8810ed",
           "symbols": {
             "failed": "e2d8ad0f8686e095",
             "init": "c78f10468427bc77",
@@ -533,7 +533,7 @@
             "toolScan",
             "toolSetup"
           ],
-          "raw": "1eb657a9ec1b875f",
+          "raw": "bd16b72ca33e5e35",
           "hasher": "go/2"
         },
         "internal/mcp/mcp.go": {
@@ -1215,7 +1215,7 @@
       }
     },
     "documentation/index.md": {
-      "page": "d1dbf17e76a171b5",
+      "page": "3bf1b1fcb0460b30",
       "citations": {
         "internal/code/code.go::Analyze": {
           "surface": "498b2762e77d0628",

@@ -9,7 +9,7 @@ sources:
 
 # Using indoc from a coding agent
 
-The indoc plugin for Claude Code and GitHub Copilot CLI gives your agent indoc's operations as MCP tools, plus a skill that says how to use them. Ask it to "document this project" or "update the stale docs".
+The indoc plugin for Claude Code gives your agent indoc's operations as MCP tools, plus a skill that says how to use them. Ask it to "document this project" or "update the stale docs".
 
 ## Install
 
@@ -20,17 +20,11 @@ Claude Code, in a terminal session (`claude`; the editor extensions do not run `
 /plugin install indoc@indoc
 ```
 
-GitHub Copilot CLI:
-
-```
-copilot plugin install byabasaija/indoc:plugin
-```
-
 On first use the plugin's launcher downloads the indoc release matching the plugin version for your platform, checks it against the release's `checksums.txt`, and caches it in the plugin's data directory. A download that does not match its checksum is never run. To use a local build instead, set `INDOC_BIN` to its path.
 
 ## Tools
 
-`indoc mcp` runs the MCP server on stdin and stdout (`internal/cli/mcp.go::mcpServer`); any MCP client can start it directly.
+`indoc mcp` runs the MCP server on stdin and stdout (`internal/cli/mcp.go::mcpServer`); any MCP client can start it directly. Plugins for other agents (GitHub Copilot CLI, Cursor, OpenAI Codex, Gemini CLI) are planned; see the [roadmap](https://github.com/byabasaija/indoc/blob/main/ROADMAP.md#next).
 
 | Tool | Does | Changes files |
 |---|---|---|
