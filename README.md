@@ -90,10 +90,9 @@ Every order is charged once per idempotency key (`shop/checkout/service.py::Chec
 
 Fix the page, or run `indoc ack <page>` if it is still correct. Replaying 100 commits of a production codebase, 85% of the flags were real problems and 3–4% of commits would have failed with nothing wrong ([how it was measured](documentation/concepts/accuracy.md)).
 
-<picture>
-  <source media="(prefers-color-scheme: dark)" srcset="design/screenshots/site-dark.png">
-  <img src="design/screenshots/site-light.png" width="760" alt="A page in an indoc site: sidebar sections from folders, breadcrumbs, highlighted code, and the GitHub card in the header">
-</picture>
+## Built with indoc
+
+indoc's own documentation is Markdown in [`documentation/`](documentation/), citing indoc's code. CI checks it on every pull request, and indoc builds and publishes it to [byabasaija.github.io/indoc](https://byabasaija.github.io/indoc/).
 
 ## indoc vs Docusaurus and MkDocs
 
