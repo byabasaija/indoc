@@ -49,7 +49,7 @@ or in GitHub Copilot CLI: `copilot plugin install byabasaija/indoc:plugin`. Then
 **In CI**, add one step to a workflow:
 
 ```yaml
-      - uses: byabasaija/indoc@v0.8.1
+      - uses: byabasaija/indoc@v0.8.2
 ```
 
 **By hand** on macOS or Linux (or `go install github.com/byabasaija/indoc/cmd/indoc@latest`, or a binary from [Releases](https://github.com/byabasaija/indoc/releases)):
