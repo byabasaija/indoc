@@ -100,7 +100,7 @@
       }
     },
     "documentation/get-started/quick-start.md": {
-      "page": "bb30fc40b3279b65",
+      "page": "b2ea14696ec32d51",
       "citations": {
         "internal/cli/bundle.go::runBundle": {
           "surface": "afbcb60d55daccfa",
@@ -453,19 +453,19 @@
           "hasher": "bytes"
         },
         "plugin/bin/indoc": {
-          "body": "f7d35c7d34fa3070",
-          "raw": "f7d35c7d34fa3070",
+          "body": "ca85c2fab55847a1",
+          "raw": "ca85c2fab55847a1",
           "hasher": "bytes"
         },
         "plugin/skills/indoc/SKILL.md": {
-          "body": "bcba34a3765f126e",
-          "raw": "bcba34a3765f126e",
+          "body": "d402ec335ef14cce",
+          "raw": "d402ec335ef14cce",
           "hasher": "bytes"
         }
       }
     },
     "documentation/guides/ci.md": {
-      "page": "5caee4e644898d07",
+      "page": "4bd932b475125a5b",
       "citations": {
         "internal/cli/check.go::runCheck": {
           "surface": "4d82fe88e3e7a473",

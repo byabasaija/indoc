@@ -19,7 +19,7 @@ For the command itself, on macOS or Linux:
 curl -fsSL https://github.com/byabasaija/indoc/releases/latest/download/install.sh | sh
 ```
 
-It installs to `/usr/local/bin` when writable, otherwise `~/.local/bin`, after verifying the download against the release's checksums. Pin a version with `| sh -s -- v0.7.0`, or choose the folder with `INDOC_INSTALL_DIR`. Alternatively, `go install github.com/byabasaija/indoc/cmd/indoc@latest`, or download a binary (including Windows) from the GitHub releases page.
+It installs to `/usr/local/bin` when writable, otherwise `~/.local/bin`, after verifying the download against the release's checksums. Pin a version with `| sh -s -- v0.8.0`, or choose the folder with `INDOC_INSTALL_DIR`. Alternatively, `go install github.com/byabasaija/indoc/cmd/indoc@latest`, or download a binary (including Windows) from the GitHub releases page.
 
 ## Initialize
 

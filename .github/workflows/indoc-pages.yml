@@ -25,7 +25,7 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0 # "Last updated" dates come from git history
-      - uses: byabasaija/indoc@v0.7.0
+      - uses: byabasaija/indoc@v0.8.0
         with:
           command: bundle
           out: _site
