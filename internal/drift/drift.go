@@ -315,8 +315,10 @@ func compareSources(r *Repo, p pages.Page, entry PageLock, covered []string) []F
 			out = append(out, Finding{Page: p.Path, Kind: Drift, Ref: path, Detail: "tests changed"})
 			continue
 		}
-		public, private := surfaceChanges(was, f)
+		public, private, skipped := surfaceChanges(was, f, cited(p, path))
 		switch {
+		case public == "" && private == "" && skipped:
+			// Only cited symbols changed; their citations report it.
 		case public != "":
 			out = append(out, Finding{Page: p.Path, Kind: Stale, Ref: path, Detail: public})
 		case private != "":
@@ -337,9 +339,22 @@ func compareSources(r *Repo, p pages.Page, entry PageLock, covered []string) []F
 	return out
 }
 
+// cited returns the symbols the page cites in path.
+func cited(p pages.Page, path string) map[string]bool {
+	out := map[string]bool{}
+	for _, c := range p.Citations {
+		if c.Path == path {
+			out[c.Symbol] = true
+		}
+	}
+	return out
+}
+
 // surfaceChanges describes added, removed, and re-signed symbols, split into
-// public ones (stale) and private ones (drift). Either may be "".
-func surfaceChanges(was FileLock, f code.File) (public, private string) {
+// public ones (stale) and private ones (drift). Either may be "". Symbols in
+// skip are left out, because their citations already report them; skipped
+// says whether any were.
+func surfaceChanges(was FileLock, f code.File, skip map[string]bool) (public, private string, skipped bool) {
 	now := f.Surfaces()
 	privateNow := f.Private()
 	privateWas := map[string]bool{}
@@ -360,6 +375,8 @@ func surfaceChanges(was FileLock, f code.File) (public, private string) {
 		case !ok:
 			g := pick(q, privateNow[q])
 			g.added = append(g.added, q)
+		case old != s && skip[q]:
+			skipped = true
 		case old != s:
 			g := pick(q, privateNow[q] && privateWas[q])
 			g.changed = append(g.changed, q)
@@ -371,7 +388,7 @@ func surfaceChanges(was FileLock, f code.File) (public, private string) {
 			g.removed = append(g.removed, q)
 		}
 	}
-	return describe(pub.changed, pub.added, pub.removed), describe(priv.changed, priv.added, priv.removed)
+	return describe(pub.changed, pub.added, pub.removed), describe(priv.changed, priv.added, priv.removed), skipped
 }
 
 func describe(changed, added, removed []string) string {

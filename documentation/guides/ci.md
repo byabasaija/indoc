@@ -18,7 +18,7 @@ sources:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: byabasaija/indoc@v0.8.0
+      - uses: byabasaija/indoc@v0.8.1
 ```
 
 The action downloads the matching indoc release, verifies its checksum, and runs `indoc check` in the repository root. Inputs:
@@ -39,7 +39,7 @@ documentation/dev/checkout.md
     DRIFT      shop/checkout/session.py  implementation changed; signatures unchanged
 ```
 
-Lines marked `✗` fail the check. With `--strict`, drift, unanchored pages, and unverifiable citations fail too.
+Lines marked `✗` fail the check. With `--strict`, drift, unanchored pages, and unverifiable citations fail too. A change to a cited symbol is reported once, on the citation, not again for its file. In a terminal, failures are red and drift yellow; set `NO_COLOR=1` to turn colors off (`internal/cli/check.go::printFindings`).
 
 | Kind | Meaning | Fix |
 |---|---|---|

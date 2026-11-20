@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"os"
 	"strings"
 
 	"github.com/byabasaija/indoc/internal/drift"
@@ -83,9 +84,24 @@ func runCheck(configPath string, out io.Writer, strict, warn, asJSON bool) error
 	return nil
 }
 
+// colors are ANSI styles, empty unless out is a terminal and NO_COLOR is unset.
+type colors struct{ bold, red, yellow, green, dim, reset string }
+
+func colorsFor(out io.Writer) colors {
+	f, ok := out.(*os.File)
+	if !ok || os.Getenv("NO_COLOR") != "" || os.Getenv("TERM") == "dumb" {
+		return colors{}
+	}
+	if info, err := f.Stat(); err != nil || info.Mode()&os.ModeCharDevice == 0 {
+		return colors{}
+	}
+	return colors{bold: "\x1b[1m", red: "\x1b[1;31m", yellow: "\x1b[33m", green: "\x1b[32m", dim: "\x1b[2m", reset: "\x1b[0m"}
+}
+
 func printFindings(out io.Writer, pageCount int, findings []drift.Finding, strict bool) {
+	c := colorsFor(out)
 	if len(findings) == 0 {
-		fmt.Fprintf(out, "%d pages match the code.\n", pageCount)
+		fmt.Fprintf(out, "%s✓%s %d pages match the code.\n", c.green, c.reset, pageCount)
 		return
 	}
 	counts := map[string]int{}
@@ -95,18 +111,18 @@ func printFindings(out io.Writer, pageCount int, findings []drift.Finding, stric
 			if current != "" {
 				fmt.Fprintln(out)
 			}
-			fmt.Fprintln(out, f.Page)
+			fmt.Fprintln(out, c.bold+f.Page+c.reset)
 			current = f.Page
 		}
-		mark := " "
+		mark, style := " ", c.yellow
 		if f.Fails(strict) {
-			mark = "✗"
+			mark, style = "✗", c.red
 		}
 		ref := f.Ref
 		if ref != "" {
 			ref += "  "
 		}
-		fmt.Fprintf(out, "  %s %-10s %s%s\n", mark, strings.ToUpper(f.Kind), ref, f.Detail)
+		fmt.Fprintf(out, "  %s%s %-10s%s %s%s%s%s\n", style, mark, strings.ToUpper(f.Kind), c.reset, ref, c.dim, f.Detail, c.reset)
 		counts[f.Kind]++
 	}
 

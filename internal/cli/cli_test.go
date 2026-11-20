@@ -489,7 +489,7 @@ func TestMCPWorkflow(t *testing.T) {
 
 	r.write("app/main.py", strings.Replace(appPy, "def admit(patient)", "def admit(patient, ward)", 1))
 	res = call(5, "indoc_check", map[string]any{})
-	if res["isError"] == true || res["structuredContent"].(map[string]any)["failing"].(float64) != 2 {
+	if res["isError"] == true || res["structuredContent"].(map[string]any)["failing"].(float64) != 1 { // the cited function, reported once
 		t.Fatalf("check after signature change: %s", text(res))
 	}
 	res = call(6, "indoc_ack", map[string]any{"pages": []string{"documentation/index.md"}})

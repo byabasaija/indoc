@@ -322,3 +322,22 @@ func TestNewTestFilesAreDrift(t *testing.T) {
 		"drift docs/routing.md shop/checkout/test_new.py",
 		"drift docs/routing.md shop/checkout/testdata/sample.json")
 }
+
+func TestCitedSignatureChangeIsReportedOnce(t *testing.T) {
+	f := newFixture(t)
+	f.write("shop/checkout/dispatcher.py", strings.Replace(dispatcher, "def dispatch(self, session)", "def dispatch(self, session, retries)", 1))
+	got := f.check()
+	expect(t, got, "stale docs/routing.md shop/checkout/dispatcher.py::Dispatcher.dispatch")
+
+	// Another symbol changing in the same file is still reported for the file.
+	f.write("shop/checkout/dispatcher.py", strings.Replace(strings.Replace(dispatcher,
+		"def dispatch(self, session)", "def dispatch(self, session, retries)", 1),
+		"def route(self, session)", "def route(self, session, provider)", 1))
+	got = f.check()
+	expect(t, got,
+		"stale docs/routing.md shop/checkout/dispatcher.py",
+		"stale docs/routing.md shop/checkout/dispatcher.py::Dispatcher.dispatch")
+	if got[0].Detail != "signature changed: Dispatcher.route" {
+		t.Errorf("detail = %q", got[0].Detail)
+	}
+}

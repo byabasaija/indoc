@@ -8,7 +8,7 @@ Want something here sooner? [Open an issue](https://github.com/byabasaija/indoc/
 
 | Version | What it added |
 |---|---|
-| **0.8** | The header shows a GitHub repository card: name, latest release, stars, and forks; the header fits narrow screens |
+| **0.8** | The header shows a GitHub repository card: name, latest release, stars, and forks; the header fits narrow screens; `check` reports each change once, in color (0.8.1) |
 | **0.7** | A standard docs layout: folders become sidebar sections that fold open, nested as deep as the folders go, with breadcrumbs; the agent lays new docs out in sections (get started, guides, reference, concepts) |
 | **0.6** | `indoc publish`: GitHub Pages, static hosts, or served by your app with tested code for Django, FastAPI, Flask, Express, NestJS, Next.js, Astro, and Go; `.indoc/theme/` with replaceable parts; more `appearance:` settings; hand edits to the output are caught, not overwritten |
 | **0.5** | Citations show as symbol names with a "Checked against the code" box; `citations: short \| full \| hidden`; links to the code opt-in (`source_links`); pages at the same URL refused; outlines organized by purpose |

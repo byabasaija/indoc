@@ -25,10 +25,7 @@
 </p>
 
 <p align="center">
-  <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="design/screenshots/landing-dark.png">
-    <img src="design/screenshots/landing-light.png" width="860" alt="indoc's own documentation site, built by indoc: landing page with hero, call-to-action buttons, and feature cards">
-  </picture>
+  <img src="design/demo.gif" width="860" alt="indoc checking its own docs: indoc check passes, a cited function's parameters change, and indoc check fails naming the page and the function, exiting 1">
 </p>
 
 ---
@@ -88,7 +85,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: byabasaija/indoc@v0.8.0
+      - uses: byabasaija/indoc@v0.8.1
         # with:
         #   mode: warn   # report without failing while you try it out
 ```
@@ -146,7 +143,7 @@ These rules were tuned by replaying 100 commits of a real production codebase: 8
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="design/screenshots/site-dark.png">
-  <img src="design/screenshots/site-light.png" width="720" alt="A page in an indoc site: sidebar from folders, highlighted code, a verified citation linked to the code, and an on-this-page outline">
+  <img src="design/screenshots/site-light.png" width="720" alt="A page in an indoc site: sidebar sections from folders, breadcrumbs, highlighted code, and the GitHub card in the header">
 </picture>
 
 - Sidebar from your folders, full-text search, light and dark themes
