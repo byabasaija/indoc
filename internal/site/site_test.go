@@ -388,3 +388,16 @@ func TestRepoCard(t *testing.T) {
 		t.Error("repo card shown without a repository")
 	}
 }
+
+func TestTitleFromFrontmatter(t *testing.T) {
+	s := basicSite(t)
+	s.Pages[3].Markdown = "Answers to common questions.\n\n## Install\n"
+	out := build(t, s)
+	faq := read(t, out, "faq/index.html")
+	if !strings.Contains(faq, "<h1>FAQ</h1>") {
+		t.Error("a page without its own heading shows no title")
+	}
+	if n := strings.Count(read(t, out, "guides/setup/index.html"), "<h1"); n != 1 {
+		t.Errorf("a page with its own heading has %d h1s", n)
+	}
+}

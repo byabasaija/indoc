@@ -1,8 +1,8 @@
-# The README demo: indoc failing its own docs when a cited function changes.
+# The "How it works" demo: indoc failing its own docs when a cited function changes.
 # Record with design/record-demo.sh, which runs this in a throwaway copy of
 # the repository; never run it in your working tree.
 
-Output demo.gif
+Output demo-check.gif
 
 Set Shell "bash"
 Set FontSize 22

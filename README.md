@@ -12,105 +12,58 @@
   <a href="https://github.com/byabasaija/indoc/actions/workflows/ci.yml"><img src="https://github.com/byabasaija/indoc/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
   <a href="https://github.com/byabasaija/indoc/releases"><img src="https://img.shields.io/github/v/release/byabasaija/indoc" alt="Latest release"></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-blue.svg" alt="MIT license"></a>
-  <a href="go.mod"><img src="https://img.shields.io/github/go-mod/go-version/byabasaija/indoc" alt="Go version"></a>
 </p>
 
 <p align="center">
+  <a href="https://byabasaija.github.io/indoc/"><strong>Documentation</strong></a> ·
   <a href="#quick-start">Quick start</a> ·
   <a href="#how-it-works">How it works</a> ·
-  <a href="#indoc-vs-docusaurus-and-mkdocs">Compared to Docusaurus</a> ·
-  <a href="https://byabasaija.github.io/indoc/">Docs</a> ·
-  <a href="documentation/concepts/accuracy.md">Accuracy</a> ·
+  <a href="#indoc-vs-docusaurus-and-mkdocs">vs Docusaurus</a> ·
   <a href="ROADMAP.md">Roadmap</a>
 </p>
 
 <p align="center">
-  <img src="design/demo.gif" width="860" alt="indoc checking its own docs: indoc check passes, a cited function's parameters change, and indoc check fails naming the page and the function, exiting 1">
+  <img src="design/demo.gif" width="860" alt="Claude Code documenting a real project with indoc: it scans the code, asks about readers and the logo, shows an outline for approval, writes the pages, and builds the docs site">
 </p>
-
----
 
 Docs rot quietly. A function gets a new parameter, a route moves, and the guide that explains them keeps saying the old thing until a user hits it.
 
-**indoc ties every Markdown page to the code it describes.** When that code changes and the page does not, your pull request goes red:
+**indoc ties every Markdown page to the code it describes.** Your coding agent writes the pages and cites the functions they explain. When that code changes and a page doesn't, `indoc check` fails your pull request and names the page. indoc itself never calls an AI model.
 
-```console
-$ indoc check
-documentation/dev/checkout.md
-  ✗ STALE      shop/checkout/service.py::CheckoutService.charge  cited symbol's signature changed
-    DRIFT      shop/checkout/session.py  implementation changed; signatures unchanged
-
-6 pages checked: 1 stale, 1 drift
-Error: docs do not match the code
-```
-
-Your coding agent writes the pages. indoc checks them. indoc never calls an AI model and needs no API key.
-
-📖 **Documentation: [byabasaija.github.io/indoc](https://byabasaija.github.io/indoc/)**, built and checked by indoc itself.
-
-## Why indoc
-
-- 🔴 **Stale docs fail CI.** Pages cite code as `path::Symbol`. Change a cited signature and `indoc check` names the page and what changed. Comments, formatting, and logging changes are ignored, so it doesn't cry wolf.
-- 🔗 **Citations are verified.** Rename a function and the page citing it is reported as broken; the site won't build until it's fixed. Readers see a clean symbol name, not a file path, and a "Checked against the code" box on each page; public repos can link every citation to its exact line.
-- 🧭 **Reference from the source.** Routes, environment variables, and CLI commands are extracted from Django, FastAPI, Express, Next.js, NestJS, Astro, and Cobra. Nobody copies them by hand.
-- 🤖 **Made for coding agents.** Install the plugin for Claude Code or Copilot CLI and say "document this project". It agrees on readers and an outline with you, writes, checks, and builds.
-- 📦 **One binary, one static site.** No Node, no Python, no config sprawl. The output is plain HTML with search, dark mode, and highlighting that works on any host or straight from disk.
+- **Stale docs fail CI.** Comments, formatting, and private helpers are ignored, so it doesn't cry wolf.
+- **Reference from the source.** Routes, environment variables, and CLI commands are extracted from Django, FastAPI, Express, Next.js, NestJS, Astro, and Cobra.
+- **A real docs site.** Sections, search, dark mode, your logo; one static folder that works on any host, or served by your own app.
+- **One binary.** No Node, no Python, no API key.
 
 ## Quick start
 
-### With your coding agent
-
-**Claude Code**
+**With your coding agent.** In Claude Code:
 
 ```
 /plugin marketplace add byabasaija/indoc
 /plugin install indoc@indoc
 ```
 
-**GitHub Copilot CLI**
+or in GitHub Copilot CLI: `copilot plugin install byabasaija/indoc:plugin`. Then ask *"document this project"*, and later *"update the stale docs"*. The plugin downloads and verifies the indoc binary itself.
 
-```
-copilot plugin install byabasaija/indoc:plugin
-```
-
-Then ask: *"document this project"*. Later: *"update the stale docs"*.
-
-The plugin downloads the indoc binary for your platform on first use and verifies its checksum. Nothing else to install. Other MCP clients can run `indoc mcp` directly.
-
-### In CI
+**In CI**, add one step to a workflow:
 
 ```yaml
-jobs:
-  docs:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
       - uses: byabasaija/indoc@v0.8.1
-        # with:
-        #   mode: warn   # report without failing while you try it out
 ```
 
-### By hand
-
-macOS and Linux:
+**By hand** on macOS or Linux (or `go install github.com/byabasaija/indoc/cmd/indoc@latest`, or a binary from [Releases](https://github.com/byabasaija/indoc/releases)):
 
 ```sh
 curl -fsSL https://github.com/byabasaija/indoc/releases/latest/download/install.sh | sh
+indoc init && indoc preview
 ```
 
-The script verifies the download against the release checksums. Or use Go (`go install github.com/byabasaija/indoc/cmd/indoc@latest`), or download a binary (including Windows) from [Releases](https://github.com/byabasaija/indoc/releases).
-
-```sh
-indoc init       # create .indoc/config.yaml
-indoc preview    # live site on localhost while you write
-indoc bundle     # build the site, record pages as verified
-indoc publish    # GitHub Pages, a static host, or served by your own app
-indoc check      # in CI: fail when docs no longer match the code
-```
+[Getting started](https://byabasaija.github.io/indoc/get-started/quick-start/) has the rest.
 
 ## How it works
 
-A page says which code it covers and cites the symbols it explains:
+A page lists the code it covers and cites the symbols it explains:
 
 ```markdown
 ---
@@ -119,47 +72,28 @@ sources:
   - shop/checkout/**
 ---
 
-Every order is charged by `shop/checkout/service.py::CheckoutService.charge`,
-which picks a payment provider for the customer's country.
+Every order is charged once per idempotency key (`shop/checkout/service.py::CheckoutService.charge`).
 ```
 
-`.indoc/lock.json` (committed) records what each page was verified against. `indoc check` compares the code with that record:
+`indoc bundle` builds the site and records what each page was checked against in `.indoc/lock.json`. `indoc check` compares the code with that record:
+
+<p align="center">
+  <img src="design/demo-check.gif" width="760" alt="indoc checking its own docs: a cited function's parameters change, and indoc check fails naming the page and the function">
+</p>
 
 | What changed | Result |
 |---|---|
-| A cited symbol's signature, or the symbol is gone | **stale** / **broken**: check fails |
-| A public signature added, removed, or changed under `sources` | **stale**: check fails |
-| A cited symbol's body | **drift**: reported; fails on `strict: true` pages or with `--strict` |
-| Private helpers, tests, or implementation under `sources` | **drift**: reported; fails with `--strict` |
-| Comments, docstrings, logging calls, formatting | ignored |
+| A cited signature, or a public signature under `sources` | **stale**: check fails |
+| A cited symbol was renamed or removed | **broken**: check fails |
+| A cited symbol's body, or private code under `sources` | **drift**: reported; fails only with `--strict` or on `strict: true` pages |
+| Comments, docstrings, logging, formatting | ignored |
 
-Fix the page, or run `indoc ack <page>` to confirm it is still correct. Either way, the review is recorded in git.
-
-These rules were tuned by replaying 100 commits of a real production codebase: 85% of sampled flags were real problems, and about 3–4% of commits would have failed CI with nothing wrong in the docs. [How it was measured](documentation/concepts/accuracy.md).
-
-## What you get
-
-**A docs site.** One pre-rendered HTML page per Markdown file, readable without JavaScript.
+Fix the page, or run `indoc ack <page>` if it is still correct. Replaying 100 commits of a production codebase, 85% of the flags were real problems and 3–4% of commits would have failed with nothing wrong ([how it was measured](documentation/concepts/accuracy.md)).
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="design/screenshots/site-dark.png">
-  <img src="design/screenshots/site-light.png" width="720" alt="A page in an indoc site: sidebar sections from folders, breadcrumbs, highlighted code, and the GitHub card in the header">
+  <img src="design/screenshots/site-light.png" width="760" alt="A page in an indoc site: sidebar sections from folders, breadcrumbs, highlighted code, and the GitHub card in the header">
 </picture>
-
-- Sidebar from your folders, full-text search, light and dark themes
-- Syntax highlighting and copy buttons on code blocks, Mermaid diagrams
-- A landing page with hero and feature cards, set in frontmatter
-- "Edit this page", "Last updated", a GitHub card with the latest release, stars, and forks, header links, footer
-- Your logo, colors, fonts, and layout in config; a `.indoc/theme/` folder to replace the header, footer, or hero. Rebuilds never overwrite it, and hand edits to the output are caught instead of lost
-- Relative links: serve it from any host or path, or mount it in your app
-
-See [Customizing the site](documentation/guides/customizing.md).
-
-**Reference pages, extracted.** Routes with HTTP methods and handlers, environment variables with defaults (secrets redacted), and CLI commands with flags, each linking to its source line.
-
-**A project map for your agent.** `indoc scan --json` reports frameworks, entry points, real task-runner commands, unpublished Markdown, and the most-changed files, so the agent writes about what your project actually does instead of a generic outline.
-
-**Nothing published by accident.** New pages go in `documentation/`. Plans, reviews, and agent notes in `docs/` are never published unless you name them.
 
 ## indoc vs Docusaurus and MkDocs
 
@@ -167,87 +101,22 @@ Docusaurus and MkDocs are excellent site generators. indoc is narrower: it keeps
 
 | | indoc | Docusaurus | MkDocs |
 |---|---|---|---|
-| CI fails when code described by a page changes | ✅ | ❌ | ❌ |
-| Code references verified to exist | ✅ any supported language | ❌ | Python API docs, via mkdocstrings |
-| Routes, env vars, commands from source | ✅ | From an OpenAPI spec, via plugin | Via plugins |
-| Written by your coding agent, checked by the tool | ✅ plugin + MCP | ❌ | ❌ |
+| CI fails when the code a page describes changes | ✓ | | |
+| Code references verified to exist | ✓ | | Python API docs, via mkdocstrings |
+| Routes, env vars, commands from source | ✓ | From an OpenAPI spec, via plugin | Via plugins |
+| Written by your coding agent, checked by the tool | ✓ | | |
 | Toolchain | One binary | Node.js, React | Python |
-| Versioned docs, i18n, plugins, MDX | ❌ by design | ✅ | ✅ |
+| Versioned docs, i18n, plugins, MDX | No, by design | ✓ | ✓ |
 
-**Already on Docusaurus or MkDocs? Keep it.** Add `sources:` and citations to your existing pages and run `indoc check` in CI. indoc reads Docusaurus frontmatter, and building the site with indoc is optional.
+**Already on Docusaurus or MkDocs? Keep it.** Add `sources:` and citations to your pages and run `indoc check` in CI; building the site with indoc is optional.
 
-## Support
+## Learn more
 
-<details>
-<summary><strong>Languages</strong>: JavaScript, TypeScript, Python, Go</summary>
-
-<br>
-
-Precise staleness and `path::Symbol` citations need a parser. Everything else works on any repository.
-
-| Language | Parser | Checked against |
-|---|---|---|
-| JavaScript, TypeScript, JSX, TSX | tree-sitter | The TypeScript compiler: 9,436 files, 56,396 symbols, all matching |
-| Python | tree-sitter | CPython's own parser: 34,120 of 34,121 files, 454,837 symbols |
-| Go | Go standard library | — |
-| Others | — | Files are tracked; any change is reported as drift |
-
-Exported JavaScript/TypeScript declarations are public; Python uses `_name` and Go lowercase names for private. Adding a private helper never fails `check`.
-
-</details>
-
-<details>
-<summary><strong>Frameworks</strong>: Django, DRF, FastAPI, Express, Next.js, NestJS, Astro, Cobra</summary>
-
-<br>
-
-| Framework | Routes | Configuration | Commands |
-|---|---|---|---|
-| Django + DRF | ✅ URLconf through `include()`, routers, `@action`; methods from views, viewsets, `@api_view` | ✅ django-environ, python-decouple, `os.environ` | ✅ management commands |
-| FastAPI | ✅ decorators, `APIRouter` prefixes, nested `include_router`, websockets, mounts | ✅ pydantic `BaseSettings` | |
-| Express | ✅ routes across files, `route()` chains, mounted routers and sub-apps | `process.env` | |
-| Next.js | ✅ App Router pages and route handlers, Pages Router pages and API routes | `process.env` | |
-| NestJS | ✅ `@Controller` + `@Get`/`@Post`/..., global prefix | `process.env` | |
-| Astro | ✅ `src/pages` pages and endpoints | `import.meta.env` | |
-| Cobra (Go) | | `os.Getenv` | ✅ command tree, flags, arguments |
-| Flask, Go `net/http` | best effort | | |
-| Rails, Laravel | planned | | |
-
-Every extractor is tested against the framework's own route table: Django's URL resolver on six real projects (524 routes), FastAPI's router, Express 4 and 5 at runtime, `next build`'s route manifests, the routes Nest registers, and Cobra's command tree. All match route for route, including HTTP methods. Extraction is static: indoc never imports or runs your code.
-
-`indoc scan` also warns about routes that can never be reached and variables missing from `.env.example`.
-
-</details>
-
-## FAQ
-
-**Does indoc use AI?**
-No. Your coding agent (or you) writes the pages. indoc parses code, records hashes, and builds HTML. It makes no network calls during a build.
-
-**Will it publish my internal notes?**
-No. Only files matched by `pages:` in `.indoc/config.yaml` are published. Pages default to `documentation/`, not `docs/`, because `docs/` is where plans and agent notes usually collect.
-
-**Won't it fail CI on every commit?**
-No. Only public signatures and cited symbols fail the check. Body changes are reported as drift and fail only where you ask for it (`strict: true` or `--strict`). Start with `mode: warn` if you want to see it first.
-
-**My language isn't supported.**
-indoc still tracks the files a page covers and reports any change as drift. Citations need a parser; open an issue with a real repository you'd like supported.
-
-**Where does the site go?**
-Wherever you choose with `indoc publish`: GitHub Pages (it writes the deploy workflow), any static host, or your own app under a path like `/guide/`, public or login-only. For an app it prints tested code for Django, FastAPI, Flask, Express, NestJS, Next.js, Astro, or Go. See [Publishing the site](documentation/guides/publishing.md).
-
-## Contributing
-
-Issues and pull requests are welcome. Framework and language requests are most useful with a link to a real repository that uses them.
-
-```sh
-go test ./...                              # all tests
-go run ./cmd/indoc check --strict          # indoc's own docs must match its code
-make grammars                              # rebuild tree-sitter grammars (Docker)
-make vendor                                # refresh Prism and Mermaid
-```
-
-[ARCHITECTURE.md](ARCHITECTURE.md) explains how the pieces fit and why, [RELEASING.md](RELEASING.md) how to cut a release, [documentation/concepts/accuracy.md](documentation/concepts/accuracy.md) how each part is tested against the real tools, and [ROADMAP.md](ROADMAP.md) what's next and what indoc won't do.
+- [Documentation](https://byabasaija.github.io/indoc/): writing pages, CI, customizing and publishing the site
+- [Supported languages and frameworks](documentation/reference/support.md) and [FAQ](documentation/concepts/faq.md)
+- [How accurate is indoc?](documentation/concepts/accuracy.md): every parser and extractor tested against the real tools
+- [Roadmap](ROADMAP.md): what's next, and what indoc won't become
+- [Contributing](CONTRIBUTING.md) and [Discussions](https://github.com/byabasaija/indoc/discussions)
 
 ## License
 

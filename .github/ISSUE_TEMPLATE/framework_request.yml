@@ -1,0 +1,37 @@
+name: Framework or language request
+description: Ask indoc to extract routes, configuration, or commands from a framework, or to parse a new language.
+labels: [framework]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        A link to a real repository decides the order: each extractor is tested against the framework's own route table on real code, so we need code to test against.
+  - type: input
+    id: name
+    attributes:
+      label: Framework or language
+      placeholder: Flask, Rails, Laravel, Spring, Kotlin…
+    validations:
+      required: true
+  - type: input
+    id: repo
+    attributes:
+      label: A public repository that uses it
+      description: The more typical of real projects, the better. Several are welcome.
+      placeholder: https://github.com/owner/repo
+    validations:
+      required: true
+  - type: checkboxes
+    id: want
+    attributes:
+      label: What indoc should extract
+      options:
+        - label: Routes, with HTTP methods and handlers
+        - label: Configuration and environment variables
+        - label: CLI commands and flags
+        - label: "`path::Symbol` citations (parsing the language)"
+  - type: textarea
+    id: truth
+    attributes:
+      label: How the framework lists its own routes
+      description: The command or API that prints the real route table (for example `rails routes` or `php artisan route:list`), if you know it.

@@ -9,6 +9,16 @@ indoc keeps Markdown pages tied to code. Pages list the code they cover (`source
 
 Use the indoc MCP tools: `indoc_scan`, `indoc_setup`, `indoc_check`, `indoc_ack`, `indoc_bundle`. The same operations exist as the `indoc` command.
 
+## Asking the user
+
+The user decides from what you show them, so make every question easy to read and answer:
+
+- **One decision per question.** The question is one short sentence. Never put lists, outlines, or several questions inside it.
+- **The user must see what they approve.** Some agents (Claude Code among them) shorten the text you write just before a question or tool call to a one-line summary, so an outline written there is hidden. Put the material in the question itself: if your question tool has a preview for an option, put the outline, file list, or proposal in the preview of the recommended option. If it has none, end your turn with the material and the question in plain text instead of using a question tool. Saying something was drafted is not showing it.
+- **Options are short labels** (one to five words) with a one-line description, the recommended one first. Only offer options that answer that question.
+- Questions that are independent and quick to answer (can readers open the repository? which logo?) may be asked together. The outline is always asked on its own, after the user has seen it.
+- If your tools have no question form, ask in plain text with the same rules: numbered options, the recommended one first.
+
 ## 1. Scan
 
 Call `indoc_scan`. On first use it sets the project up.
@@ -28,13 +38,30 @@ Call `indoc_scan`. On first use it sets the project up.
 
 - Offer the best candidates from `map.logos` by path. Point out a tall lockup with small text (height well above width): it shrinks to an unreadable smudge in the header and browser tab, so suggest a square mark or an SVG if they have one.
 - If nothing fits, ask for a path in the repository or an https URL.
-- Then call `indoc_setup` with `logo`. It checks that the file exists. If the user has no logo, continue without one; never invent or draw one.
+- If the project has no logo, offer to design one: a simple, square SVG mark (a letter or a plain symbol from what the project does, one or two colors, no text that must be read small). Save it as `documentation/assets/logo.svg`, describe it in a line (shape and colors) and give the path so the user can open it, and change it until they approve. Never present a logo you made as the project's own without asking.
+- Then call `indoc_setup` with `logo`. It checks that the file exists. If the user wants no logo, continue without one.
 
 Then read the code, starting from the entry points and the central modules. Tell the user about `coverage` warnings worth acting on, such as unreachable routes or variables missing from `.env.example`.
 
 ## 2. Agree on an outline before writing new docs
 
-When there are no pages yet, or the user asks for new sections, **propose the readers and an outline and wait for approval**. Base it on evidence, not a template:
+When there are no pages yet, or the user asks for new sections, **propose the readers and an outline and wait for approval**. Present it as a message, not inside a question: the readers in one or two lines, then the folder tree with each page's title, its kind, and one line on what the reader gets from it, then the landing page's tagline and card titles. For example:
+
+```text
+Readers: developers who run and extend the API; partners who call it.
+
+documentation/
+  index.md                 Landing: "Move money with one API call."
+  get-started/
+    quick-start.md         Tutorial: install, configure, make the first call
+  guides/
+    how-to-add-a-provider.md   How-to: plug in a new payment provider
+  reference/               Generated: routes, configuration (plus error codes, hand-written)
+  concepts/
+    how-charging-works.md  Explanation: idempotency, retries, ledger entries
+```
+
+Ask "Approve this outline?" with options such as "Approve" and "Change something", and put this whole outline in the preview of "Approve", one short line per page and under 25 lines so it fits without scrolling (or, without previews, end your turn with the outline and the question in plain text). The user approves only an outline they can read. Base it on evidence, not a template:
 
 - Who uses this code? A public or partner API, a CLI, a library, a deployed service, the team's own developers?
 - Do existing docs already target an audience?

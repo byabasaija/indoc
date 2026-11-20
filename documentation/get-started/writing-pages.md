@@ -27,7 +27,7 @@ Every order is charged by
 
 | Key | Meaning |
 |---|---|
-| `title` | Page title. Falls back to the first `# heading`, then the file name. |
+| `title` | Page title. Falls back to the first `# heading`, then the file name. A page without its own `# heading` shows the title as its heading, so either style works. |
 | `order` | Sort position. Pages without one sort after, by path. |
 | `audience` | Optional reader group, such as `partner` or `dev`. |
 | `sources` | Globs of code this page describes. `**` matches any depth. |

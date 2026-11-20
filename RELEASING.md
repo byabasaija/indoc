@@ -15,7 +15,7 @@ So `main` must never pin a version whose release doesn't exist yet, or every plu
    - `internal/version/version.go`: `Version = "X.Y.Z-dev"`
    - The `byabasaija/indoc@vX.Y.Z` examples in `README.md`, `documentation/guides/ci.md`, and `plugin/skills/indoc/SKILL.md`
 2. Run `indoc bundle`, then `indoc check --strict`, and `go test ./...`. The launcher change drifts `documentation/guides/agents.md`; `indoc ack` it once you've confirmed it's still right.
-3. If `indoc check`'s output changed, re-record the README demo with `design/record-demo.sh` (needs `brew install vhs`) and look at the GIF before committing.
+3. If `indoc check`'s output changed, re-record `design/demo-check.gif` with `design/record-demo.sh` (needs `brew install vhs`) and look at the GIF before committing.
 4. If the release changes behavior users rely on, write `.github/release-notes/vX.Y.Z.md` with an **Upgrading** section; the workflow uses it instead of generated notes.
 5. Commit (`chore: release X.Y.Z`) and tag the commit. **Do not push `main` yet.**
    ```sh

@@ -99,6 +99,135 @@
         }
       }
     },
+    "documentation/concepts/faq.md": {
+      "page": "3566ee0d2d82e7b3",
+      "sources": {
+        "internal/config/config.go": {
+          "body": "d415ecfee2273d29",
+          "symbols": {
+            "Config": "d06bba2c1bdad9a8",
+            "Config.CitationStyle": "9967250f66762b25",
+            "Config.FileURLs": "dee92f60cf4fc410",
+            "Config.PublicLink": "32a14e389e082600",
+            "Config.Save": "ab4c717e8f3c6e18",
+            "Config.SourceLink": "d0269e979316b6e1",
+            "Config.Validate": "468add9a2e54c5af",
+            "Config.validatePublishing": "97609fe2ef7fe09a",
+            "Default": "fcba8035c4318c9d",
+            "InferProjectName": "665df7f08f982cfb",
+            "InferSourceURL": "357e1bd6b502cadd",
+            "Link": "9941900250d55bc4",
+            "Load": "7988a8d596a72425",
+            "Paths": "76140627bde13cc5",
+            "Publish": "2045874059627c18",
+            "Resolve": "dbdc0ac20bbad50d",
+            "contains": "ff1822e7196e7478",
+            "goModuleName": "dafb094673af3a2d",
+            "packageJSONName": "32172c9075e6be3a",
+            "pyprojectName": "44d439eb4064fd49",
+            "sourceTemplate": "16f7771317498873"
+          },
+          "private": [
+            "Config.validatePublishing",
+            "contains",
+            "goModuleName",
+            "packageJSONName",
+            "pyprojectName",
+            "sourceTemplate"
+          ],
+          "raw": "95a880fdc5c0701f",
+          "hasher": "go/2"
+        },
+        "internal/drift/drift.go": {
+          "body": "906cab1e2f46354b",
+          "symbols": {
+            "Ack": "bdb11477c7c441cf",
+            "AckResult": "9848b62df55748a4",
+            "Check": "44441a0b4c307a7a",
+            "FileLock": "670dc86edcd04c57",
+            "Finding": "5732b8238ac08f38",
+            "Finding.Fails": "7c6f4d383dc2bc4e",
+            "LoadLock": "c194e5c08d9c855d",
+            "Lock": "1cc7b85f02cb4593",
+            "Lock.Save": "4c0f0709160a3e98",
+            "NewLock": "abf618bb6258701a",
+            "NewRepo": "7ca6b0547e0470bf",
+            "PageLock": "8c77e55d143a12ac",
+            "PageSet": "faff90c371a74c2f",
+            "Repo": "8f89df8ff0853c86",
+            "Repo.Analyze": "02cf115fc0979c59",
+            "Repo.covered": "6744a19ba34c9040",
+            "Stamp": "8df7959ee83484b4",
+            "SymbolLock": "cc3c8454bb7c98eb",
+            "analysis": "63f5a2e6d87ed764",
+            "checkCitations": "604b2c850b0dfbd2",
+            "cited": "117c2ba2e5a26420",
+            "compareCitations": "9714340f130cc1ae",
+            "compareSources": "f4ee5ca9a53c24e7",
+            "describe": "a44bb99c5d92c380",
+            "hashBytes": "60fe68dca6b8818d",
+            "pathSet": "7c4b5bc9f1fc6c51",
+            "surfaceChanges": "69f848c8192a9fdc",
+            "upgradable": "7a51ab81571e6b4b"
+          },
+          "private": [
+            "Repo.covered",
+            "analysis",
+            "checkCitations",
+            "cited",
+            "compareCitations",
+            "compareSources",
+            "describe",
+            "hashBytes",
+            "pathSet",
+            "surfaceChanges",
+            "upgradable"
+          ],
+          "raw": "3a62cb4d744bc942",
+          "hasher": "go/2"
+        },
+        "internal/drift/drift_test.go": {
+          "body": "1fb6204cfd518f93",
+          "symbols": {
+            "TestAckWithoutTargetsNeverSilencesUnchangedStalePage": "b69c1af2d399f822",
+            "TestCitedBodyChangeIsDriftUnlessStrict": "a7b49e9e94fbb0b7",
+            "TestCitedSignatureChangeIsReportedOnce": "eadb2710404bc521",
+            "TestCommentsAndFormattingAreIgnored": "077ac7ce3e281816",
+            "TestEditedPageNeedsAck": "6dddb032ffa7eacd",
+            "TestLockRoundTrip": "a0b24990fab53d39",
+            "TestNewAndRemovedFilesAreStale": "b6344dfa25ae7e03",
+            "TestNewTestFilesAreDrift": "77e5c156856c1beb",
+            "TestOlderLockHashes": "edb9f4e413d77970",
+            "TestPrivateHelpersAreDrift": "52d4c671db4955ae",
+            "TestRenamedCitationIsBroken": "c46c6a19c6c1075a",
+            "TestSignatureChangeIsStale": "1ecb8b51cfffb49a",
+            "TestSourcesMatchingNothingIsBroken": "027389132e5095b6",
+            "TestTestFileChangesAreDrift": "f70593cf59da72d1",
+            "TestUncitedBodyChangeIsDrift": "bb2827890ffcf18c",
+            "TestUnparsedFileChangeIsDrift": "192cfd3403e75684",
+            "TestUnstampedRemovedAndUnanchoredPages": "22b5302cac9ed7dc",
+            "expect": "7873f02655415306",
+            "fixture": "20752e2188a33784",
+            "fixture.ack": "867e432f089efa62",
+            "fixture.check": "4754855255e943b6",
+            "fixture.load": "e2e339212501112d",
+            "fixture.write": "b7c86aa511848740",
+            "newFixture": "acec58cf9f0581c7"
+          },
+          "private": [
+            "expect",
+            "fixture",
+            "fixture.ack",
+            "fixture.check",
+            "fixture.load",
+            "fixture.write",
+            "newFixture"
+          ],
+          "raw": "799a6c6fb5c45ad3",
+          "hasher": "go/2"
+        }
+      }
+    },
     "documentation/get-started/quick-start.md": {
       "page": "522d6e0ad1505f55",
       "citations": {
@@ -228,7 +357,7 @@
       }
     },
     "documentation/get-started/writing-pages.md": {
-      "page": "f1daac2800525344",
+      "page": "885b663827c0bcde",
       "citations": {
         "internal/code/code.go::Analyze": {
           "surface": "498b2762e77d0628",
@@ -239,13 +368,13 @@
         "internal/drift/drift.go::Finding.Fails": {
           "surface": "7c6f4d383dc2bc4e",
           "body": "cbcb7de0f5756098",
-          "raw": "f022796b08cb3cbc",
+          "raw": "3a62cb4d744bc942",
           "hasher": "go/2"
         },
         "internal/drift/drift.go::Stamp": {
           "surface": "8df7959ee83484b4",
           "body": "a9d4bcad15e37f8e",
-          "raw": "f022796b08cb3cbc",
+          "raw": "3a62cb4d744bc942",
           "hasher": "go/2"
         },
         "internal/pages/pages.go::Parse": {
@@ -342,7 +471,7 @@
       }
     },
     "documentation/guides/agents.md": {
-      "page": "e36424b4ab245c6f",
+      "page": "66a1ea5969465a3f",
       "citations": {
         "internal/cli/mcp.go::mcpServer": {
           "surface": "9a5340343b623d99",
@@ -458,8 +587,8 @@
           "hasher": "bytes"
         },
         "plugin/skills/indoc/SKILL.md": {
-          "body": "87e3592d8ca3939b",
-          "raw": "87e3592d8ca3939b",
+          "body": "e1c4a5e48a4725cb",
+          "raw": "e1c4a5e48a4725cb",
           "hasher": "bytes"
         }
       }
@@ -665,13 +794,13 @@
         "internal/site/site.go::Build": {
           "surface": "b40cda3ec9f95359",
           "body": "b33d12e5510c42cc",
-          "raw": "743f236b6ac05d04",
+          "raw": "58ce3710ab9b5727",
           "hasher": "go/2"
         },
         "internal/site/site.go::Edited": {
           "surface": "85d34bc16cc74109",
           "body": "75f0a43570836e6e",
-          "raw": "743f236b6ac05d04",
+          "raw": "58ce3710ab9b5727",
           "hasher": "go/2"
         },
         "internal/site/theme.go::Outdated": {
@@ -814,7 +943,7 @@
           "hasher": "javascript/44c892e0be05/2"
         },
         "internal/site/site.go": {
-          "body": "5cea0b6b0f5df201",
+          "body": "021c5bb8c15a8083",
           "symbols": {
             "Build": "b40cda3ec9f95359",
             "Edited": "85d34bc16cc74109",
@@ -837,7 +966,7 @@
             "builder.resolveLink": "35658f81ca7efb9d",
             "builder.searchIndex": "b866e3a29a08428f",
             "builder.url": "9b3db7992be90541",
-            "built": "5c06c1d5edac5c61",
+            "built": "7dfcc5fb6386f5cc",
             "commonDir": "acbb3d0fb641a90f",
             "contentHash": "a9c9e3518c6f7aaf",
             "humanize": "a8e40962f5500bfa",
@@ -883,11 +1012,11 @@
             "writer.finish",
             "writer.write"
           ],
-          "raw": "743f236b6ac05d04",
+          "raw": "58ce3710ab9b5727",
           "hasher": "go/2"
         },
         "internal/site/site_test.go": {
-          "body": "79e37b782c2bb145",
+          "body": "0db963495031a3fe",
           "symbols": {
             "TestFileURLs": "8f43e7080e6d9fd0",
             "TestLanding": "3c18404c6fab744f",
@@ -901,6 +1030,7 @@
             "TestReferenceTables": "ae59f9f109f5a7e9",
             "TestRepoCard": "57da9572a00b81ec",
             "TestStaleFilesRemoved": "4823141262fe41dd",
+            "TestTitleFromFrontmatter": "63a5659d9546b81e",
             "TestURLCollisions": "8e8f2ff211de670e",
             "basicSite": "31a2e0164be82723",
             "build": "227a27ce1384a0c5",
@@ -913,7 +1043,7 @@
             "exists",
             "read"
           ],
-          "raw": "c032dd9198ea66a2",
+          "raw": "ddf3fbaead7e4f66",
           "hasher": "go/2"
         },
         "internal/site/templates/nav.html": {
@@ -922,8 +1052,8 @@
           "hasher": "bytes"
         },
         "internal/site/templates/page.html": {
-          "body": "3dc35b4ae89d4382",
-          "raw": "3dc35b4ae89d4382",
+          "body": "8f6576c29b4a2d60",
+          "raw": "8f6576c29b4a2d60",
           "hasher": "bytes"
         },
         "internal/site/templates/parts/features.html": {
@@ -1225,6 +1355,886 @@
         }
       },
       "sources": {
+        "internal/reference/cobra.go": {
+          "body": "eda87f27b8322b6b",
+          "symbols": {
+            "cobraCommand": "1342157094aec72d",
+            "commandLiteral": "b95f2065285c2f09",
+            "commandPath": "8704ed431078d7a5",
+            "extractCobra": "ff2a98ea5d59d7c5",
+            "firstWord": "03be2f65e40c2312",
+            "flagDefinition": "95c886d20445ddda",
+            "stringValue": "05b4bb0b6430817d"
+          },
+          "private": [
+            "cobraCommand",
+            "commandLiteral",
+            "commandPath",
+            "extractCobra",
+            "firstWord",
+            "flagDefinition",
+            "stringValue"
+          ],
+          "raw": "ce35917dc28789bc",
+          "hasher": "go/2"
+        },
+        "internal/reference/commands.go": {
+          "body": "6b32cb3076b3a926",
+          "symbols": {
+            "commandArguments": "ce5519c40cdb1444",
+            "extractManagementCommands": "8b62c1da13d1975e"
+          },
+          "private": [
+            "commandArguments",
+            "extractManagementCommands"
+          ],
+          "raw": "926fbc10cbb0eb4a",
+          "hasher": "go/2"
+        },
+        "internal/reference/django.go": {
+          "body": "19deacc9c718a450",
+          "symbols": {
+            "actionDecorator": "db41f608ef7cb574",
+            "django": "2c1450a77781995c",
+            "django.add": "1e19cf6e2e732989",
+            "django.allowedMethods": "41e332e04f0a97bd",
+            "django.classMethods": "274279391dd0ca71",
+            "django.collectActions": "a35ae29fb4b449fc",
+            "django.collectMethods": "734235a34f85ce7f",
+            "django.element": "8a7ecc3c5142b90b",
+            "django.expand": "f8bc21941e022f4c",
+            "django.external": "bc25a8ecb9a41294",
+            "django.include": "09d45e54f92ed816",
+            "django.note": "4525e514ed24169a",
+            "django.router": "47dd38a8f9ed1a30",
+            "django.setting": "9b37b61b99a90fe9",
+            "django.shadowed": "6dfb12e1f7e59f41",
+            "django.viewMethods": "5ca8220f3b940555",
+            "django.viewset": "75d92992c5d70ebc",
+            "django.walkFile": "d5311a15119ee878",
+            "element": "5cc01bfd3752be44",
+            "extractDjango": "608205490bfe2d53",
+            "lastSeg": "23537a828f4fc6aa",
+            "ordered": "8b56f310e529afeb",
+            "short": "a6cd2c360b178dae",
+            "upperStrings": "60a70566482bf82e"
+          },
+          "private": [
+            "actionDecorator",
+            "django",
+            "django.add",
+            "django.allowedMethods",
+            "django.classMethods",
+            "django.collectActions",
+            "django.collectMethods",
+            "django.element",
+            "django.expand",
+            "django.external",
+            "django.include",
+            "django.note",
+            "django.router",
+            "django.setting",
+            "django.shadowed",
+            "django.viewMethods",
+            "django.viewset",
+            "django.walkFile",
+            "element",
+            "extractDjango",
+            "lastSeg",
+            "ordered",
+            "short",
+            "upperStrings"
+          ],
+          "raw": "c50a7b56bfd577d0",
+          "hasher": "go/2"
+        },
+        "internal/reference/django_differential_test.go": {
+          "body": "5564104946b75e19",
+          "symbols": {
+            "TestDjangoDifferential": "5cc7f1ff2b6986ed",
+            "expandHome": "f8b41f1df9563f28",
+            "indexOf": "7700a087417b5297",
+            "normalizeDjangoPath": "d03978a2a4d336e4",
+            "orderedList": "5cff58ff5f1086e8"
+          },
+          "private": [
+            "expandHome",
+            "indexOf",
+            "normalizeDjangoPath",
+            "orderedList"
+          ],
+          "raw": "9aa85e90747dde5a",
+          "hasher": "go/2"
+        },
+        "internal/reference/django_test.go": {
+          "body": "574b26acbd6f1794",
+          "symbols": {
+            "TestDjangoDetectedWithoutURLconfWarns": "425453a2b180b636",
+            "TestDjangoExtraction": "9def1ef9291daafe",
+            "TestRedactDefault": "53a2d759c2ffe092",
+            "section": "f99b29194b6cfe91",
+            "writeFixture": "72e59015914ba5c3"
+          },
+          "private": [
+            "section",
+            "writeFixture"
+          ],
+          "raw": "de76273a4cd7d68c",
+          "hasher": "go/2"
+        },
+        "internal/reference/express.go": {
+          "body": "4d75067d8988f1d3",
+          "symbols": {
+            "express": "f488001829dfd7c1",
+            "express.classify": "0a1ed7ca8b19627c",
+            "express.note": "2e0dc89d1ed1c476",
+            "express.routerArg": "3527704985cf52d5",
+            "express.target": "2edd463e104914c3",
+            "extractExpress": "413fac6722b08685",
+            "flatten": "a1f37aa5ce008417",
+            "handlerName": "9d8438b9c517bb3f",
+            "isRequireOf": "16d8a8c1def87e67",
+            "joinRoute": "5bc12a59711fe350",
+            "jsProject": "6ae6a9940b6f3048",
+            "jsProject.export": "0ce0877bf47e021d",
+            "jsProject.load": "aea5b0b66f94ee82",
+            "jsProject.resolve": "85aa1109e73dafdd",
+            "jsProject.resolveModule": "0b662a6eb5119e4d",
+            "jsProject.value": "1cf9ce718d8acbbd",
+            "jsRef": "acc91e4a753864eb",
+            "mount": "07d895594c2a4146",
+            "nameOf": "17c8bdae0144624f",
+            "newJSProject": "78751dce76d222e0",
+            "pathValues": "3ce87f45b2898c4f",
+            "registration": "662ca7c931b84a48",
+            "routerKind": "9a7c6604dc705a16"
+          },
+          "private": [
+            "express",
+            "express.classify",
+            "express.note",
+            "express.routerArg",
+            "express.target",
+            "extractExpress",
+            "flatten",
+            "handlerName",
+            "isRequireOf",
+            "joinRoute",
+            "jsProject",
+            "jsProject.export",
+            "jsProject.load",
+            "jsProject.resolve",
+            "jsProject.resolveModule",
+            "jsProject.value",
+            "jsRef",
+            "mount",
+            "nameOf",
+            "newJSProject",
+            "pathValues",
+            "registration",
+            "routerKind"
+          ],
+          "raw": "7729113420a2ffd2",
+          "hasher": "go/2"
+        },
+        "internal/reference/express_test.go": {
+          "body": "39768074d3f87ebe",
+          "symbols": {
+            "TestExpressESMTypeScript": "1b0b38b799b9f9e5",
+            "TestExpressExtraction": "3117cbf3ed114849"
+          },
+          "raw": "b3ab57ac00e627a6",
+          "hasher": "go/2"
+        },
+        "internal/reference/extract.go": {
+          "body": "f98af20253d76dcf",
+          "symbols": {
+            "SourceFile": "131c92f89d100e24",
+            "bytesContainNUL": "8e7d02757d319d9f",
+            "canonicalGoMethod": "dad52a4a80bcac54",
+            "configIn": "a9bcd1e50247cf69",
+            "firstPath": "a895b5421eac761e",
+            "generic": "ef7326f525218b77",
+            "readSource": "5143b732fb007a7a",
+            "routeMethod": "b3f57e6a59c8cc9d",
+            "routesIn": "e2355ae8e1e2a3e8",
+            "window": "665652a7482ff585"
+          },
+          "private": [
+            "bytesContainNUL",
+            "canonicalGoMethod",
+            "configIn",
+            "firstPath",
+            "generic",
+            "readSource",
+            "routeMethod",
+            "routesIn",
+            "window"
+          ],
+          "raw": "e5ddd4511dd07f06",
+          "hasher": "go/2"
+        },
+        "internal/reference/extract_test.go": {
+          "body": "a5d1dd29d3a105b9",
+          "symbols": {
+            "TestExtractRoutesAndConfig": "0ac4f86f8958cc69",
+            "stringsJoin": "528469df168e4948",
+            "writeFile": "0a9163586fc6f3ea"
+          },
+          "private": [
+            "stringsJoin",
+            "writeFile"
+          ],
+          "raw": "237d4d2f6546b02d",
+          "hasher": "go/2"
+        },
+        "internal/reference/fastapi.go": {
+          "body": "11b48be533ef2d79",
+          "symbols": {
+            "argText": "3ae2471426d46c65",
+            "builtinDocs": "bbe5c8ad072e363b",
+            "builtinRoute": "9ebac1b29f2bd4ce",
+            "extractFastAPI": "30cf836c4cf78741",
+            "fastapi": "4d3d441eca9779ce",
+            "fastapi.add": "bf91f11ad6edd475",
+            "fastapi.app": "ecd8ac541b758476",
+            "fastapi.fastapiCtor": "badc0701a8cec88a",
+            "fastapi.note": "ee0e4aa9c787404c",
+            "fastapi.router": "92192e5323ce0916",
+            "literalPath": "54baca091432749e",
+            "methodList": "3023e7ee82e94c66",
+            "readFile": "463ce554b30fc414",
+            "shadowWarnings": "ae544a80f131d9b1"
+          },
+          "private": [
+            "argText",
+            "builtinDocs",
+            "builtinRoute",
+            "extractFastAPI",
+            "fastapi",
+            "fastapi.add",
+            "fastapi.app",
+            "fastapi.fastapiCtor",
+            "fastapi.note",
+            "fastapi.router",
+            "literalPath",
+            "methodList",
+            "readFile",
+            "shadowWarnings"
+          ],
+          "raw": "7aa152b91958d57a",
+          "hasher": "go/2"
+        },
+        "internal/reference/fastapi_test.go": {
+          "body": "d635b665b8acca88",
+          "symbols": {
+            "TestFastAPIDifferential": "ba4523dc28c35bdf",
+            "TestFastAPIExtraction": "8ee828ae91dda99f",
+            "compareFastAPI": "36a5157f630bfd7a",
+            "orderedOrAll": "0154f7429ed026f6"
+          },
+          "private": [
+            "compareFastAPI",
+            "orderedOrAll"
+          ],
+          "raw": "6db0fb9bb0fd2535",
+          "hasher": "go/2"
+        },
+        "internal/reference/fsroutes.go": {
+          "body": "0ce4624895994688",
+          "symbols": {
+            "appSegments": "fdc73e4459f5c97b",
+            "cleanRoute": "8ef89957dd53979d",
+            "exportedMethods": "8e5a97f20d851092",
+            "extractAstro": "e0f56c0e5d4ffc0a",
+            "extractNext": "046adc12a56145c0",
+            "hasRoot": "452716aac1b4e6eb",
+            "hidden": "4cfbb5edc2b118dd",
+            "nextBasePath": "b5b4678949b0247f",
+            "packageDepends": "06f8a61f54b04b65"
+          },
+          "private": [
+            "appSegments",
+            "cleanRoute",
+            "exportedMethods",
+            "extractAstro",
+            "extractNext",
+            "hasRoot",
+            "hidden",
+            "nextBasePath",
+            "packageDepends"
+          ],
+          "raw": "e5565425eb5798a2",
+          "hasher": "go/2"
+        },
+        "internal/reference/fsroutes_test.go": {
+          "body": "e3483aed21ffcb72",
+          "symbols": {
+            "TestAstroExtraction": "55d19f5cd0a359be",
+            "TestNextExtraction": "49ea6650876c2196",
+            "readJSON": "c2ba21d2530d7658"
+          },
+          "private": [
+            "readJSON"
+          ],
+          "raw": "624aa2691d9f6cec",
+          "hasher": "go/2"
+        },
+        "internal/reference/nest.go": {
+          "body": "13cb82fd3ba52db4",
+          "symbols": {
+            "extractNest": "abe40a9043e88fb0",
+            "nestImports": "418e4620b2a9c3cf",
+            "nestJoin": "45b6b22a0f899ab2",
+            "nestPaths": "006c64267123d5bd"
+          },
+          "private": [
+            "extractNest",
+            "nestImports",
+            "nestJoin",
+            "nestPaths"
+          ],
+          "raw": "7270100a5c553469",
+          "hasher": "go/2"
+        },
+        "internal/reference/nest_test.go": {
+          "body": "23d614f069f112ee",
+          "symbols": {
+            "TestNestExtraction": "29bc48cda71c22e7"
+          },
+          "raw": "6285a97824c5363c",
+          "hasher": "go/2"
+        },
+        "internal/reference/pyenv.go": {
+          "body": "9c26791a3599348b",
+          "symbols": {
+            "contains": "ff1822e7196e7478",
+            "envCall": "b50254727252b2ff",
+            "envFromCall": "261265cfc4521986",
+            "envFromSubscript": "483b4818d052d456",
+            "envRead": "781e95f786145fd4",
+            "extractPythonEnv": "8c11f782b15eb7fd",
+            "isSettingsClass": "25f80a73d8762893",
+            "optionalCall": "af61633125e18b15",
+            "readEnvExample": "75e0352ec3a3ea10",
+            "redactDefault": "4068a865f17a2730",
+            "settingsFields": "8b62218f48a2185f"
+          },
+          "private": [
+            "contains",
+            "envCall",
+            "envFromCall",
+            "envFromSubscript",
+            "envRead",
+            "extractPythonEnv",
+            "isSettingsClass",
+            "optionalCall",
+            "readEnvExample",
+            "redactDefault",
+            "settingsFields"
+          ],
+          "raw": "774c62d06c378fdc",
+          "hasher": "go/2"
+        },
+        "internal/reference/pyproject.go": {
+          "body": "ee2bc503263ff275",
+          "symbols": {
+            "dirOf": "d055f82835eb63ac",
+            "join": "f34ab20a62468fa8",
+            "newPyProject": "61204c2a2224cf80",
+            "nonEmpty": "d66138addda929de",
+            "pyProject": "f6387957a9357932",
+            "pyProject.importTarget": "7166421b92054065",
+            "pyProject.load": "39ada80ba95de41f",
+            "pyProject.lookup": "844f13ff046204de",
+            "pyProject.lookupDepth": "e58d22e110277b01",
+            "pyProject.moduleFile": "088a02f401422cfa",
+            "pyProject.moduleName": "9715a610c62f4176",
+            "pyProject.resolveAbsolute": "ef32031d239acca1",
+            "ref": "16f5b8afb206d21b"
+          },
+          "private": [
+            "dirOf",
+            "join",
+            "newPyProject",
+            "nonEmpty",
+            "pyProject",
+            "pyProject.importTarget",
+            "pyProject.load",
+            "pyProject.lookup",
+            "pyProject.lookupDepth",
+            "pyProject.moduleFile",
+            "pyProject.moduleName",
+            "pyProject.resolveAbsolute",
+            "ref"
+          ],
+          "raw": "4d8cd5ce01069575",
+          "hasher": "go/2"
+        },
+        "internal/reference/reference.go": {
+          "body": "30359c588b248661",
+          "symbols": {
+            "Coverage": "a4c40678d4643931",
+            "Extract": "17595d9732df58da",
+            "Report": "70504ac63e96eb8e",
+            "appendNew": "b08d8f22235162b4",
+            "crossCheckEnvExample": "b065f3ea67a592b8",
+            "nonTest": "2a254ab8c4186979"
+          },
+          "private": [
+            "appendNew",
+            "crossCheckEnvExample",
+            "nonTest"
+          ],
+          "raw": "af842c308aa7f3b4",
+          "hasher": "go/2"
+        },
+        "internal/reference/sources.go": {
+          "body": "a9c989c2226f1e54",
+          "symbols": {
+            "Sources": "09d2aa099f04de28",
+            "isTest": "0d6d36f97904bc0e"
+          },
+          "private": [
+            "isTest"
+          ],
+          "raw": "5666b4e9d7612fb2",
+          "hasher": "go/2"
+        },
+        "internal/reference/sources_test.go": {
+          "body": "3b3e5b7d528ea511",
+          "symbols": {
+            "TestSources": "d4393cefcf847a37"
+          },
+          "raw": "886919c49b0b3263",
+          "hasher": "go/2"
+        },
+        "internal/reference/testdata/django_urls.py": {
+          "body": "e86a1861c4548803",
+          "symbols": {
+            "all_outside": "3c207ac4d3cc5ce7",
+            "leaves": "716a2f9e8ddd7252",
+            "methods": "767813871d8ebb7b",
+            "module_outside": "b5428a0e4ddeb7fc",
+            "outside": "f881b6009cbb7353",
+            "walk": "066b258472351972"
+          },
+          "raw": "af7d9d4094f0cf0d",
+          "hasher": "python/293fdc02038e/2"
+        },
+        "internal/reference/testdata/express_routes.cjs": {
+          "body": "cec17aeb9d676469",
+          "symbols": {
+            "idOf": "e3b0c44298fc1c14",
+            "instrument": "e79c9b55d3b11ec2",
+            "join": "e3b0c44298fc1c14",
+            "walk": "e3b0c44298fc1c14"
+          },
+          "private": [
+            "idOf",
+            "instrument",
+            "join",
+            "walk"
+          ],
+          "raw": "316d99891eddd381",
+          "hasher": "javascript/44c892e0be05/2"
+        },
+        "internal/reference/testdata/fastapi_routes.py": {
+          "body": "02895eecafb365a9",
+          "symbols": {
+            "row": "66a02dbb956cc27c",
+            "walk": "43a0842ee20f3de2"
+          },
+          "raw": "1d05ab8562e60fca",
+          "hasher": "python/293fdc02038e/2"
+        },
+        "internal/reference/testdata/nest_routes.js": {
+          "body": "bd7e4eafd3cdef07",
+          "raw": "36e82953271d2fd3",
+          "hasher": "javascript/44c892e0be05/2"
+        }
+      }
+    },
+    "documentation/reference/support.md": {
+      "page": "7e713681950bd85e",
+      "sources": {
+        "internal/lang/golang/golang.go": {
+          "body": "0d5eaf71d6b919b9",
+          "symbols": {
+            "FileHash": "17d28befdac9e4cd",
+            "Parse": "a32a8e18f96485a1",
+            "exported": "e2f508b00a13def4",
+            "receiverName": "bcdc3bb896492522",
+            "tokens": "6cc698e2d4aabae9"
+          },
+          "private": [
+            "exported",
+            "receiverName",
+            "tokens"
+          ],
+          "raw": "c48472c68acf33a7",
+          "hasher": "go/2"
+        },
+        "internal/lang/golang/golang_test.go": {
+          "body": "04b3bb2db0dc3594",
+          "symbols": {
+            "TestHashes": "50b00ca3cc6b5cd0",
+            "TestParse": "4dd1c61961f707e3",
+            "find": "46fced9dec3a4d49"
+          },
+          "private": [
+            "find"
+          ],
+          "raw": "69b1ebd26e43de12",
+          "hasher": "go/2"
+        },
+        "internal/lang/jsts/differential_test.go": {
+          "body": "184532ec18394fae",
+          "symbols": {
+            "TestDifferentialTypeScript": "d9f23ffb70c56921",
+            "diffLines": "6bbbd0bc0dd970a2",
+            "longestLine": "640154a45693c7ea"
+          },
+          "private": [
+            "diffLines",
+            "longestLine"
+          ],
+          "raw": "ecc0f94c722301e0",
+          "hasher": "go/2"
+        },
+        "internal/lang/jsts/jsts.go": {
+          "body": "17b103a8920329e7",
+          "symbols": {
+            "File": "8442aa3a791e7b28",
+            "Grammar": "4ab6dcbf94d52f01",
+            "Parse": "fef720f8ecb9a975",
+            "exportedNames": "0cff68d5c70ef2a4",
+            "extractor": "c40dae5267316364",
+            "extractor.declaration": "a9384dc79dff7798",
+            "extractor.memberPrivate": "9b8e392c98324e11",
+            "extractor.node": "af934d836047f574",
+            "extractor.parentPrivate": "40b8e8cfac902095",
+            "extractor.symbol": "95fff261dc2fe476",
+            "extractor.text": "3832ed1878dd3035",
+            "extractor.visit": "343ee80af3bfa86e",
+            "isFunction": "4c5d661f25907fa4",
+            "isLogging": "83b1a3f7b9e96ea1",
+            "memberBodies": "603f5cc7c8981b68",
+            "memberSpan": "7ddf5c9bcfda68ca",
+            "scope": "deb2f638dfa646f5",
+            "tokens": "c48bd4b8ae02798f"
+          },
+          "private": [
+            "exportedNames",
+            "extractor",
+            "extractor.declaration",
+            "extractor.memberPrivate",
+            "extractor.node",
+            "extractor.parentPrivate",
+            "extractor.symbol",
+            "extractor.text",
+            "extractor.visit",
+            "isFunction",
+            "isLogging",
+            "memberBodies",
+            "memberSpan",
+            "scope",
+            "tokens"
+          ],
+          "raw": "d34062ce59300168",
+          "hasher": "go/2"
+        },
+        "internal/lang/jsts/jsts_test.go": {
+          "body": "65a5d571d76b4d84",
+          "symbols": {
+            "TestHashes": "50b00ca3cc6b5cd0",
+            "TestJavaScriptCommonJSExports": "c205e54f2a08bc3f",
+            "TestParseSymbols": "c6737c2a595079e0",
+            "parseOne": "8c11831f28f69b54",
+            "symbol": "22fc767fe99fa2f5"
+          },
+          "private": [
+            "parseOne",
+            "symbol"
+          ],
+          "raw": "118d461f57bb6644",
+          "hasher": "go/2"
+        },
+        "internal/lang/jsts/module.go": {
+          "body": "6d5272a49eaec623",
+          "symbols": {
+            "Array": "7213db44280d289b",
+            "Array.Text": "53a32a0fc4b0a5c0",
+            "Call": "2acdb0ebb4b12507",
+            "Call.Arg": "9efb9fa0cc77500e",
+            "Call.CalleeName": "38475357d1e33e43",
+            "Call.Text": "2f3ba1efb84831e6",
+            "Class": "ed7179edd3954603",
+            "Expr": "32d24960751fc03e",
+            "Func": "edc5b1d6305339d0",
+            "Func.Text": "5d2a93a482685f01",
+            "Import": "940d7d6452e4af84",
+            "Member": "f9bfff54bcf5028f",
+            "Member.Text": "db0ab0df6ad6ee14",
+            "Method": "6581a56b1b368832",
+            "Module": "58e611093188a19b",
+            "Name": "34eb4103aa90cdb6",
+            "Name.Text": "2638c021a0cd5fd8",
+            "Opaque": "4747befabb84ed39",
+            "Opaque.Text": "12f30aaa3da4a4c6",
+            "ParseModule": "b1feeff1c5886ce1",
+            "Str": "2bc4102bdab99b8c",
+            "Str.Text": "5644493fb3d5fe36",
+            "isDefault": "b4bb0c8bfe87dfdd",
+            "moduleBuilder": "409377fe7ddeede7",
+            "moduleBuilder.assignment": "c12fe0cf5950d444",
+            "moduleBuilder.class": "0eb64799f25753d8",
+            "moduleBuilder.declaration": "c1ef608245b7e76c",
+            "moduleBuilder.decorator": "da42c97bf7f6eaa6",
+            "moduleBuilder.export": "de5c35c3427d58c9",
+            "moduleBuilder.expr": "192c7fbeac016d5b",
+            "moduleBuilder.importStatement": "d0f8e82c5baf608b",
+            "moduleBuilder.requireBinding": "a98df7f9d4462531",
+            "moduleBuilder.statement": "b73d15c0e8e62937",
+            "moduleBuilder.text": "73f6e983aaf26bcc",
+            "stringValue": "7bf0f462a4aa8f9e"
+          },
+          "private": [
+            "isDefault",
+            "moduleBuilder",
+            "moduleBuilder.assignment",
+            "moduleBuilder.class",
+            "moduleBuilder.declaration",
+            "moduleBuilder.decorator",
+            "moduleBuilder.export",
+            "moduleBuilder.expr",
+            "moduleBuilder.importStatement",
+            "moduleBuilder.requireBinding",
+            "moduleBuilder.statement",
+            "moduleBuilder.text",
+            "stringValue"
+          ],
+          "raw": "3987806262983d80",
+          "hasher": "go/2"
+        },
+        "internal/lang/jsts/module_test.go": {
+          "body": "13b1facdda6a0c2e",
+          "symbols": {
+            "TestParseModule": "fbc19a7d91363b65",
+            "TestParseModuleNestDecorators": "ccb8f32f823b5eda"
+          },
+          "raw": "e59c8ff1c362e5d1",
+          "hasher": "go/2"
+        },
+        "internal/lang/jsts/testdata/ts_symbols.js": {
+          "body": "7290dd678c1965af",
+          "symbols": {
+            "dump": "4b8916620062892f",
+            "dump.add": "e3b0c44298fc1c14",
+            "dump.line": "e3b0c44298fc1c14",
+            "dump.nameOf": "e3b0c44298fc1c14",
+            "dump.visit": "43bb782658f330ac",
+            "ext": "82058b20b8b6a7fc",
+            "isFunctionLike": "5dbe35ddcc7d19cf"
+          },
+          "private": [
+            "dump",
+            "dump.add",
+            "dump.line",
+            "dump.nameOf",
+            "dump.visit",
+            "ext",
+            "isFunctionLike"
+          ],
+          "raw": "00890d2b6acc9675",
+          "hasher": "javascript/44c892e0be05/2"
+        },
+        "internal/lang/lang.go": {
+          "body": "83757831f6c46b69",
+          "symbols": {
+            "Hash": "5e0b620c61a1580e",
+            "Symbol": "2b6fb01d6f3bc321"
+          },
+          "raw": "ca6b23cf8eff8c36",
+          "hasher": "go/2"
+        },
+        "internal/lang/python/differential_test.go": {
+          "body": "366b15a783aca0af",
+          "symbols": {
+            "TestDifferentialCPython": "49cfe6c74017d341",
+            "cpythonSymbols": "12327988f019e3ec",
+            "diffSymbols": "6c1d63576f45f126",
+            "expandHome": "f8b41f1df9563f28",
+            "fmtSym": "221eb609eaec7643",
+            "ourSymbols": "b1610c811ec22978",
+            "refSym": "cee257f9cc62a807",
+            "sortSyms": "c11ebbf809e0b476"
+          },
+          "private": [
+            "cpythonSymbols",
+            "diffSymbols",
+            "expandHome",
+            "fmtSym",
+            "ourSymbols",
+            "refSym",
+            "sortSyms"
+          ],
+          "raw": "50710f7acff6ab7d",
+          "hasher": "go/2"
+        },
+        "internal/lang/python/expr.go": {
+          "body": "9a264a41bfc7871d",
+          "symbols": {
+            "Attr": "6ba5fea4dd9b0f11",
+            "Attr.Text": "d7f615ba1eed125c",
+            "BinOp": "bdc44b737932f0b7",
+            "BinOp.Text": "45b7d3f65cd3ba74",
+            "Call": "c8564cb8f1e09add",
+            "Call.Arg": "e581a19fe8a722e0",
+            "Call.FuncName": "905967f1d5822f1d",
+            "Call.Kw": "c68b051ad8a66ad8",
+            "Call.Text": "2f3ba1efb84831e6",
+            "Cond": "dc0220d4aec25b94",
+            "Cond.Text": "c8f743837083b154",
+            "Dotted": "2f8873cc77569413",
+            "Dotted.Text": "ef54ff96a7b1cc25",
+            "Expr": "32d24960751fc03e",
+            "Kwarg": "4689541b24df5b1e",
+            "Opaque": "4747befabb84ed39",
+            "Opaque.Text": "12f30aaa3da4a4c6",
+            "Seq": "b1d4578a1abcfea2",
+            "Seq.Text": "e8aa61fb272f218a",
+            "Starred": "faa57fbd000cf907",
+            "Starred.Text": "2e209d552922eff0",
+            "Str": "fab166702e24f965",
+            "Str.Text": "5644493fb3d5fe36",
+            "call": "0b00da7a4895c03e",
+            "expr": "8089a36cbdbe5196",
+            "named": "e57b6fe95b98e218",
+            "oneLine": "54a7e90ee7c9b419",
+            "str": "aa7e1c00bdbebfa9",
+            "unescape": "ab3bf87fd9661766"
+          },
+          "private": [
+            "call",
+            "expr",
+            "named",
+            "oneLine",
+            "str",
+            "unescape"
+          ],
+          "raw": "30a9113078684db8",
+          "hasher": "go/2"
+        },
+        "internal/lang/python/module.go": {
+          "body": "2bc8d3d05de124a8",
+          "symbols": {
+            "Assign": "092f864d9aaf1615",
+            "CallStmt": "de868ff39b66bf38",
+            "Class": "c6eedcc8602657a0",
+            "Func": "d17d4e514377015d",
+            "Import": "19b67ad12cbe4a11",
+            "Module": "fa74bf9a4bb03594",
+            "ParseModule": "7812141a1a8d03e8",
+            "Subscript": "27d3d1316344b95e",
+            "firstNamed": "9f42e02ba62bda11",
+            "moduleBuilder": "409377fe7ddeede7",
+            "moduleBuilder.class": "f9feb775d4cf2ad1",
+            "moduleBuilder.expressionStatement": "07d575c930337c04",
+            "moduleBuilder.function": "145895282ce98fa0",
+            "moduleBuilder.imports": "f85de5810f41b93b",
+            "moduleBuilder.nested": "f0240ec185e9bbfe",
+            "moduleBuilder.statements": "4a85079346fc8f2f"
+          },
+          "private": [
+            "firstNamed",
+            "moduleBuilder",
+            "moduleBuilder.class",
+            "moduleBuilder.expressionStatement",
+            "moduleBuilder.function",
+            "moduleBuilder.imports",
+            "moduleBuilder.nested",
+            "moduleBuilder.statements"
+          ],
+          "raw": "7c1b3f6f59ddcc1d",
+          "hasher": "go/2"
+        },
+        "internal/lang/python/module_test.go": {
+          "body": "fc433d5daae85999",
+          "symbols": {
+            "TestAnnotatedAssignments": "734bf84f7ca7e3cf",
+            "TestParseModule": "fbc19a7d91363b65",
+            "TestStrings": "fa7e7f8d8d68b595"
+          },
+          "raw": "a3a828b1d86a40e3",
+          "hasher": "go/2"
+        },
+        "internal/lang/python/parse_test.go": {
+          "body": "5fd997a4cf15b7ad",
+          "symbols": {
+            "TestClassBodyIsItsInterface": "c30419b788399f60",
+            "TestDocstringsAndLoggingAreIgnored": "de1e1582e3082f3b",
+            "TestHashesIgnoreFormattingAndComments": "0442106f5465be01",
+            "TestHashesSeeBlockStructure": "3982991ed7b97a7a",
+            "TestHashesSeparateSurfaceFromBody": "c7956de34a21137a",
+            "TestParseFStringBackslashBrace": "2f1fe920c8bb9707",
+            "TestParseFStringNestedQuotes": "dfd4170806856a14",
+            "TestParseMultilineHeaderInBlock": "77692ed52283f107",
+            "TestParseNeverPanicsOnMalformedInput": "3dea03c615439fe0",
+            "TestParseStructure": "2a684df9ec586394",
+            "TestTrailingCommasAreFormatting": "0b60f3dfb5348d9f",
+            "find": "5e617bffcb2f4035"
+          },
+          "private": [
+            "find"
+          ],
+          "raw": "058bc44417bbfd82",
+          "hasher": "go/2"
+        },
+        "internal/lang/python/symbols.go": {
+          "body": "28f7c397475d735a",
+          "symbols": {
+            "File": "8442aa3a791e7b28",
+            "FileHash": "5afaefb2fd611e52",
+            "Parse": "5cf8f956ee183ceb",
+            "ParseFile": "4ce4a4a0d30c7c46",
+            "extractor": "62f775aa6499504d",
+            "extractor.block": "7e958483ef1e5ec9",
+            "extractor.definition": "b1259860df06d46a",
+            "ignorable": "f14943f99936b7f5",
+            "keywordRow": "c4e3b276c7e2b5a5",
+            "lastCodeRow": "dc33f6ee011a5503",
+            "memberBodies": "54567be7030fd6cf",
+            "privateQual": "faa2e3952464b599",
+            "qualOf": "00de8ce3f2c138d8",
+            "scope": "deb2f638dfa646f5",
+            "tokens": "c48bd4b8ae02798f"
+          },
+          "private": [
+            "extractor",
+            "extractor.block",
+            "extractor.definition",
+            "ignorable",
+            "keywordRow",
+            "lastCodeRow",
+            "memberBodies",
+            "privateQual",
+            "qualOf",
+            "scope",
+            "tokens"
+          ],
+          "raw": "079fc1abc785b80f",
+          "hasher": "go/2"
+        },
+        "internal/lang/python/testdata/ast_symbols.py": {
+          "body": "ac66f25151d3ea20",
+          "symbols": {
+            "main": "ce70d14f9fe7942c",
+            "visit": "b17fd7cb15849b10"
+          },
+          "raw": "aee77c0c187c7303",
+          "hasher": "python/293fdc02038e/2"
+        },
         "internal/reference/cobra.go": {
           "body": "eda87f27b8322b6b",
           "symbols": {

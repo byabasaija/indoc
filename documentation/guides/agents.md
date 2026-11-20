@@ -46,8 +46,8 @@ On first use the plugin's launcher downloads the indoc release matching the plug
 1. Scans the project: frameworks, entry points, real commands, existing Markdown, and images that look like a logo.
 2. Asks which existing Markdown to publish, if there is any.
 3. Asks whether the docs' readers can open the repository, and only then turns on links to the code.
-4. Asks which logo to use, offering the candidates it found (and warning when one is a tall lockup that will be unreadable in the header), or asks you for one. `indoc_setup` checks the file exists before writing it to the config (`internal/cli/mcp.go::setLogo`).
-5. Proposes the readers and an outline, each page labeled as a tutorial, how-to, reference, or explanation and placed in a section folder (get started, guides, reference, concepts), with a landing page, and waits for your approval.
+4. Asks which logo to use, offering the candidates it found (and warning when one is a tall lockup that will be unreadable in the header), or asks you for one. If the project has none, it offers to design a simple square SVG mark and shows it to you before using it. `indoc_setup` checks the file exists before writing it to the config (`internal/cli/mcp.go::setLogo`).
+5. Proposes the readers and an outline, each page labeled as a tutorial, how-to, reference, or explanation and placed in a section folder (get started, guides, reference, concepts), with a landing page, and waits for your approval. Each question is one decision; the outline is shown inside the approval question, so you always see what you approve.
 6. Writes the pages with citations, builds the site, and runs the check.
 
 When a repository already has Markdown, `indoc_scan` lists it and publishes nothing (`internal/cli/mcp.go::setup`); the agent asks you which files to publish and passes them to `indoc_setup`. Each tool takes an optional `root`; otherwise it uses `CLAUDE_PROJECT_DIR` or the directory the server started in.

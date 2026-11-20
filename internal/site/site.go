@@ -94,6 +94,7 @@ type built struct {
 	Dir       string // the section folder the page belongs to; a folder's own page belongs to that folder
 	HTML      template.HTML
 	Headings  []doc.Heading
+	HasTitle  bool // the Markdown has its own level-1 heading
 	Text      string
 	Reference *doc.RefSection
 	mermaid   bool
@@ -327,6 +328,12 @@ func (b *builder) render() error {
 			return fmt.Errorf("%s: %w", p.Source, err)
 		}
 		p.HTML, p.Headings, p.Text, p.mermaid = template.HTML(res.HTML), res.Headings, res.Text, res.UsesMermaid
+		for _, h := range res.Headings {
+			if h.Level == 1 {
+				p.HasTitle = true
+				break
+			}
+		}
 		b.mermaid = b.mermaid || res.UsesMermaid
 		if p.Layout == "landing" {
 			if err := b.renderSections(p); err != nil {

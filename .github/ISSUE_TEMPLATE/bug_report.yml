@@ -1,0 +1,54 @@
+name: Bug report
+description: indoc crashed, printed an error, or built a broken site.
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for reporting. If `indoc check` passed or failed when it shouldn't have, use **Wrong check result** instead.
+  - type: input
+    id: version
+    attributes:
+      label: indoc version
+      description: Output of `indoc version`.
+      placeholder: "indoc 0.8.1 (commit: …)"
+    validations:
+      required: true
+  - type: dropdown
+    id: how
+    attributes:
+      label: How you ran it
+      options:
+        - Command line
+        - Claude Code plugin
+        - Copilot CLI plugin
+        - GitHub Action
+        - Other
+    validations:
+      required: true
+  - type: input
+    id: os
+    attributes:
+      label: Operating system
+      placeholder: macOS 15 (arm64), Ubuntu 24.04, Windows 11
+    validations:
+      required: true
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened
+      description: The command you ran and its full output. Paste text, not a screenshot.
+      render: console
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: What you expected
+    validations:
+      required: true
+  - type: textarea
+    id: repro
+    attributes:
+      label: How to reproduce
+      description: A public repository, or the smallest files that show it (a page, the code it cites, `.indoc/config.yaml`).

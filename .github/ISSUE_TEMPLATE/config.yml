@@ -1,0 +1,8 @@
+blank_issues_enabled: true
+contact_links:
+  - name: Documentation
+    url: https://byabasaija.github.io/indoc/
+    about: How to write pages, check them in CI, customize and publish the site.
+  - name: Questions and ideas
+    url: https://github.com/byabasaija/indoc/discussions
+    about: Ask how to do something, show what you built, or propose an idea before it becomes an issue.

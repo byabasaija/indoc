@@ -162,6 +162,9 @@
       {{.Page.HTML}}
       {{- with .Page.Reference}}{{template "reference" .}}{{end}}
       {{- else}}
+      {{- if and (not .Page.HasTitle) (not .Landing)}}
+      <h1>{{.Page.Title}}</h1>
+      {{- end}}
       {{.Page.HTML}}
       {{- end}}
     </article>

@@ -1,0 +1,56 @@
+name: Wrong check result
+description: indoc check flagged a change that doesn't matter, or missed one that does.
+labels: [accuracy]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        These reports tune indoc's rules, so the code change and the page matter more than anything else.
+  - type: dropdown
+    id: kind
+    attributes:
+      label: What went wrong
+      options:
+        - Failed when the docs were still correct (false alarm)
+        - Passed when the docs were wrong (missed change)
+        - Reported the wrong kind (stale vs drift)
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: indoc version
+      description: Output of `indoc version`.
+    validations:
+      required: true
+  - type: textarea
+    id: report
+    attributes:
+      label: The check output
+      description: The full output of `indoc check`.
+      render: console
+    validations:
+      required: true
+  - type: textarea
+    id: diff
+    attributes:
+      label: The code change
+      description: The diff of the cited code (`git diff <before>..<after> -- path/to/file`).
+      render: diff
+    validations:
+      required: true
+  - type: textarea
+    id: page
+    attributes:
+      label: The page
+      description: The page's frontmatter and the sentence that cites the code.
+      render: markdown
+    validations:
+      required: true
+  - type: textarea
+    id: why
+    attributes:
+      label: Why it's wrong
+      description: For a false alarm, why the page still holds. For a missed change, what the page now gets wrong.
+    validations:
+      required: true
